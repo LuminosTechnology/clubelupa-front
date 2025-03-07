@@ -4,6 +4,7 @@ export const MapWrapper = styled.div`
   width: 100%;
   height: calc(100vh - 103.9px);
   position: relative;
+  margin-top: -35px;
   z-index: 0;
 `;
 
@@ -14,7 +15,7 @@ export const MapContainer = styled.div`
 
 export const RestaurantCard = styled.div`
   position: absolute;
-  transform: translateY(-200px); // Move card above marker
+  transform: translateY(-530px);
   left: 20px;
   right: 20px;
   height: 100px;

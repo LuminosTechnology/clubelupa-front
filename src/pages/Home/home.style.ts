@@ -51,3 +51,32 @@ export const ErrorMessage = styled.div`
   width: 100%;
   text-align: left;
 `;
+
+export const UserDataContainer = styled.div`
+  padding: 20px;
+  background-color: white;
+  border-radius: 10px;
+  margin: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  h2 {
+    color: #333;
+    margin-bottom: 15px;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+      color: #666;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+`;

@@ -1,6 +1,6 @@
 import api from "./api";
 import { Preferences } from "@capacitor/preferences";
-import { ForgotPasswordRequest, LoginUserRequest, LoginUserResponse, ResetPasswordRequest } from "./interfaces/Auth";
+import { ForgotPasswordRequest, LoginUserRequest, LoginUserResponse, ResetPasswordRequest, User } from "./interfaces/Auth";
 
 const AUTH_TOKEN_KEY = "auth_token";
 
@@ -60,4 +60,38 @@ export const resetPassword = async (data: ResetPasswordRequest) => {
   const response = await api.post("/reset-password", data);
   console.log("[Auth Service] Password reset response:", response.data);
   return response.data;
+};
+
+export const getUserByToken = async (): Promise<User> => {
+  console.log("[Auth Service] Fetching user data by token");
+  const token = await getToken();
+  
+  if (!token) {
+    console.error("[Auth Service] Token not found, cannot fetch user data");
+    throw new Error("Authentication token not found");
+  }
+
+  const response = await api.get<{ user: User }>("/user-by-token", {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  
+  console.log("[Auth Service] Retrieved user data:", response.data.user);
+  return response.data.user;
+};
+
+export const updateUserProfile = async (userData: Partial<User>): Promise<User> => {
+  console.log("[Auth Service] Updating user profile with data:", userData);
+  const token = await getToken();
+  
+  if (!token) {
+    console.error("[Auth Service] Token not found, cannot update profile");
+    throw new Error("Authentication token not found");
+  }
+
+  const response = await api.put<{ user: User }>("/profile", userData, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  
+  console.log("[Auth Service] Profile update response:", response.data.user);
+  return response.data.user;
 };

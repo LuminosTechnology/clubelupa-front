@@ -56,6 +56,24 @@ const Map: React.FC<MapProps> = ({ apiKey }) => {
       hours: 'Aberto agora • Fecha às 23:00',
       image: 'https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060',
       location: { lat: -25.48479, lng: -49.30285 }
+    },
+    {
+      id: '2',
+      name: 'Restaurante Exemplo',
+      address: 'Rua Exemplo, 123',
+      distance: '2.5 km',
+      hours: 'Aberto agora • Fecha às 23:00',
+      image: 'https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060',
+      location: { lat: -25.48469, lng: -49.3385 }
+    },
+    {
+      id: '3',
+      name: 'Restaurante Exemplo',
+      address: 'Rua Exemplo, 123',
+      distance: '2.5 km',
+      hours: 'Aberto agora • Fecha às 23:00',
+      image: 'https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060',
+      location: { lat: -25.49469, lng: -49.4585 }
     }
   ];
 
@@ -65,6 +83,7 @@ const Map: React.FC<MapProps> = ({ apiKey }) => {
 
       const mapElement = document.getElementById('map');
       if (!mapElement) return;
+
 
       const newMap = await GoogleMap.create({
         id: 'map-1',
@@ -83,6 +102,10 @@ const Map: React.FC<MapProps> = ({ apiKey }) => {
           disableDefaultUI: true,
           clickableIcons: false
         }
+      });
+
+      await newMap.setOnCameraMoveStartedListener(() => {
+        setSelectedRestaurant(null);
       });
 
       // Add markers

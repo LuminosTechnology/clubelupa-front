@@ -14,6 +14,10 @@
   --ion-color-secondary: #E6C178;
   --ion-color-tertiary: #E0A075;
 
+  --orange: #E0A075;
+  --green: #9FA369;
+  --yellow: #E6C178;
+
   /* Typography */
   --ion-font-family: 'Karla', sans-serif;
   --ion-default-font-size: 16px;

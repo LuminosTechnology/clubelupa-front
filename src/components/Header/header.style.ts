@@ -1,18 +1,30 @@
 import styled from 'styled-components';
-
 export const HeaderContainer = styled.div<{ $bgColor: string }>`
   height: 138.9px;
   width: 100%;
-  /* background-color: ${({ $bgColor }) => $bgColor}; */
   background-color: #F0F0EF;
+  border-bottom-left-radius: 35px;
+  border-bottom-right-radius: 35px;
   padding: 30px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  /* border-bottom-left-radius: 35px;
-  border-bottom-right-radius: 35px; */
+  position: relative;
+  z-index: 2;
   box-shadow: 0px -3px 10px 0px #00000080;
-  z-index: 1;
+
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 35px;
+    background-color: #F0F0EF;
+    border-bottom-left-radius: 35px;
+    border-bottom-right-radius: 35px;
+  }
 `;
 
 export const SearchContainer = styled.div`
