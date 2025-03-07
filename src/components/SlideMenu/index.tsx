@@ -11,6 +11,7 @@ import {
 } from './SlideMenu.style';
 import { useHistory, useLocation } from 'react-router-dom';
 import { logout } from '../../services/auth-service';
+import { Preferences } from '@capacitor/preferences';
 
 interface SlideMenuProps {
   isOpen: boolean;
@@ -28,16 +29,27 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
   }, [location.pathname]);
 
   const handleLogout = async () => {
-    await logout();
-    onClose();
-    history.push('/login');
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      await Preferences.remove({ key: 'auth_token' });
+      onClose();
+      history.replace('/login');
+    }
   };
 
   const menuItems = [
-    { label: 'Início', path: '/home' },
     { label: 'Perfil', path: '/profile' },
-    { label: 'Configurações', path: '/settings' },
-    // Add more menu items as needed
+    { label: 'Afiliados', path: '/home' },
+    { label: 'Meus Cupons', path: '/home' },
+    { label: 'Troca de LupaCoins', path: '/home' },
+    { label: 'Meu Plano', path: '/home' },
+    { label: 'Meus Favoritos', path: '/home' },
+    { label: 'Histórico', path: '/home' },
+    { label: 'Indique e Ganhe', path: '/home' },
+    { label: 'Seja um Afiliado', path: '/home' },
   ];
 
   return (
@@ -45,7 +57,7 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
       <MenuOverlay $isOpen={isOpen} onClick={onClose} />
       <MenuContainer $isOpen={isOpen}>
         <CloseButton onClick={onClose}>
-          <IonIcon icon={close} />
+          <IonIcon icon={close} style={{ width: '25px', height: '25px' }} />
         </CloseButton>
 
         <MenuItems>
@@ -64,7 +76,7 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
 
         <LogoutButton onClick={handleLogout}>
           Desconectar
-          <IonIcon icon={logOut} style={{ width: '28px' }} />
+          <IonIcon icon={logOut} style={{ width: '25px', height: '25px', marginLeft: '10px', marginRight: '2px' }} />
         </LogoutButton>
       </MenuContainer>
     </>

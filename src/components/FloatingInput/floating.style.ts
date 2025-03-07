@@ -57,11 +57,27 @@ export const Input = styled.input`
 
   &:-webkit-autofill,
   &:-webkit-autofill:hover,
-  &:-webkit-autofill:focus {
-    -webkit-text-fill-color: white;
-    -webkit-box-shadow: 0 0 0px 1000px transparent inset;
+  &:-webkit-autofill:focus,
+  &:-webkit-autofill:active {
+    -webkit-text-fill-color: white !important;
+    -webkit-box-shadow: 0 0 0 30px transparent inset !important;
     transition: background-color 5000s ease-in-out 0s;
-    background-clip: content-box;
+    background-clip: content-box !important;
+    caret-color: white;
+    border-bottom: 1px solid white;
+  }
+
+  &:-webkit-autofill::first-line {
+    font-size: 16px;
+    font-weight: 700;
+    font-family: inherit;
+  }
+
+  &.error:-webkit-autofill,
+  &.error:-webkit-autofill:hover,
+  &.error:-webkit-autofill:focus,
+  &.error:-webkit-autofill:active {
+    border-bottom-color: #ff4646;
   }
 
   &.error {

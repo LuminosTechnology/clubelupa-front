@@ -21,7 +21,7 @@ export const MenuContainer = styled.div<{ $isOpen: boolean }>`
   height: 100%;
   background-color: var(--ion-color-tertiary);
   z-index: 1000;
-  padding: 50px;
+  padding: 55px;
   border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
   transition: right 0.3s ease;
@@ -42,23 +42,31 @@ export const MenuItems = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
-  margin-top: 50px;
+  margin-top: 150px;
 `;
 
 export const MenuItem = styled.button`
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid white;
   color: white;
-  padding: 20px 0;
+  padding: 12px 0;
+  padding-left: 12px;
   font-size: 16px;
+  font-weight: 700;
   font-family: 'Karla', sans-serif;
   cursor: pointer;
   text-align: center;
   transition: opacity 0.2s ease;
+  width: 100%;
+  text-align: left;
 
   &:hover {
     opacity: 0.8;
+  }
+
+  &:last-child {
+    border-bottom: none;
   }
 `;
 
