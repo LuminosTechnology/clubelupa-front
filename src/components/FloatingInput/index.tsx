@@ -61,6 +61,7 @@ const FloatingInput: React.FC<FloatingInputProps> = ({
           <Input
             as={InputMask}
             mask={mask}
+            maskChar={null}
             value={value}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
             onFocus={() => setIsFocused(true)}

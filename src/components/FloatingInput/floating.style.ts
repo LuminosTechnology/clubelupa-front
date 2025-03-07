@@ -43,6 +43,7 @@ export const Input = styled.input`
   border-bottom: 1px solid white;
   background: transparent;
   color: white;
+  font-weight: 700;
   font-size: 16px;
   outline: none;
 

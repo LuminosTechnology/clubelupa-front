@@ -36,10 +36,10 @@ const Home: React.FC = () => {
     <IonPage>
       <Header backgroundColor="var(--ion-color-primary)" />
       <IonContent>
-        <Map
+        {/* <Map
           apiKey={GOOGLE_MAPS_API_KEY}
           aria-label="Teste"
-        />
+        /> */}
       </IonContent>
     </IonPage>
   );
