@@ -1,2 +1,49 @@
-/* For information on how to create your own theme, please see:
-http://ionicframework.com/docs/theming/ */
+@import url('https://fonts.googleapis.com/css2?family=Karla:wght@400;500;600;700&display=swap');
+
+:root {
+  --ion-safe-area-top: env(safe-area-inset-top);
+  --ion-safe-area-bottom: env(safe-area-inset-bottom);
+  --ion-toolbar-padding-top: var(--ion-safe-area-top);
+
+  /* Custom global variables */
+  --app-background-color: #ffffff;
+  --app-text-color: #000000;
+
+  /* Theme Colors */
+  --ion-color-primary: #9FA369;
+  --ion-color-secondary: #E6C178;
+  --ion-color-tertiary: #E0A075;
+
+  /* Typography */
+  --ion-font-family: 'Karla', sans-serif;
+  --ion-default-font-size: 16px;
+  --ion-font-weight-normal: 400;
+}
+
+/* Global styles */
+* {
+  font-family: var(--ion-font-family);
+  font-size: var(--ion-default-font-size);
+  font-weight: var(--ion-font-weight-normal);
+}
+
+ion-content {
+  --padding-top: var(--ion-safe-area-top);
+}
+
+ion-header {
+  position: relative;
+}
+
+ion-toolbar {
+  --min-height: 56px;
+  --padding-top: var(--ion-safe-area-top);
+}
+
+body {
+  overflow: hidden;
+}
+
+ion-content {
+  --overflow: hidden;
+}
