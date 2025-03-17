@@ -15,24 +15,33 @@ export const MapContainer = styled.div`
 
 export const RestaurantCard = styled.div`
   position: absolute;
-  transform: translateY(-530px);
-  left: 20px;
-  right: 20px;
-  height: 100px;
+  top: 29%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 280px;
   background: white;
   border-radius: 12px;
   padding: 12px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 12px;
 `;
 
+export const CloseButton = styled.button`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: #666;
+`;
+
 export const RestaurantInfo = styled.div`
-  flex: 1;
   display: flex;
   gap: 12px;
-  height: 100%;
 `;
 
 export const RestaurantImage = styled.img`
@@ -84,4 +93,32 @@ export const ViewMoreButton = styled.button`
   &:hover {
     opacity: 0.9;
   }
+`;
+
+export const CheckInButton = styled.button`
+  background-color:  --ion-color-secondary;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #7A834A;
+  }
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+`;
+
+export const CheckInMessage = styled.p`
+  color: #ff4646;
+  font-size: 14px;
+  text-align: center;
+  margin: 0;
 `;
