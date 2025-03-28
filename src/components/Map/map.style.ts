@@ -18,7 +18,8 @@ export const RestaurantCard = styled.div`
   top: 29%;
   left: 50%;
   transform: translate(-50%, -50%);
-  max-width: 280px;
+  max-width: 400px;
+  min-width: 300px;
   background: white;
   border-radius: 12px;
   padding: 12px;

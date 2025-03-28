@@ -113,9 +113,26 @@ const Map: React.FC<MapProps> = ({ apiKey }) => {
         config: {
           center: location,
           zoom: 15,
-          styles: isDayTime() ? dayTheme : nightTheme,
+          mapId: isDayTime() ? '6c69da475e7f7301' : '8e0a97af9386fef',
           disableDefaultUI: true,
-          clickableIcons: false
+          clickableIcons: false,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+          zoomControl: false,
+          mapTypeId: 'roadmap',
+          tilt: 45,
+          maxZoom: 18,
+          minZoom: 12,
+          restriction: {
+            latLngBounds: {
+              north: location.lat + 0.1,
+              south: location.lat - 0.1,
+              east: location.lng + 0.1,
+              west: location.lng - 0.1,
+            },
+            strictBounds: true
+          }
         }
       });
 
