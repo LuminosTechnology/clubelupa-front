@@ -24,6 +24,14 @@ export const register = async (data: any) => {
   return response;
 };
 
+/* Adicionando a função para cadastro de afiliado na rota /afiliados/cadastro */
+export const registerAffiliate = async (data: any) => {
+  console.log("[Auth Service] Attempting affiliate registration with data:", data);
+  const response = await api.post("/afiliados/cadastro", data);
+  console.log("[Auth Service] Registration response:", response.data);
+  return response;
+};
+
 export const logout = async () => {
   console.log("[Auth Service] Attempting logout");
   const token = await getToken();

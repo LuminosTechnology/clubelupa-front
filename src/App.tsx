@@ -32,6 +32,8 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import RegisterSuccess from "./pages/Register/RegisterSuccess";
 import ForgotPassword from "./pages/ForgotPassword";
 import ChangePassword from "./pages/ForgotPassword/ChangePassword";
+import AffiliateRegister from "./pages/AffiliateRegister/AffiliateRegister";
+import AffiliateRegisterSuccess from "./pages/AffiliateRegister/AffiliateRegisterSuccess";
 
 setupIonicReact();
 
@@ -74,6 +76,8 @@ const App: React.FC = () => {
             render={() => (isAuthenticated ? <Redirect to="/home" /> : <Login />)}
           />
           <Route exact path="/register" component={Register} />
+          <Route exact path="/affiliate-register" component={AffiliateRegister} />
+          <Route exact path="/affiliate-register-success" component={AffiliateRegisterSuccess} />
           <Route exact path="/register-success" component={RegisterSuccess} />
           <Route exact path="/forgot-password" component={ForgotPassword} />
           <Route exact path="/change-password" component={ChangePassword} />
