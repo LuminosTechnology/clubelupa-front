@@ -24,7 +24,6 @@ export const register = async (data: any) => {
   return response;
 };
 
-/* Adicionando a função para cadastro de afiliado na rota /afiliados/cadastro */
 export const registerAffiliate = async (data: any) => {
   console.log("[Auth Service] Attempting affiliate registration with data:", data);
   const response = await api.post("/afiliados/cadastro", data);
@@ -73,16 +72,13 @@ export const resetPassword = async (data: ResetPasswordRequest) => {
 export const getUserByToken = async (): Promise<User> => {
   console.log("[Auth Service] Fetching user data by token");
   const token = await getToken();
-  
   if (!token) {
     console.error("[Auth Service] Token not found, cannot fetch user data");
     throw new Error("Authentication token not found");
   }
-
   const response = await api.get<{ user: User }>("/user-by-token", {
     headers: { Authorization: `Bearer ${token}` }
   });
-  
   console.log("[Auth Service] Retrieved user data:", response.data.user);
   return response.data.user;
 };
@@ -90,16 +86,32 @@ export const getUserByToken = async (): Promise<User> => {
 export const updateUserProfile = async (userData: Partial<User>): Promise<User> => {
   console.log("[Auth Service] Updating user profile with data:", userData);
   const token = await getToken();
-  
   if (!token) {
     console.error("[Auth Service] Token not found, cannot update profile");
     throw new Error("Authentication token not found");
   }
-
   const response = await api.put<{ user: User }>("/profile", userData, {
     headers: { Authorization: `Bearer ${token}` }
   });
-  
   console.log("[Auth Service] Profile update response:", response.data.user);
   return response.data.user;
+};
+
+export const updateProfilePhoto = async (file: File): Promise<string> => {
+  console.log("[Auth Service] Updating profile photo");
+  const token = await getToken();
+  if (!token) {
+    console.error("[Auth Service] Token not found, cannot update profile photo");
+    throw new Error("Authentication token not found");
+  }
+  const formData = new FormData();
+  formData.append("profile_photo", file);
+  const response = await api.post<{ url: string }>("/profile/photo", formData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data"
+    }
+  });
+  console.log("[Auth Service] Profile photo update response:", response.data);
+  return response.data.url;
 };

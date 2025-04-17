@@ -12,17 +12,24 @@ import {
   Name,
   SubInfo,
   Option,
+  OptionIcon,
   Divider,
+  LogoutContainer,
 } from './AffiliateArea.style';
 
 import { logout } from '../../services/auth-service';
 import profilePic from '../../assets/profile-pic.svg';
+import editIcon from '../../assets/edit.svg';
+import publicidadeIcon from '../../assets/publicidade.svg';
+import relatoriosIcon from '../../assets/relatorios.svg';
+import emailIcon from '../../assets/email.svg';
+import instagramIcon from '../../assets/insta.svg';
 
-/** Botão “Sair” centralizado com override de cores */
+/** Botão “Sair” centralizado */
 const LogoutButton = styled(Button)`
   display: block;
-  margin: 100px auto 0;
-  background-color: #8e9455 !important;
+  margin: 0 auto;
+  background-color: #8E9455 !important;
   color: #ffffff !important;
 `;
 
@@ -33,8 +40,12 @@ const AffiliateArea: React.FC = () => {
     try {
       await logout();
     } finally {
-      history.goBack();  // retorna para a tela anterior
+      history.goBack();
     }
+  };
+
+  const goToEdit = () => {
+    history.push('/affiliate-area-edit');
   };
 
   return (
@@ -55,16 +66,40 @@ const AffiliateArea: React.FC = () => {
           <SubInfo>xxx.xxx.xxx/0001‑xx</SubInfo>
           <SubInfo>alameda@alameda.com.br</SubInfo>
 
-          <Option primary>Editar Perfil</Option>
-          <Divider />
-          <Option>Publicidade</Option>
-          <Divider />
-          <Option>Relatórios</Option>
+          <Option primary onClick={goToEdit}>
+            <OptionIcon src={editIcon} alt="Ícone Editar Perfil" />
+            Editar Perfil
+          </Option>
           <Divider />
 
-          <LogoutButton onClick={handleLogout}>
-            Sair
-          </LogoutButton>
+          <Option>
+            <OptionIcon src={publicidadeIcon} alt="Ícone Publicidade" />
+            Publicidade
+          </Option>
+          <Divider />
+
+          <Option>
+            <OptionIcon src={relatoriosIcon} alt="Ícone Relatórios" />
+            Relatórios
+          </Option>
+          {/* 80px de espaço abaixo dessas três opções */}
+          <Divider style={{ marginBottom: '80px' }} />
+
+          {/* Email e Instagram */}
+          <Option>
+            <OptionIcon src={emailIcon} alt="Ícone Email" />
+            contato@clubelupa.com.br
+          </Option>
+          <Option>
+            <OptionIcon src={instagramIcon} alt="Ícone Instagram" />
+            ClubeLupa
+          </Option>
+
+          <LogoutContainer>
+            <LogoutButton onClick={handleLogout}>
+              Sair
+            </LogoutButton>
+          </LogoutContainer>
         </AreaContainer>
       </IonContent>
     </IonPage>

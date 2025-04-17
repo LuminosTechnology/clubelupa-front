@@ -41,11 +41,19 @@ export const SubInfo = styled.p`
 
 /* ------ Ações e divisórias ------ */
 export const Option = styled.p<{ primary?: boolean }>`
+  display: flex;
+  align-items: center;
   font-size: 16px;
   color: #868950;
   margin: ${({ primary }) => (primary ? '58px 0 0 0' : '12px 0 0 0')};
+  cursor: pointer;
+`;
 
-  /* remove ícones (gap desnecessário) */
+/* Ícone posicionado à esquerda de cada opção (16×16) */
+export const OptionIcon = styled.img`
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
 `;
 
 /* linha divisória */
@@ -57,11 +65,10 @@ export const Divider = styled.hr`
   border-top: 1px solid #868950;
 `;
 
+/* Container para o botão de logout, 70px acima do botão */
 export const LogoutContainer = styled.div`
   width: 100%;
-  margin: 32px 0 0 0;
+  margin: 70px 0 0 0;
   display: flex;
   justify-content: center;
 `;
-
-

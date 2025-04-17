@@ -32,7 +32,7 @@ export const Title = styled.h1<{ $color: string }>`
   margin-top: 25px;
   text-align: center;
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 400;
   color: ${({ $color }) => $color};
   
 `;

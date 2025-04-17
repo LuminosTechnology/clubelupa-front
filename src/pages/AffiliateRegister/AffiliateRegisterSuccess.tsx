@@ -18,7 +18,7 @@ const AffiliateRegisterSuccess: React.FC = () => {
         <AffiliateSuccessContainer>
           <AffiliateTitle>Cadastro enviado com sucesso!</AffiliateTitle>
           <AffiliateSubtitle>
-            O processo seletivo pode levar até 72 horas para ser concluído.
+          O processo seletivo pode levar até 72 horas para se concluido. Até Lá, aproveite nosso aplicativo para ter as melhores experiencias.
           </AffiliateSubtitle>
           <AffiliateButtonContainer>
             <Button variant="secondary" onClick={() => history.push("/")}>

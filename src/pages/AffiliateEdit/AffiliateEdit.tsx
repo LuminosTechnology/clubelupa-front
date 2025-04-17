@@ -1,64 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { IonPage, IonContent } from '@ionic/react';
-import { useHistory } from 'react-router-dom';
-
 import AppHeader from '../../components/SimpleHeader';
-import FloatingInput from '../../components/FloatingInput';
-import Button from '../../components/Button';
+import profilePlaceholder from '../../assets/profile-pic.svg';
 
 import {
-  EditContainer,
+  Container,
+  Content,
   ProfileWrapper,
+  PhotoContainer,
   ProfilePhoto,
-  EditPhotoButton,
+  EditOverlay,
+  EditContainer,
   TitleSection,
+  FieldWrapper,
+  CepRow,
+  BuscarButton,
   SaveButtonWrapper,
-  GreenTheme,          // ⬅ tema verde
+  GreenLabelTheme,
+  InputTextTheme,
+  SalvarButton,
 } from './AffiliateEdit.style';
 
-import profilePic from '../../assets/profile-pic.svg';
-
-/* ---------- Tipagem ---------- */
-interface AffiliateData {
-  nome_local: string;
-  celular: string;
-  horario_funcionamento: string;
-  email: string;
-  cep: string;
-  bairro: string;
-  rua: string;
-  cidade: string;
-  uf: string;
-  categoria: string;
-  demais_categorias: string;
-  instagram: string;
-  site: string;
-}
-
-/* ---------- Estado inicial (mock) ---------- */
-const initialData: AffiliateData = {
-  nome_local: 'Local de Exemplo',
-  celular: '(11) 98765-4321',
-  horario_funcionamento: '09:00 às 18:00',
-  email: 'contato@exemplo.com',
-  cep: '01234-567',
-  bairro: 'Centro',
-  rua: 'Rua Exemplo',
-  cidade: 'São Paulo',
-  uf: 'SP',
-  categoria: 'Comércio',
-  demais_categorias: 'Restaurantes',
-  instagram: '@exemplo',
-  site: 'https://www.exemplo.com',
-};
+import { AffiliateData } from '../../services/interfaces/Affiliate';
 
 const AffiliateEdit: React.FC = () => {
-  const history = useHistory();
-  const [form, setForm] = useState<AffiliateData>(initialData);
+  const [form, setForm] = useState<AffiliateData>({
+    nome_local: 'Fernanda Paludo',
+    celular: '',
+    horario_funcionamento: '',
+    email: '',
+    cep: '',
+    bairro: '',
+    rua: '',
+    cidade: '',
+    uf: '',
+    categoria: '',
+    demais_categorias: '',
+    instagram: '',
+    site: '',
+  });
+  const [scrolled, setScrolled] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState<string>(profilePlaceholder);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSave = () => {
-    console.table(form);   // aqui você chamaria o backend
-    history.goBack();      // volta para a tela anterior
+    console.log(form);
+    alert('Dados salvos localmente!');
+  };
+
+  const onEditPhotoClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handlePhotoChange: React.ChangeEventHandler<HTMLInputElement> = e => {
+    if (!e.target.files?.length) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setPhotoUrl(reader.result);
+      }
+    };
+    reader.readAsDataURL(e.target.files[0]);
   };
 
   return (
@@ -69,103 +71,196 @@ const AffiliateEdit: React.FC = () => {
         textColor="#FFFFFF"
       />
 
-      {/* Foto + botão editar */}
-      <ProfileWrapper>
-        <ProfilePhoto src={profilePic} alt="Foto de perfil" />
-        <EditPhotoButton>Editar</EditPhotoButton>
-      </ProfileWrapper>
+          <ProfileWrapper scrolled={scrolled}>
+            <PhotoContainer>
+              <ProfilePhoto src={photoUrl} alt="Foto de perfil" />
+              <EditOverlay onClick={onEditPhotoClick}>Editar</EditOverlay>
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handlePhotoChange}
+              />
+            </PhotoContainer>
+          </ProfileWrapper>
+      <IonContent
+        fullscreen
+        style={{ '--background': '#868950' }}
+        onIonScroll={e => setScrolled(e.detail.scrollTop > 0)}
+      >
+        <Content>
 
-      <IonContent fullscreen style={{ '--background': '#FFFFFF' }}>
-        {/* aplica o tema verde apenas nesta página */}
-        <GreenTheme>
-          <EditContainer>
-            <TitleSection>Editar Perfil Comercial</TitleSection>
+          <GreenLabelTheme>
+            <InputTextTheme>
+              <EditContainer>
+                <TitleSection>Editar Perfil Comercial</TitleSection>
 
-            {/* -------- Campos -------- */}
-            <FloatingInput
-              label="Nome do Local"
-              value={form.nome_local}
-              onChange={(v) => setForm({ ...form, nome_local: v })}
-            />
-            <FloatingInput
-              label="Celular"
-              value={form.celular}
-              onChange={(v) => setForm({ ...form, celular: v })}
-              mask="(99) 99999-9999"
-            />
-            <FloatingInput
-              label="Horário de Funcionamento"
-              value={form.horario_funcionamento}
-              onChange={(v) =>
-                setForm({ ...form, horario_funcionamento: v })
-              }
-            />
-            <FloatingInput
-              label="E‑mail"
-              value={form.email}
-              onChange={(v) => setForm({ ...form, email: v })}
-              type="email"
-            />
-            <FloatingInput
-              label="CEP"
-              value={form.cep}
-              onChange={(v) => setForm({ ...form, cep: v })}
-              mask="99999-999"
-            />
-            <FloatingInput
-              label="Bairro"
-              value={form.bairro}
-              onChange={(v) => setForm({ ...form, bairro: v })}
-            />
-            <FloatingInput
-              label="Rua"
-              value={form.rua}
-              onChange={(v) => setForm({ ...form, rua: v })}
-            />
-            <FloatingInput
-              label="Cidade"
-              value={form.cidade}
-              onChange={(v) => setForm({ ...form, cidade: v })}
-            />
-            <FloatingInput
-              label="UF"
-              value={form.uf}
-              onChange={(v) =>
-                setForm({ ...form, uf: v.toUpperCase().slice(0, 2) })
-              }
-            />
-            <FloatingInput
-              label="Categoria"
-              value={form.categoria}
-              onChange={(v) => setForm({ ...form, categoria: v })}
-            />
-            <FloatingInput
-              label="Demais Categorias"
-              value={form.demais_categorias}
-              onChange={(v) =>
-                setForm({ ...form, demais_categorias: v })
-              }
-            />
-            <FloatingInput
-              label="Instagram"
-              value={form.instagram}
-              onChange={(v) => setForm({ ...form, instagram: v })}
-            />
-            <FloatingInput
-              label="Site"
-              value={form.site}
-              onChange={(v) => setForm({ ...form, site: v })}
-              type="url"
-            />
+                <FieldWrapper>
+                  <label>Nome do Local</label>
+                  <input
+                    placeholder="Fernanda Paludo"
+                    value={form.nome_local}
+                    onChange={e =>
+                      setForm({ ...form, nome_local: e.target.value })
+                    }
+                  />
+                </FieldWrapper>
 
-            {/* Botão Salvar */}
-            <SaveButtonWrapper>
-              <Button variant="primary" onClick={handleSave}>
-                Salvar Alterações
-              </Button>
-            </SaveButtonWrapper>
-          </EditContainer>
-        </GreenTheme>
+                <FieldWrapper>
+                  <label>Celular</label>
+                  <input
+                    placeholder="(41) 99999‑9999"
+                    value={form.celular}
+                    onChange={e =>
+                      setForm({ ...form, celular: e.target.value })
+                    }
+                  />
+                </FieldWrapper>
+
+                <FieldWrapper>
+                  <label>Horário de Funcionamento</label>
+                  <input
+                    placeholder="Seg‑Sex 09:00 às 18:00"
+                    value={form.horario_funcionamento}
+                    onChange={e =>
+                      setForm({
+                        ...form,
+                        horario_funcionamento: e.target.value,
+                      })
+                    }
+                  />
+                </FieldWrapper>
+
+                <FieldWrapper>
+                  <label>E‑mail</label>
+                  <input
+                    type="email"
+                    placeholder="contato@exemplo.com"
+                    value={form.email}
+                    onChange={e =>
+                      setForm({ ...form, email: e.target.value })
+                    }
+                  />
+                </FieldWrapper>
+
+                <CepRow>
+                  <FieldWrapper style={{ flex: 1 }}>
+                    <label>CEP</label>
+                    <input
+                      placeholder="01234‑567"
+                      value={form.cep}
+                      onChange={e =>
+                        setForm({ ...form, cep: e.target.value })
+                      }
+                    />
+                  </FieldWrapper>
+                  <BuscarButton>BUSCAR</BuscarButton>
+                </CepRow>
+
+                <FieldWrapper>
+                  <label>Bairro</label>
+                  <input
+                    placeholder="Centro"
+                    value={form.bairro}
+                    onChange={e =>
+                      setForm({ ...form, bairro: e.target.value })
+                    }
+                  />
+                </FieldWrapper>
+
+                <FieldWrapper>
+                  <label>Rua</label>
+                  <input
+                    placeholder="Rua Exemplo"
+                    value={form.rua}
+                    onChange={e =>
+                      setForm({ ...form, rua: e.target.value })
+                    }
+                  />
+                </FieldWrapper>
+
+                <FieldWrapper>
+                  <label>Cidade</label>
+                  <input
+                    placeholder="Curitiba"
+                    value={form.cidade}
+                    onChange={e =>
+                      setForm({ ...form, cidade: e.target.value })
+                    }
+                  />
+                </FieldWrapper>
+
+                <FieldWrapper>
+                  <label>UF</label>
+                  <input
+                    placeholder="PR"
+                    maxLength={2}
+                    value={form.uf}
+                    onChange={e =>
+                      setForm({
+                        ...form,
+                        uf: e.target.value.toUpperCase().slice(0, 2),
+                      })
+                    }
+                  />
+                </FieldWrapper>
+
+                <FieldWrapper>
+                  <label>Categoria Principal</label>
+                  <input
+                    placeholder="Cosméticos"
+                    value={form.categoria}
+                    onChange={e =>
+                      setForm({ ...form, categoria: e.target.value })
+                    }
+                  />
+                </FieldWrapper>
+
+                <FieldWrapper>
+                  <label>Demais Categorias</label>
+                  <input
+                    placeholder="Infantil, Marcas com viés sustentável"
+                    value={form.demais_categorias}
+                    onChange={e =>
+                      setForm({
+                        ...form,
+                        demais_categorias: e.target.value,
+                      })
+                    }
+                  />
+                </FieldWrapper>
+
+                <FieldWrapper>
+                  <label>Instagram</label>
+                  <input
+                    placeholder="@exemplo"
+                    value={form.instagram}
+                    onChange={e =>
+                      setForm({ ...form, instagram: e.target.value })
+                    }
+                  />
+                </FieldWrapper>
+
+                <FieldWrapper>
+                  <label>Site</label>
+                  <input
+                    type="url"
+                    placeholder="https://www.exemplo.com"
+                    value={form.site}
+                    onChange={e =>
+                      setForm({ ...form, site: e.target.value })
+                    }
+                  />
+                </FieldWrapper>
+
+                <SaveButtonWrapper>
+                  <SalvarButton onClick={handleSave}>SALVAR</SalvarButton>
+                </SaveButtonWrapper>
+              </EditContainer>
+            </InputTextTheme>
+          </GreenLabelTheme>
+        </Content>
       </IonContent>
     </IonPage>
   );
