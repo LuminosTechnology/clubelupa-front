@@ -34,6 +34,8 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ChangePassword from "./pages/ForgotPassword/ChangePassword";
 import AffiliateRegister from "./pages/AffiliateRegister/AffiliateRegister";
 import AffiliateRegisterSuccess from "./pages/AffiliateRegister/AffiliateRegisterSuccess";
+import AffiliateArea from "./pages/AffiliateArea/AffiliateArea";
+import AffiliateEdit from "./pages/AffiliateEdit/AffiliateEdit";
 
 setupIonicReact();
 
@@ -77,6 +79,8 @@ const App: React.FC = () => {
           />
           <Route exact path="/register" component={Register} />
           <Route exact path="/affiliate-register" component={AffiliateRegister} />
+          <Route exact path="/affiliate-area" component={AffiliateArea} />
+          <Route exact path="/affiliate-area-edit" component={AffiliateEdit} />
           <Route exact path="/affiliate-register-success" component={AffiliateRegisterSuccess} />
           <Route exact path="/register-success" component={RegisterSuccess} />
           <Route exact path="/forgot-password" component={ForgotPassword} />
