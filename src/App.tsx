@@ -32,6 +32,7 @@ import AffiliateRegister from "./pages/AffiliateRegister/AffiliateRegister";
 import AffiliateRegisterSuccess from "./pages/AffiliateRegister/AffiliateRegisterSuccess";
 import AffiliateArea from "./pages/AffiliateArea/AffiliateArea";
 import AffiliateEdit from "./pages/AffiliateEdit/AffiliateEdit";
+import AffiliateStores from "./pages/AffiliateStores/AffiliateStoresPage";
 import ProfilePage from "./pages/Profile/ProfilePage";
 import ProfilePageEdit from "./pages/ProfileEdit/ProfileEditPage"
 
@@ -73,6 +74,7 @@ const App: React.FC = () => {
           <Route exact path="/affiliate-register"component={AffiliateRegister}/>
           <Route exact path="/profile"component={ProfilePage}/>
           <Route exact path="/profile-edit"component={ProfilePageEdit}/>
+          <Route exact path="/affiliates" component={AffiliateStores} />
           <Route exact path="/affiliate-area" component={AffiliateArea} />
           <Route exact path="/affiliate-area-edit" component={AffiliateEdit}/>
           <Route exact path="/affiliate-register-success" component={AffiliateRegisterSuccess}/>

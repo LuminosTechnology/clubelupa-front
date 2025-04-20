@@ -8,7 +8,7 @@ export const BackButton = styled.img`
   width: 20px;
   height: 20px;
   cursor: pointer;
-  margin-bottom: 60px;
+  margin-bottom: 5px;
   transition: opacity 0.2s ease;
 
   &:hover {
