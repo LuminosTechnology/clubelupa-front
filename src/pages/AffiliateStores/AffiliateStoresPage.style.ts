@@ -1,11 +1,22 @@
 // src/pages/AffiliateStores/AffiliateStoresPage.style.ts
 import styled from "styled-components";
 
+export const ScrollArea = styled.div`
+  position: absolute;
+  top: 56px;       /* ajuste se seu AppHeader tiver altura diferente */
+  bottom: 0;
+  left: 0;
+  margin-top: 80px;
+  right: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+`;
+
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 28px;
-  padding: 32px 20px 40px 0; /* top | right | bottom | left */
+  padding: 32px 20px 40px 0;
   background: #ffffff;
 `;
 

@@ -1,21 +1,6 @@
-// src/pages/ProfileEditPage/ProfileEditPage.style.ts
-import styled from 'styled-components';
+import styled from "styled-components";
 
-export const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: auto;
-  background: #ffffff;
-`;
 
-export const Content = styled.div`
-  flex: 1;
-  overflow-y: auto;
-  background: #ffffff;
-  margin-top: -30px;
-  padding: 132px 20px 40px;
-`;
 
 export const ProfileWrapper = styled.div<{ scrolled: boolean }>`
   position: fixed;
@@ -59,6 +44,12 @@ export const EditOverlay = styled.button`
   cursor: pointer;
 `;
 
+export const Content = styled.div`
+  background: #ffffff;
+  margin-top: 100px; /* espaço extra para caber a foto fixa + header */
+  padding: 20px;
+`;
+
 export const EditContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -66,7 +57,7 @@ export const EditContainer = styled.div`
 `;
 
 export const TitleSection = styled.h2`
-  margin: 40px 0 30px;
+  margin: 0 0 30px;
   font-size: 22px;
   font-weight: 800;
   color: #868950;

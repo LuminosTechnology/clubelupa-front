@@ -1,28 +1,9 @@
-import styled from 'styled-components';
+// src/pages/AffiliateEdit/AffiliateEdit.style.ts
+import styled from "styled-components";
 
-/* —— Container principal —— */
-export const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background: #ffffff;
-`;
-
-/* —— Área rolável (formulário) —— */
-export const Content = styled.div`
-  flex: 1;
-  overflow-y: auto;
-  background: #ffffff;
-
-  /* Recuo para cobrir a curvatura do header */
-  margin-top: -30px;
-  padding: 132px 20px 40px; /* 112 original + 20px de sobreposição */
-`;
-
-/* —— Foto de perfil: fixa na viewport, mas desaparece com transição —— */
 export const ProfileWrapper = styled.div<{ scrolled: boolean }>`
   position: fixed;
-  top: 120px; /* ajuste conforme a altura do seu header */
+  top: 120px;
   left: 20px;
   width: 96px;
   height: 96px;
@@ -33,7 +14,6 @@ export const ProfileWrapper = styled.div<{ scrolled: boolean }>`
   transition: opacity 0.3s ease-in-out;
 `;
 
-/* —— Container da imagem —— */
 export const PhotoContainer = styled.div`
   width: 100%;
   height: 100%;
@@ -53,7 +33,7 @@ export const EditOverlay = styled.button`
   width: 100%;
   height: 32%;
   background: #868950;
-  color: #fff;
+  color: #ffffff;
   border: none;
   font-size: 14px;
   font-weight: 700;
@@ -63,7 +43,12 @@ export const EditOverlay = styled.button`
   cursor: pointer;
 `;
 
-/* —— Formulário interno —— */
+export const Content = styled.div`
+  background: #ffffff;
+  margin-top: 100px; /* espaço para foto fixa + header */
+  padding: 20px;
+`;
+
 export const EditContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -71,7 +56,7 @@ export const EditContainer = styled.div`
 `;
 
 export const TitleSection = styled.h2`
-  margin: 40px 0 30px;
+  margin: 0 0 30px;
   font-size: 22px;
   font-weight: 800;
   color: #868950;
@@ -121,7 +106,7 @@ export const BuscarButton = styled.button`
   height: 40px;
   padding: 0 24px;
   background: #8e9455;
-  color: #fff;
+  color: #ffffff;
   border: none;
   border-radius: 100px;
   font-weight: 700;

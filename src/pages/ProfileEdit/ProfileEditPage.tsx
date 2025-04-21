@@ -4,10 +4,10 @@ import { IonPage, IonContent } from "@ionic/react";
 import { useHistory } from "react-router-dom";
 
 import AppHeader from "../../components/SimpleHeader";
+import ScrollArea from "../../components/ScrollArea/ScrollArea";
 import profilePlaceholder from "../../assets/profile-pic.svg";
 
 import {
-  Container,
   Content,
   ProfileWrapper,
   PhotoContainer,
@@ -86,33 +86,33 @@ const ProfileEditPage: React.FC = () => {
 
   return (
     <IonPage>
-      <Container>
+      <IonContent
+        fullscreen
+        style={{ "--background": "#ffffff" } as React.CSSProperties}
+      >
+        {/* HEADER FIXO */}
         <AppHeader
           title="Editar Perfil"
           backgroundColor="#868950"
           textColor="#FFFFFF"
         />
 
-        <ProfileWrapper scrolled={scrolled}>
-          <PhotoContainer>
-            <ProfilePhoto src={photoUrl} alt="Foto de perfil" />
-            <EditOverlay onClick={onEditPhotoClick}>Editar</EditOverlay>
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              style={{ display: "none" }}
-              onChange={handlePhotoChange}
-            />
-          </PhotoContainer>
-        </ProfileWrapper>
+        {/* ÁREA ROLÁVEL ABAIXO DO HEADER */}
+        <ScrollArea onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 0)}>
+          <ProfileWrapper scrolled={scrolled}>
+            <PhotoContainer>
+              <ProfilePhoto src={photoUrl} alt="Foto de perfil" />
+              <EditOverlay onClick={onEditPhotoClick}>Editar</EditOverlay>
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                onChange={handlePhotoChange}
+              />
+            </PhotoContainer>
+          </ProfileWrapper>
 
-        <IonContent
-          fullscreen
-          scrollEvents={true}
-          style={{ "--background": "#868950" } as React.CSSProperties}
-          onIonScroll={(e) => setScrolled(e.detail.scrollTop > 0)}
-        >
           <Content>
             <GreenLabelTheme>
               <InputTextTheme>
@@ -233,10 +233,10 @@ const ProfileEditPage: React.FC = () => {
               </InputTextTheme>
             </GreenLabelTheme>
           </Content>
-        </IonContent>
-      </Container>
+        </ScrollArea>
+      </IonContent>
     </IonPage>
-  );
-};
+);
+}
 
 export default ProfileEditPage;
