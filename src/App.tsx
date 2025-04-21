@@ -20,6 +20,11 @@ import AffiliateView from "./pages/AffiliateView/AffiliateView";
 import ProfilePage from "./pages/Profile/ProfilePage";
 import ProfilePageEdit from "./pages/ProfileEdit/ProfileEditPage";
 import Voucher from "./pages/Voucher/Voucher";
+import Notification from "./pages/Notification/Notification";
+import TalkToUs from "./pages/TalkToUs/TalkToUs";
+import ReccomendAndWin from "./pages/RecommendAndWin/RecommendAndWin";
+import MyPlan from "./pages/MyPlan/MyPlan";
+import UpgradePlan from "./pages/UpgradePlan/UpgradePlan";
 
 import { getToken } from "./services/auth-service";
 
@@ -67,18 +72,23 @@ const App: React.FC = () => {
         <IonRouterOutlet>
           <Route exact path="/login" render={() => isAuthenticated ? <Redirect to="/home" /> : <Login />} />
           <Route exact path="/register" component={Register} />
-          <Route exact path="/register-success" component={RegisterSuccess} />
-        <Route exact path="/my-vouchers" component={Voucher} />
-          <Route exact path="/forgot-password" component={ForgotPassword} />
-          <Route exact path="/change-password" component={ChangePassword} />
-          <Route exact path="/affiliate-register" component={AffiliateRegister} />
-          <Route exact path="/affiliate-register-success" component={AffiliateRegisterSuccess} />
-          <Route exact path="/affiliate-area" component={AffiliateArea} />
-          <Route exact path="/affiliate-area-edit" component={AffiliateEdit} />
+          <Route exact path="/register/success" component={RegisterSuccess} />
+          <Route exact path="/myvouchers" component={Voucher} />
+          <Route exact path="/forgot/password" component={ForgotPassword} />
+          <Route exact path="/change/password" component={ChangePassword} />
+          <Route exact path="/affiliate/register" component={AffiliateRegister} />
+          <Route exact path="/affiliate/register/success" component={AffiliateRegisterSuccess} />
+          <Route exact path="/affiliate/area" component={AffiliateArea} />
+          <Route exact path="/affiliate/area/edit" component={AffiliateEdit} />
           <Route exact path="/affiliates" component={AffiliateStores} />
           <Route exact path="/affiliate-view/:id" component={AffiliateView} />
           <Route exact path="/profile" component={ProfilePage} />
-          <Route exact path="/profile-edit" component={ProfilePageEdit} />
+          <Route exact path="/profile/edit" component={ProfilePageEdit} />
+          <Route exact path="/profile/notification" component={Notification} />
+          <Route exact path="/profile/talktous" component={TalkToUs} />
+          <Route exact path="/recommendandwin" component={ReccomendAndWin} />
+          <Route exact path="/myplan" component={MyPlan} />
+          <Route exact path="/myplan/upgrade" component={UpgradePlan} />
           <Route exact path="/home" component={Home} />
 
           <Redirect exact from="/" to={isAuthenticated ? "/home" : "/login"} />

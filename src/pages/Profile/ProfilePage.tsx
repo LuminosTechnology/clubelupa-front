@@ -1,3 +1,4 @@
+// src/pages/ProfilePage/ProfilePage.tsx
 import React, { useEffect, useState } from 'react';
 import { IonPage, IonContent } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
@@ -27,6 +28,7 @@ import notificationIcon from '../../assets/notification.svg';
 import chatIcon from '../../assets/chat.svg';
 import emailIcon from '../../assets/email.svg';
 import instagramIcon from '../../assets/insta.svg';
+import TalkToUs from '../TalkToUs/TalkToUs';
 
 /** Botão “SAIR” centralizado */
 const LogoutButton = styled(Button)`
@@ -57,7 +59,15 @@ const ProfilePage: React.FC = () => {
   };
 
   const goToEditProfile = () => {
-    history.push('/profile-edit');
+    history.push('/profile/edit');
+  };
+
+  const goToNotification = () => {
+    history.push('/profile/notification');
+  };
+
+  const goToTalkToUs = () => {
+    history.push('/profile/talktous');
   };
 
   return (
@@ -72,10 +82,10 @@ const ProfilePage: React.FC = () => {
         <Avatar src={avatarPic} alt="Foto de perfil" />
       </AvatarWrapper>
 
-      <IonContent fullscreen style={{ '--background': '#FFFFFF' }}>
+      <IonContent fullscreen style={{ '--background': '#FFFFFF' } as any}>
         <ProfileContainer>
-          <UserName>{user?.name ?? ''}</UserName>
-          <UserSubInfo>{user?.phone ?? ''}</UserSubInfo>
+          <UserName>{user?.nome_completo ?? ''}</UserName>
+          <UserSubInfo>{user?.cpf ?? ''}</UserSubInfo>
           <UserSubInfo>{user?.email ?? ''}</UserSubInfo>
 
           <MenuOption primary onClick={goToEditProfile}>
@@ -90,13 +100,14 @@ const ProfilePage: React.FC = () => {
           </MenuOption>
           <Divider />
 
-          <MenuOption>
+          {/* Aqui a mudança: onClick para navegar */}
+          <MenuOption onClick={goToNotification}>
             <MenuIcon src={notificationIcon} alt="Ícone Notificação" />
             Notificação
           </MenuOption>
           <Divider />
 
-          <MenuOption>
+          <MenuOption onClick={goToTalkToUs}>
             <MenuIcon src={chatIcon} alt="Ícone Fale Conosco" />
             Fale Conosco
           </MenuOption>

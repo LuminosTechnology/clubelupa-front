@@ -45,7 +45,7 @@ const AffiliateArea: React.FC = () => {
   };
 
   const goToEdit = () => {
-    history.push('/affiliate-area-edit');
+    history.push('/affiliate/area/edit');
   };
 
   return (

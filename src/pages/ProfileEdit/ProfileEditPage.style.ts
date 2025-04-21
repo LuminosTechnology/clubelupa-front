@@ -105,7 +105,7 @@ export const CepRow = styled.div`
 
 export const BuscarButton = styled.button`
   height: 40px;
-  padding: 0 24px;
+  padding: 0 54px;
   background: #8e9455;
   color: #ffffff;
   border: none;
