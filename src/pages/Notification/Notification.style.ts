@@ -77,7 +77,7 @@ export const ToggleLabel = styled.span`
 `;
 
 /* switch toggle */
-export const Switch = styled.label`
+export const ToggleSwitch = styled.label`
   position: relative;
   display: inline-block;
   width: 67px;

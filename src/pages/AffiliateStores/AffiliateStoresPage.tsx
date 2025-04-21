@@ -4,15 +4,11 @@ import { IonPage, IonContent } from "@ionic/react";
 import { useHistory } from "react-router-dom";
 
 import AppHeader from "../../components/SimpleHeader";
-import SlideMenu from "../../components/SlideMenu";
 import SearchBar from '../../components/SearchButton/SearchBar';
 
 import {
   ScrollArea,
   Container,
-  SearchBarWrapper,
-  SearchIcon,
-  SearchInput,
   ListWrapper,
   StoreCard,
   StoreImage,
@@ -20,7 +16,6 @@ import {
   StoreLine,
 } from "./AffiliateStoresPage.style";
 
-import menuIcon from "../../assets/Menu.svg";
 import searchIcon from "../../assets/lupa-search.svg";
 import sampleImg from "../../assets/sample-store.png";
 
@@ -43,8 +38,11 @@ export const stores: Store[] = [
 
 const AffiliateStoresPage: React.FC = () => {
   const [query, setQuery] = useState("");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const history = useHistory();
+
+  const filteredStores = stores.filter(s =>
+    s.name.toLowerCase().includes(query.toLowerCase().trim())
+  );
 
   return (
     <IonPage>
@@ -52,10 +50,7 @@ const AffiliateStoresPage: React.FC = () => {
         title="Afiliados"
         backgroundColor="#E6C178"
         textColor="#FFFFFF"
-        menuIcon={menuIcon}
-        onMenuClick={() => setIsMenuOpen(true)}
       />
-      <SlideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
 
       <IonContent fullscreen style={{ "--background": "#FFFFFF" } as React.CSSProperties}>
         <ScrollArea>
@@ -68,23 +63,21 @@ const AffiliateStoresPage: React.FC = () => {
             />
 
             <ListWrapper>
-              {stores
-                .filter(s => s.name.toLowerCase().includes(query.toLowerCase().trim()))
-                .map(store => (
-                  <StoreCard
-                    key={store.id}
-                    onClick={() => history.push(`/affiliate-view/${store.id}`)}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <StoreImage src={store.img} alt={store.name} />
-                    <StoreInfo style={{ background: store.color }}>
-                      <StoreLine>{store.name}</StoreLine>
-                      <StoreLine>{store.category}</StoreLine>
-                      <StoreLine>{store.schedule}</StoreLine>
-                      <StoreLine>{store.benefits}</StoreLine>
-                    </StoreInfo>
-                  </StoreCard>
-                ))}
+              {filteredStores.map(store => (
+                <StoreCard
+                  key={store.id}
+                  onClick={() => history.push(`/affiliate-view/${store.id}`)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <StoreImage src={store.img} alt={store.name} />
+                  <StoreInfo style={{ background: store.color }}>
+                    <StoreLine>{store.name}</StoreLine>
+                    <StoreLine>{store.category}</StoreLine>
+                    <StoreLine>{store.schedule}</StoreLine>
+                    <StoreLine>{store.benefits}</StoreLine>
+                  </StoreInfo>
+                </StoreCard>
+              ))}
             </ListWrapper>
           </Container>
         </ScrollArea>

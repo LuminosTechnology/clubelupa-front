@@ -5,17 +5,17 @@ import { useHistory } from 'react-router-dom';
 import AppHeader from '../../components/SimpleHeader';
 
 import {
-  ProfileContainer,
   AvatarWrapper,
   Avatar,
+  ProfileContainer,
   UserName,
   UserSubInfo,
   FieldWrapper,
   Label,
   Input,
+  CCVInput,
   Row,
   HalfField,
-  CCVInput,
   ButtonWrapper,
   PremiumButton,
 } from './UpgradePlan.style';
@@ -32,14 +32,17 @@ const UpgradePlan: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        setUser(await getUserByToken());
+        const fetched = await getUserByToken();
+        setUser(fetched);
       } catch (err) {
-        console.error(err);
+        console.error('Erro ao buscar dados do usuário', err);
       }
     })();
   }, []);
 
-  const handleUpgrade = () => history.push('/plan/upgrade');
+  const handleUpgrade = () => {
+    history.push('/plan/upgrade');
+  };
 
   return (
     <IonPage>
@@ -59,9 +62,8 @@ const UpgradePlan: React.FC = () => {
           <UserSubInfo>{user?.cpf}</UserSubInfo>
           <UserSubInfo>{user?.email}</UserSubInfo>
 
-          {/* Campos de cartão */}
           <FieldWrapper>
-            <Label>Nome do local</Label>
+            <Label>Nome do titular</Label>
             <Input placeholder="Nome completo" />
           </FieldWrapper>
 
@@ -73,7 +75,7 @@ const UpgradePlan: React.FC = () => {
           <Row>
             <HalfField>
               <Label>Data de Validade</Label>
-              <Input placeholder="__/__/__" />
+              <Input placeholder="MM/AA" />
             </HalfField>
             <HalfField>
               <Label>CCV</Label>

@@ -17,7 +17,7 @@ import {
   ToggleWrapper,
   ToggleOption,
   ToggleLabel,
-  Switch,
+  ToggleSwitch,
 } from './Notification.style';
 
 import { logout, getUserByToken } from '../../services/auth-service';
@@ -74,17 +74,17 @@ const Notification: React.FC = () => {
           {/* Dois toggles com labels */}
           <ToggleWrapper>
             <ToggleOption>
-              <Switch>
+              <ToggleSwitch>
                 <input type="checkbox" />
                 <span />
-              </Switch>
-              <ToggleLabel>Receber e-mais de promoção</ToggleLabel>
+              </ToggleSwitch>
+              <ToggleLabel>Receber e‑mails de promoção</ToggleLabel>
             </ToggleOption>
             <ToggleOption>
-              <Switch>
+              <ToggleSwitch>
                 <input type="checkbox" />
                 <span />
-              </Switch>
+              </ToggleSwitch>
               <ToggleLabel>Notificações</ToggleLabel>
             </ToggleOption>
           </ToggleWrapper>

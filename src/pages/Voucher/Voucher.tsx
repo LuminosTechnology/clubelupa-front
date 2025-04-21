@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { IonPage, IonContent } from "@ionic/react";
 import AppHeader from "../../components/SimpleHeader";
-import SlideMenu from "../../components/SlideMenu";
 import FooterVoucher from "../../components/Footer-Voucher/FooterVoucher";
 import SearchBar from '../../components/SearchButton/SearchBar';
 
@@ -25,17 +24,12 @@ import {
   ViewMore,
 } from "./Voucher.style";
 
-import menuIcon from "../../assets/Menu.svg";
 import searchIcon from "../../assets/lupa-search.svg";
 import voucherIcon from "../../assets/voucher.svg";
 
 const Vouncher: React.FC = () => {
   const [query, setQuery] = useState("");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // controla se o footer está montado/exibido
   const [showFooter, setShowFooter] = useState(false);
-  // incrementa toda vez que clicamos em "Ver Mais"
   const [expandTrigger, setExpandTrigger] = useState(0);
 
   const items = [
@@ -53,7 +47,6 @@ const Vouncher: React.FC = () => {
     if (!showFooter) {
       setShowFooter(true);
     }
-    // dispara expansão sempre
     setExpandTrigger(prev => prev + 1);
   };
 
@@ -63,10 +56,7 @@ const Vouncher: React.FC = () => {
         title="Meus Cupons"
         backgroundColor="#E6C178"
         textColor="#FFFFFF"
-        menuIcon={menuIcon}
-        onMenuClick={() => setIsMenuOpen(true)}
       />
-      <SlideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
 
       <IonContent fullscreen style={{ "--background": "#FFFFFF" } as any}>
         <ScrollArea>

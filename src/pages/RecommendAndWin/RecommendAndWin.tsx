@@ -44,7 +44,6 @@ const RecommendAndWin: React.FC = () => {
   };
 
   const handleWhats = () => {
-    // abra o WhatsApp
     window.open('https://wa.me/seunumerodetelefone', '_blank');
   };
 

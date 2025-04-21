@@ -29,7 +29,7 @@ import {
   updateUserProfile,
   updateProfilePhoto,
 } from "../../services/auth-service";
-import { UserProfile } from "../../services/interfaces/Auth";
+import { User } from "../../services/interfaces/Auth";  // <-- corrigido
 
 const ProfileEditPage: React.FC = () => {
   const history = useHistory();
@@ -39,7 +39,8 @@ const ProfileEditPage: React.FC = () => {
   const [photoUrl, setPhotoUrl] = useState<string>(profilePlaceholder);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
-  const [form, setForm] = useState<UserProfile>({
+  // usar Partial<User> para inicializar apenas os campos que interessam
+  const [form, setForm] = useState<Partial<User>>({
     nome_completo: "",
     celular: "",
     cpf: "",
@@ -55,17 +56,19 @@ const ProfileEditPage: React.FC = () => {
     (async () => {
       const user = await getUserByToken();
       setForm({
-        nome_completo: user.nome_completo || "",
-        celular: user.celular || "",
-        cpf: user.cpf || "",
-        email: user.email || "",
-        cep: user.cep || "",
-        rua: user.rua || "",
-        bairro: user.bairro || "",
-        cidade: user.cidade || "",
-        uf: user.uf || "",
+        nome_completo: user.nome_completo,
+        celular: user.celular,
+        cpf: user.cpf,
+        email: user.email,
+        cep: user.cep,
+        rua: user.rua,
+        bairro: user.bairro,
+        cidade: user.cidade,
+        uf: user.uf,
       });
-      if ((user as any).avatar_url) setPhotoUrl((user as any).avatar_url);
+      if ((user as any).avatar_url) {
+        setPhotoUrl((user as any).avatar_url);
+      }
     })();
   }, []);
 
@@ -80,7 +83,9 @@ const ProfileEditPage: React.FC = () => {
 
   const handleSave = async () => {
     await updateUserProfile(form);
-    if (photoFile) await updateProfilePhoto(photoFile);
+    if (photoFile) {
+      await updateProfilePhoto(photoFile);
+    }
     history.goBack();
   };
 
@@ -236,7 +241,7 @@ const ProfileEditPage: React.FC = () => {
         </ScrollArea>
       </IonContent>
     </IonPage>
-);
-}
+  );
+};
 
 export default ProfileEditPage;
