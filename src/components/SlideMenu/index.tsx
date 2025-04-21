@@ -43,7 +43,7 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
   const menuItems = [
     { label: 'Perfil', path: '/profile' },
     { label: 'Afiliados', path: '/affiliates' },
-    { label: 'Meus Cupons', path: '/my/vouchers' },
+    { label: 'Meus Cupons', path: '/myvouchers' },
     { label: 'Troca de LupaCoins', path: '/home' },
     { label: 'Meu Plano', path: '/myplan' },
     { label: 'Meus Favoritos', path: '/home' },
