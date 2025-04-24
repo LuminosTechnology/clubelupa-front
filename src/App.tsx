@@ -19,12 +19,14 @@ import AffiliateStores from "./pages/AffiliateStores/AffiliateStoresPage";
 import AffiliateView from "./pages/AffiliateView/AffiliateView";
 import ProfilePage from "./pages/Profile/ProfilePage";
 import ProfilePageEdit from "./pages/ProfileEdit/ProfileEditPage";
-import Voucher from "./pages/Voucher/Voucher";
 import Notification from "./pages/Notification/Notification";
 import TalkToUs from "./pages/TalkToUs/TalkToUs";
 import ReccomendAndWin from "./pages/RecommendAndWin/RecommendAndWin";
 import MyPlan from "./pages/MyPlan/MyPlan";
 import UpgradePlan from "./pages/UpgradePlan/UpgradePlan";
+import LupoCoins from "./pages/LupoCoins/LupoCoins";
+import Experience from "./pages/Experience/Experience";
+import Favorites from "./pages/Favorites/Favorites";
 
 import { getToken } from "./services/auth-service";
 
@@ -73,7 +75,7 @@ const App: React.FC = () => {
           <Route exact path="/login" render={() => isAuthenticated ? <Redirect to="/home" /> : <Login />} />
           <Route exact path="/register" component={Register} />
           <Route exact path="/register/success" component={RegisterSuccess} />
-          <Route exact path="/myvouchers" component={Voucher} />
+          <Route exact path="/lupacoins" component={LupoCoins} />
           <Route exact path="/forgot/password" component={ForgotPassword} />
           <Route exact path="/change/password" component={ChangePassword} />
           <Route exact path="/affiliate/register" component={AffiliateRegister} />
@@ -89,6 +91,8 @@ const App: React.FC = () => {
           <Route exact path="/recommendandwin" component={ReccomendAndWin} />
           <Route exact path="/myplan" component={MyPlan} />
           <Route exact path="/myplan/upgrade" component={UpgradePlan} />
+          <Route exact path="/experience" component={Experience} />
+          <Route exact path="/favorites" component={Favorites} />
           <Route exact path="/home" component={Home} />
 
           <Redirect exact from="/" to={isAuthenticated ? "/home" : "/login"} />

@@ -2,76 +2,64 @@
 import React, { useState } from "react";
 import { IonPage, IonContent } from "@ionic/react";
 import AppHeader from "../../components/SimpleHeader";
-import FooterVoucher from "../../components/Footer-Voucher/FooterVoucher";
-import SearchBar from '../../components/SearchButton/SearchBar';
+import FooterVoucher from "../../components/Footer-LupaCoins/FooterLupaCoins";
 
 import {
   Container,
-  SearchBarWrapper,
-  SearchIcon,
-  SearchInput,
   ListWrapper,
 } from "../AffiliateStores/AffiliateStoresPage.style";
 
 import {
   ScrollArea,
+  BalanceContainer,
+  BalanceLabel,
+  BalanceAmount,
   VouncherWrapper,
   IconContainer,
   ContentContainer,
   VouncherTitle,
   VouncherCategory,
-  VouncherExpiry,
+  VouncherQuantity,
   ViewMore,
-} from "./Voucher.style";
+} from "./LupoCoins.style";
 
-import searchIcon from "../../assets/lupa-search.svg";
-import voucherIcon from "../../assets/voucher.svg";
+import voucherIcon from "../../assets/Coins.svg";
 
-const Vouncher: React.FC = () => {
-  const [query, setQuery] = useState("");
+const LupoCoins: React.FC = () => {
   const [showFooter, setShowFooter] = useState(false);
   const [expandTrigger, setExpandTrigger] = useState(0);
 
   const items = [
-    { id: 1, name: "Alameda Simple Organic", category: "Cosméticos", expiry: "22/02" },
-    { id: 2, name: "Bio Verde", category: "Alimentação", expiry: "22/02" },
-    { id: 3, name: "Casa Natural", category: "Saúde", expiry: "22/02" },
-    { id: 4, name: "Eco Shop", category: "Casa", expiry: "22/02" },
+    { id: 1, name: "Alameda Simple Organic", category: "Cosméticos", quantity: "1500" },
+    { id: 2, name: "Bio Verde", category: "Alimentação", quantity: "1000" },
+    { id: 3, name: "Casa Natural", category: "Saúde", quantity: "300" },
+    { id: 4, name: "Eco Shop", category: "Casa", quantity: "5000" },
   ];
 
-  const filtered = items.filter(i =>
-    i.name.toLowerCase().includes(query.toLowerCase().trim())
-  );
-
   const handleViewMore = () => {
-    if (!showFooter) {
-      setShowFooter(true);
-    }
+    if (!showFooter) setShowFooter(true);
     setExpandTrigger(prev => prev + 1);
   };
 
   return (
     <IonPage>
       <AppHeader
-        title="Meus Cupons"
-        backgroundColor="#E6C178"
+        title="Meus LupaCoins"
+        backgroundColor="#E0A075"
         textColor="#FFFFFF"
       />
 
       <IonContent fullscreen style={{ "--background": "#FFFFFF" } as any}>
         <ScrollArea>
           <Container>
-            <SearchBarWrapper>
-              <SearchIcon src={searchIcon} alt="Buscar" />
-              <SearchInput
-                placeholder="O que você procura hoje?"
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-              />
-            </SearchBarWrapper>
+
+            <BalanceContainer>
+              <BalanceLabel>Você tem:</BalanceLabel>
+              <BalanceAmount>155&nbsp;LupaCoins</BalanceAmount>
+            </BalanceContainer>
 
             <ListWrapper>
-              {filtered.map(item => (
+              {items.map(item => (
                 <VouncherWrapper key={item.id}>
                   <IconContainer>
                     <img src={voucherIcon} alt="Voucher" />
@@ -79,7 +67,7 @@ const Vouncher: React.FC = () => {
                   <ContentContainer>
                     <VouncherTitle>{item.name}</VouncherTitle>
                     <VouncherCategory>{item.category}</VouncherCategory>
-                    <VouncherExpiry>até dia {item.expiry}</VouncherExpiry>
+                    <VouncherQuantity>{item.quantity}&nbsp;LupaCoins</VouncherQuantity>
                     <ViewMore onClick={handleViewMore}>
                       Ver Mais
                     </ViewMore>
@@ -101,4 +89,4 @@ const Vouncher: React.FC = () => {
   );
 };
 
-export default Vouncher;
+export default LupoCoins;

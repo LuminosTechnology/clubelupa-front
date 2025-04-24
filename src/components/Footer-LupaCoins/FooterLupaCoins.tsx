@@ -1,25 +1,29 @@
 // src/components/Footer-Voucher/FooterVoucher.tsx
 import React, { useRef, useState, useEffect } from 'react';
+import styled from 'styled-components';
 import {
   FooterContainer,
   WhiteLine,
   ExpandedContent,
   VoucherIcon,
   Title,
-  Validity,
   SectionTitle,
   Text,
 } from './footer.style';
-import voucherSvg from '../../assets/voucher.svg';
+import Button from '../Button';
+import voucherSvg from '../../assets/Coins.svg';
+
+const ExchangeButton = styled(Button)`
+  margin-top: 30px; /* só aqui entre o segundo Text e o Button */
+`;
 
 interface FooterVoucherProps {
   visible: boolean;
   expandTrigger: number;
 }
 
-const FooterVoucher: React.FC<FooterVoucherProps> = ({ visible, expandTrigger }) => {
+const FooterLupaCoins: React.FC<FooterVoucherProps> = ({ visible, expandTrigger }) => {
   const minHeight = 0;
-  // agora ocupa 65% da altura da tela
   const maxHeight = window.innerHeight * 0.75;
   const footerRef = useRef<HTMLDivElement>(null);
 
@@ -82,31 +86,19 @@ const FooterVoucher: React.FC<FooterVoucherProps> = ({ visible, expandTrigger })
       <ExpandedContent $expanded={height > minHeight + 20}>
         <VoucherIcon src={voucherSvg} alt="Voucher" />
         <Title>Alameda Simple Organic Cosméticos</Title>
-        <Validity>
-          Válido até dia 22/02 às<br />
-          23:59 (horário de Brasília)
-        </Validity>
         <SectionTitle>Experiência Lupa</SectionTitle>
         <Text>
-          Escolha entre o tônico “Self Love”, um sabonete facial, uma mini argila
-          ou a pastilha dental “Tasty” nas compras acima de R$250!
+          Escolha entre o tônico “Self Love”, um sabonete facial, uma mini argila ou a pastilha dental “Tasty” nas compras acima de R$250!
         </Text>
-        <SectionTitle>Como utilizar?</SectionTitle>
-        <Text bold>No espaço físico</Text>
         <Text>
-          Basta acessar a área do assinante e se identificar ao parceiro apresentando
-          seu cartão virtual. Escanear o QR Code no estabelecimento. Apresente ao
-          parceiro a confirmação e pronto! Aproveite e viva sua experiência!
+          Você quer trocar 155 LupaCoins por essa experiência?
         </Text>
-        <Text bold>De forma online</Text>
-        <Text>
-          Para pedidos pelo Whatsapp ou Instagram: Basta enviar o código do seu
-          cartão digital ao parceiro, aguardar a confirmação sobre sua identidade e
-          ser feliz!
-        </Text>
+        <ExchangeButton>
+          QUERO TROCAR MINHAS LUPACOINS
+        </ExchangeButton>
       </ExpandedContent>
     </FooterContainer>
   );
 };
 
-export default FooterVoucher;
+export default FooterLupaCoins;
