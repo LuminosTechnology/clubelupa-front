@@ -1,11 +1,27 @@
+/* ────────────────────────────────────────────
+ * Login.tsx
+ * ──────────────────────────────────────────── */
 import React, { useState } from "react";
-import { IonPage, IonContent, IonButton } from "@ionic/react";
+import { IonPage, IonContent } from "@ionic/react";
 import { useHistory } from "react-router-dom";
-import { login } from "../../services/auth-service";
-import { ButtonContainer, Container, DividerContainer, ErrorMessage, LinkContainer, RegisterContainer } from "./login.style";
+
+import {
+  Container,
+  ErrorMessage,
+  ForgotPasswordWrapper,
+  FormWrapper,
+  IconLoginButton,
+  LinkContainer,
+  LogoWrapper,
+  RegisterContainer,
+} from "./login.style";
+
 import FloatingInput from "../../components/FloatingInput";
-import Button from "../../components/Button";
 import Link from "../../components/Link";
+import { login } from "../../services/auth-service";
+
+import Logo from "../../assets/Logo.svg";
+import LupaIcon from "../../assets/icon-lupa2.svg";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -13,28 +29,23 @@ const Login: React.FC = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const history = useHistory();
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  /* ─────────── helpers ─────────── */
+  const validateEmail = (value: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
-    if (!email) {
-      newErrors.email = 'Email é obrigatório';
-    } else if (!validateEmail(email)) {
-      newErrors.email = 'Digite um email válido';
-    }
+    if (!email) newErrors.email = "Email é obrigatório";
+    else if (!validateEmail(email)) newErrors.email = "Digite um email válido";
 
-    if (!password) {
-      newErrors.password = 'Senha é obrigatória';
-    }
+    if (!password) newErrors.password = "Senha é obrigatória";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  /* ─────────── actions ─────────── */
   const handleLogin = async () => {
     if (!validateForm()) return;
 
@@ -45,72 +56,86 @@ const Login: React.FC = () => {
       const message = error.response?.data?.message || "Erro ao fazer login!";
       setErrors({
         form: message,
-        ...(error.response?.data?.errors || {})
+        ...(error.response?.data?.errors || {}),
       });
     }
   };
 
-  const handleRegister = () => {
-    history.push("/register");
-  };
+  const handleRegister = () => history.push("/register");
 
+  /* ─────────── UI ─────────── */
   return (
     <IonPage>
-      <IonContent
-        style={{
-          "--background": "#9fa369",
-        }}
-      >
+      <IonContent style={{ "--background": "#9fa369" }}>
         <Container>
-          <h2>Entrar</h2>
+          {/* topo */}
+          <LogoWrapper>
+            <img src={Logo} alt="Logo" style={{ width: 160 }} />
+          </LogoWrapper>
 
-          <FloatingInput
-            label="Email"
-            value={email}
-            onChange={setEmail}
-            type="email"
-            error={!!errors.email}
-          />
-          {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
+          {/* centro */}
+          <FormWrapper>
+            <FloatingInput
+              label="Email"
+              value={email}
+              onChange={setEmail}
+              type="email"
+              error={!!errors.email}
+            />
+            {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
 
-          <FloatingInput
-            label="Senha"
-            value={password}
-            onChange={setPassword}
-            isPassword
-            error={!!errors.password}
-          />
-          {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
+            <FloatingInput
+              label="Senha"
+              value={password}
+              onChange={setPassword}
+              isPassword
+              error={!!errors.password}
+            />
+            {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
 
-          <div className="forgot-password" style={{ alignSelf: 'flex-end', marginTop: '10px' }}>
-            <Link onClick={() => history.push('/forgot-password')}>
-              Esqueci minha senha
-            </Link>
-          </div>
-
-          {errors.form && <ErrorMessage style={{ fontSize: '16px', fontWeight: 'bold', textAlign: 'center' }}>{errors.form}</ErrorMessage>}
-
-          <ButtonContainer>
-            <Button onClick={handleLogin}>
-              ENTRAR
-            </Button>
-
-            <LinkContainer>
-              <div>Ao entrar, você concorda com nossos</div>
-              <Link onClick={() => window.open('https://www.google.com', '_blank')}>
-                Termos e política de privacidade
+            {/* link esqueci senha à direita */}
+            <ForgotPasswordWrapper>
+              <Link onClick={() => history.push("/forgot-password")}>
+                Esqueci minha senha
               </Link>
-            </LinkContainer>
-          </ButtonContainer>
+            </ForgotPasswordWrapper>
 
-          <RegisterContainer>
-            <DividerContainer>
-              <div>ou</div>
-            </DividerContainer>
-            <Link onClick={handleRegister}>
-              Ainda não tem conta? Cadastre-se
+            {/* ainda não tem conta */}
+            <RegisterContainer>
+              <Link onClick={handleRegister}>
+                Ainda não tem conta? Cadastre-se
+              </Link>
+            </RegisterContainer>
+
+            {/* botão-ícone de login */}
+            <IconLoginButton onClick={handleLogin} aria-label="Entrar">
+              <img src={LupaIcon} alt="Entrar" />
+            </IconLoginButton>
+
+            {errors.form && (
+              <ErrorMessage
+                style={{
+                  fontSize: 16,
+                  fontWeight: "bold",
+                  textAlign: "center",
+                }}
+              >
+                {errors.form}
+              </ErrorMessage>
+            )}
+          </FormWrapper>
+
+          {/* rodapé: termos */}
+          <LinkContainer>
+            <div>Ao entrar, você concorda com nossos</div>
+            <Link
+              onClick={() =>
+                window.open("https://www.google.com", "_blank", "noopener")
+              }
+            >
+              Termos e política de privacidade
             </Link>
-          </RegisterContainer>
+          </LinkContainer>
         </Container>
       </IonContent>
     </IonPage>

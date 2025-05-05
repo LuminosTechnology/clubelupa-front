@@ -1,19 +1,22 @@
+// src/services/interfaces/Auth.ts
 export interface User {
   id: number;
   nome_completo: string;
   data_nascimento: string;
   telefone: string;
-  celular: string;
+  celular: string | null;
   cpf: string;
   cep: string;
   rua: string;
-  bairro: string;
-  cidade: string;
-  uf: string;
+  bairro: string | null;
+  cidade: string | null;
+  uf: string | null;
   email: string;
   email_verified_at: string | null;
   created_at: string;
   updated_at: string;
+  profile_photo?: string;   // URL da foto vinda da API
+  avatar_url?: string;      // opcional, manter para compatibilidade
 }
 
 export interface LoginUserRequest {

@@ -1,255 +1,251 @@
+/* ───────────────────────────────────────────────────────────────
+ * src/pages/Map/index.tsx
+ *   – mantém TODOS os campos do objeto original:
+ *     id • name • address • distance • hours • image • location
+ *     (e ainda traz category • schedule • benefits • color • img)
+ * ─────────────────────────────────────────────────────────────── */
 import React, { useEffect, useState } from 'react';
-import { MapContainer, MapWrapper, RestaurantCard, RestaurantDetails, RestaurantImage, RestaurantInfo, ViewMoreButton, CheckInButton, CheckInMessage, CloseButton } from './map.style';
+import {
+  MapContainer,
+  MapWrapper,
+  RestaurantCard,
+  RestaurantDetails,
+  RestaurantImage,
+  RestaurantInfo,
+  ViewMoreButton,
+  CheckInButton,
+  CheckInMessage,
+  CloseButton
+} from './map.style';
 import { Geolocation } from '@capacitor/geolocation';
 import { GoogleMap } from '@capacitor/google-maps';
 import lupaMarker from '../../assets/lupa-search.svg';
-import { star, close, accessibilityOutline } from 'ionicons/icons';
+import { close, accessibilityOutline } from 'ionicons/icons';
 import { IonIcon } from '@ionic/react';
-import { dayTheme, nightTheme } from './mapThemes';
 
-interface Restaurant {
-  id: string;
-  name: string;
+/* -------------------------------------------------------------------------- */
+/* 1. Mock original da lista (não mexemos nele)                               */
+import {
+  stores,   // id • name • category • schedule • benefits • color • img
+  Store
+} from '../../pages/AffiliateStores/AffiliateStoresPage';
+
+/* 2. Complemento EXCLUSIVO do mapa – garante TODOS os campos                */
+interface ExtraFields {
   address: string;
   distance: string;
   hours: string;
-  image: string;
-  location: {
-    lat: number;
-    lng: number;
-  };
+  image: string; // pode ser o mesmo img ou um diferente
+  location: { lat: number; lng: number };
+}
+
+const extraById: Record<number, ExtraFields> = {
+  1: {
+    address: 'Rua Exemplo, 123',
+    distance: '2.5 km',
+    hours: 'Aberto agora • Fecha às 23:00',
+    image:
+      'https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060',
+    location: { lat: -25.4415, lng: -49.291 }
+  },
+  2: {
+    address: 'Av. Exemplo, 456',
+    distance: '1.8 km',
+    hours: 'Aberto agora • Fecha às 21:00',
+    image:
+      'https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060',
+    location: { lat: -25.4352, lng: -49.3004 }
+  },
+  3: {
+    address: 'Praça Exemplo, 789',
+    distance: '3.1 km',
+    hours: 'Aberto agora • Fecha às 20:00',
+    image:
+      'https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060',
+    location: { lat: -25.4398, lng: -49.3201 }
+  },
+  4: {
+    address: ' Av. Prof. Pedro Viriato Parigot de Souza, 5300',
+    distance: '900 m',
+    hours: 'Aberto agora • Fecha às 22:00', 
+    image:
+      'https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060',
+    location: { lat: -25.4489, lng: -49.3558 }
+  }
+};
+
+/* 3. Tipo completo para o mapa                                              */
+interface Restaurant extends Store, ExtraFields {
   checkedIn?: boolean;
 }
 
+/* 4. Une mock + extras                                                      */
+const restaurants: Restaurant[] = stores.map((s) => ({
+  ...s,
+  ...extraById[s.id]
+}));
+
+/* -------------------------------------------------------------------------- */
 interface MapProps {
   apiKey: string;
 }
 
 const Map: React.FC<MapProps> = ({ apiKey }) => {
-  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
+  const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(
+    null
+  );
+  const [selected, setSelected] = useState<Restaurant | null>(null);
   const [map, setMap] = useState<GoogleMap | null>(null);
   const [loading, setLoading] = useState(false);
-  const DEFAULT_LOCATION = { lat: -25.4284, lng: -49.2733 };
-
   const [checkInMessage, setCheckInMessage] = useState<string | null>(null);
 
-  // Get current location
-  useEffect(() => {
-    const getCurrentPosition = async () => {
-      try {
-        const coordinates = await Geolocation.getCurrentPosition();
-        const userLocation = {
-          lat: coordinates.coords.latitude,
-          lng: coordinates.coords.longitude
-        };
-        console.log('User location:', userLocation);
-        setLocation(userLocation);
-      } catch (error) {
-        console.warn('Error getting location, using default:', error);
-        setLocation(DEFAULT_LOCATION);
-      }
-    };
+  const DEFAULT_LOCATION = { lat: -25.4415, lng: -49.291 };
+  const CHECKIN_RADIUS = 500; // m
 
-    getCurrentPosition();
+  /* ─── localização ─────────────────────────────────────────────────── */
+  useEffect(() => {
+    (async () => {
+      try {
+        const { coords } = await Geolocation.getCurrentPosition({
+          enableHighAccuracy: true
+        });
+        setUserLoc({ lat: coords.latitude, lng: coords.longitude });
+      } catch {
+        setUserLoc(DEFAULT_LOCATION);
+      }
+    })();
   }, []);
 
-  // Example restaurants data
-  const restaurants: Restaurant[] = [
-    {
-      id: '1',
-      name: 'Restaurante Exemplo',
-      address: 'Rua Exemplo, 123',
-      distance: '2.5 km',
-      hours: 'Aberto agora • Fecha às 23:00',
-      image: 'https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060',
-      location: { lat: -25.48479, lng: -49.30285 }
-    },
-    {
-      id: '2',
-      name: 'Restaurante Exemplo',
-      address: 'Rua Exemplo, 123',
-      distance: '2.5 km',
-      hours: 'Aberto agora • Fecha às 23:00',
-      image: 'https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060',
-      location: { lat: -25.48469, lng: -49.3385 }
-    },
-    {
-      id: '3',
-      name: 'Restaurante Exemplo',
-      address: 'Rua Exemplo, 123',
-      distance: '2.5 km',
-      hours: 'Aberto agora • Fecha às 23:00',
-      image: 'https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060',
-      location: { lat: -25.49469, lng: -49.4585 }
-    },
-    {
-      id: '4',
-      name: 'Teste Novo',
-      address: 'Rua Nova, 456',
-      distance: '1.2 km',
-      hours: 'Aberto agora • Fecha às 22:00',
-      image: 'https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060',
-      location: { lat: -25.507582, lng: -49.354845 }
-    }
-  ];
-
-  const isDayTime = () => {
-    const hour = new Date().getHours();
-    return hour >= 6 && hour < 18;
-  };
-
+  /* ─── mapa + marcadores ───────────────────────────────────────────── */
   useEffect(() => {
-    const createMap = async () => {
-      if (!location) return;
+    (async () => {
+      if (!userLoc) return;
 
-      const mapElement = document.getElementById('map');
-      if (!mapElement) return;
+      const el = document.getElementById('map');
+      if (!el) return;
 
-      const newMap = await GoogleMap.create({
-        id: 'map-1',
-        element: mapElement,
-        apiKey: apiKey,
+      const gMap = await GoogleMap.create({
+        id: 'affiliates-map',
+        element: el,
+        apiKey,
         config: {
-          center: location,
+          center: userLoc,
           zoom: 15,
-          mapId: isDayTime() ? '6c69da475e7f7301' : '8e0a97af9386fef',
           disableDefaultUI: true,
-          clickableIcons: false,
-          mapTypeControl: false,
-          streetViewControl: false,
-          fullscreenControl: false,
-          zoomControl: false,
-          mapTypeId: 'roadmap',
-          tilt: 45,
-          maxZoom: 18,
-          minZoom: 12,
-          restriction: {
-            latLngBounds: {
-              north: location.lat + 0.1,
-              south: location.lat - 0.1,
-              east: location.lng + 0.1,
-              west: location.lng - 0.1,
-            },
-            strictBounds: true
-          }
+          clickableIcons: false
         }
       });
 
-      await newMap.setOnCameraMoveStartedListener(() => {
-        setSelectedRestaurant(null);
-        setCheckInMessage(null); // Clear message when moving the map
-      });
-
-      // Add markers
-      for (const restaurant of restaurants) {
-        await newMap.addMarker({
-          coordinate: restaurant.location,
-          iconUrl: lupaMarker,
-          iconSize: { width: 48, height: 48 }
-        });
-      }
-
-      // Add current location marker with Ionic star icon
-      await newMap.addMarker({
-        coordinate: location,
+      await gMap.addMarker({
+        coordinate: userLoc,
         iconUrl: accessibilityOutline,
         iconSize: { width: 32, height: 32 }
       });
 
-      // Handle marker clicks
-      await newMap.setOnMarkerClickListener(async (marker) => {
-        const clicked = restaurants.find(r =>
-          r.location.lat === marker.latitude &&
-          r.location.lng === marker.longitude
-        );
+      for (const r of restaurants) {
+        await gMap.addMarker({
+          coordinate: r.location,
+          iconUrl: lupaMarker,
+          iconSize: { width: 40, height: 40 }
+        });
+      }
 
-        if (clicked) {
-          await newMap.setCamera({
-            coordinate: clicked.location,
-            animate: true
-          });
-          setSelectedRestaurant(clicked);
-          setCheckInMessage(null); // Clear message when switching cards
+      await gMap.setOnMarkerClickListener(async (m) => {
+        const hit = restaurants.find(
+          (r) => r.location.lat === m.latitude && r.location.lng === m.longitude
+        );
+        if (hit) {
+          await gMap.setCamera({ coordinate: hit.location, animate: true });
+          setSelected(hit);
+          setCheckInMessage(null);
         }
       });
 
-      setMap(newMap);
-    };
+      setMap(gMap);
+    })();
+  }, [userLoc, apiKey]);
 
-    createMap();
-  }, [location, apiKey]);
-
-  const handleCheckIn = async () => {
-    if (!selectedRestaurant || !location) return;
+  /* ─── check-in ─────────────────────────────────────────────────────── */
+  const handleCheckIn = () => {
+    if (!selected || !userLoc) return;
 
     setLoading(true);
-    const distance = getDistanceFromLatLonInMeters(
-      location.lat,
-      location.lng,
-      selectedRestaurant.location.lat,
-      selectedRestaurant.location.lng
+    const d = haversine(
+      userLoc.lat,
+      userLoc.lng,
+      selected.location.lat,
+      selected.location.lng
     );
 
-    if (distance <= 100) {
-      // setSelectedRestaurant({ ...selectedRestaurant, checkedIn: true }); // Update restaurant state
-      setCheckInMessage('Check-in realizado!');
+    if (d <= CHECKIN_RADIUS) {
+      setSelected({ ...selected, checkedIn: true });
+      setCheckInMessage('✅ Check-in realizado!');
     } else {
-      setCheckInMessage('Você está muito longe.');
+      setCheckInMessage('❌ Você está muito longe.');
     }
 
     setLoading(false);
-    setTimeout(() => setCheckInMessage(null), 3000); // Clear message after 3 seconds
+    setTimeout(() => setCheckInMessage(null), 3000);
   };
 
-  const getDistanceFromLatLonInMeters = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const R = 6371e3; // Radius of the earth in meters
-    const dLat = (lat2 - lat1) * (Math.PI / 180);
-    const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const haversine = (
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number
+  ) => {
+    const R = 6371e3;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
     const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distance = R * c; // Distance in meters
-    return distance;
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) ** 2;
+    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
   };
 
-  const handleCloseCard = () => {
-    setSelectedRestaurant(null);
-    setCheckInMessage(null);
-  };
-
+  /* ─── UI ──────────────────────────────────────────────────────────── */
   return (
     <MapWrapper>
       <MapContainer id="map" />
-      {selectedRestaurant && (
+
+      {selected && (
         <RestaurantCard>
-          <CloseButton onClick={handleCloseCard}>
+          <CloseButton
+            onClick={() => {
+              setSelected(null);
+              setCheckInMessage(null);
+            }}
+          >
             <IonIcon icon={close} />
           </CloseButton>
+
           <RestaurantInfo>
-            <RestaurantImage
-              src={selectedRestaurant.image}
-              alt={selectedRestaurant.name}
-            />
+            <RestaurantImage src={selected.image} alt={selected.name} />
             <RestaurantDetails>
-              <h3>{selectedRestaurant.name}</h3>
-              <p>{selectedRestaurant.address}</p>
-              <p>{selectedRestaurant.distance}</p>
-              <p>{selectedRestaurant.hours}</p>
+              <h3>{selected.name}</h3>
+              <p>{selected.address}</p>
+              <p>{selected.distance}</p>
+              <p>{selected.hours}</p>
             </RestaurantDetails>
           </RestaurantInfo>
-          <ViewMoreButton>
-            Ver mais sobre
-          </ViewMoreButton>
-          {!selectedRestaurant.checkedIn && (
+
+          <ViewMoreButton>Ver mais sobre</ViewMoreButton>
+
+          {!selected.checkedIn && (
             <>
               <CheckInButton onClick={handleCheckIn} disabled={loading}>
-                {loading ? 'Loading...' : 'Check-In'}
+                {loading ? 'Carregando…' : 'Check-in'}
               </CheckInButton>
-              {checkInMessage && <CheckInMessage>{checkInMessage}</CheckInMessage>}
+              {checkInMessage && (
+                <CheckInMessage>{checkInMessage}</CheckInMessage>
+              )}
             </>
+          )}
+
+          {selected.checkedIn && (
+            <CheckInMessage>✅ Check-in já realizado</CheckInMessage>
           )}
         </RestaurantCard>
       )}

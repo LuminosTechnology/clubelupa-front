@@ -28,7 +28,6 @@ import notificationIcon from '../../assets/notification.svg';
 import chatIcon from '../../assets/chat.svg';
 import emailIcon from '../../assets/email.svg';
 import instagramIcon from '../../assets/insta.svg';
-import TalkToUs from '../TalkToUs/TalkToUs';
 
 /** Botão “SAIR” centralizado */
 const LogoutButton = styled(Button)`
@@ -70,6 +69,9 @@ const ProfilePage: React.FC = () => {
     history.push('/profile/talktous');
   };
 
+  // Escolhe a foto do usuário se existir, senão o placeholder
+  const photoSrc = user?.profile_photo ?? user?.avatar_url ?? avatarPic;
+
   return (
     <IonPage>
       <AppHeader
@@ -79,7 +81,7 @@ const ProfilePage: React.FC = () => {
       />
 
       <AvatarWrapper>
-        <Avatar src={avatarPic} alt="Foto de perfil" />
+        <Avatar src={photoSrc} alt="Foto de perfil" />
       </AvatarWrapper>
 
       <IonContent fullscreen style={{ '--background': '#FFFFFF' } as any}>
@@ -100,7 +102,6 @@ const ProfilePage: React.FC = () => {
           </MenuOption>
           <Divider />
 
-          {/* Aqui a mudança: onClick para navegar */}
           <MenuOption onClick={goToNotification}>
             <MenuIcon src={notificationIcon} alt="Ícone Notificação" />
             Notificação
@@ -111,7 +112,6 @@ const ProfilePage: React.FC = () => {
             <MenuIcon src={chatIcon} alt="Ícone Fale Conosco" />
             Fale Conosco
           </MenuOption>
-          {/* 80px de espaço antes dos contatos */}
           <Divider style={{ marginBottom: '80px' }} />
 
           <MenuOption>

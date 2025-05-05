@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+// src/components/SlideMenu/SlideMenu.tsx
+import React, { useEffect, useState, useMemo } from 'react';
 import { IonIcon } from '@ionic/react';
 import { close, logOut } from 'ionicons/icons';
 import {
@@ -10,8 +11,9 @@ import {
   LogoutButton,
 } from './SlideMenu.style';
 import { useHistory, useLocation } from 'react-router-dom';
-import { logout } from '../../services/auth-service';
+import { logout, getUserByToken } from '../../services/auth-service';
 import { Preferences } from '@capacitor/preferences';
+import { User } from '../../services/interfaces/Auth';
 
 interface SlideMenuProps {
   isOpen: boolean;
@@ -21,12 +23,29 @@ interface SlideMenuProps {
 const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
   const history = useHistory();
   const location = useLocation();
+  const [user, setUser] = useState<User | null>(null);
+  const [isAffiliate, setIsAffiliate] = useState(false);
 
+  // Close menu on route change
   useEffect(() => {
     if (isOpen) {
       onClose();
     }
   }, [location.pathname]);
+
+  // Load user and detect affiliate status
+  useEffect(() => {
+    (async () => {
+      try {
+        const fetched = await getUserByToken();
+        setUser(fetched);
+        // supondo que a API retorne um campo `is_affiliate: boolean`
+        setIsAffiliate(!!(fetched as any).is_affiliate);
+      } catch (err) {
+        console.error('Erro ao buscar dados do usuário', err);
+      }
+    })();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -40,16 +59,28 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const menuItems = [
-    { label: 'Perfil', path: '/profile' },
-    { label: 'Afiliados', path: '/affiliates' },
-    { label: 'Troca de LupaCoins', path: '/lupacoins' },
-    { label: 'Meu Plano', path: '/myplan' },
-    { label: 'Meus Favoritos', path: '/favorites' },
-    { label: 'Histórico', path: '/experience' },
-    { label: 'Indique e Ganhe', path: '/recommendandwin' },
-    { label: 'Seja um Afiliado', path: '/affiliate/register' },
-  ];
+  // Monta itens de menu dinamicamente
+  const menuItems = useMemo(() => {
+    const items = [
+      { label: 'Perfil', path: '/profile' },
+      { label: 'Afiliados', path: '/affiliates' },
+      { label: 'Troca de LupaCoins', path: '/lupacoins' },
+      { label: 'Meu Plano', path: '/myplan' },
+      { label: 'Meus Favoritos', path: '/favorites' },
+      { label: 'Histórico', path: '/experience' },
+      { label: 'Indique e Ganhe', path: '/recommendandwin' },
+    ];
+
+    if (isAffiliate) {
+      // Se já é afiliado, mostra "Área do Afiliado"
+      items.push({ label: 'Área do Afiliado', path: '/affiliate/area' });
+    } else {
+      // Se não for afiliado, mostra "Seja um Afiliado"
+      items.push({ label: 'Seja um Afiliado', path: '/affiliate/register' });
+    }
+
+    return items;
+  }, [isAffiliate]);
 
   return (
     <>
@@ -60,9 +91,9 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
         </CloseButton>
 
         <MenuItems>
-          {menuItems.map((item, index) => (
+          {menuItems.map((item, idx) => (
             <MenuItem
-              key={index}
+              key={idx}
               onClick={() => {
                 history.push(item.path);
                 onClose();
@@ -75,7 +106,10 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
 
         <LogoutButton onClick={handleLogout}>
           Desconectar
-          <IonIcon icon={logOut} style={{ width: '25px', height: '25px', marginLeft: '10px', marginRight: '2px' }} />
+          <IonIcon
+            icon={logOut}
+            style={{ width: '25px', height: '25px', marginLeft: 10 }}
+          />
         </LogoutButton>
       </MenuContainer>
     </>

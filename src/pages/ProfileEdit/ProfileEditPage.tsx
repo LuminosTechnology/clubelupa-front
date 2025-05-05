@@ -29,7 +29,7 @@ import {
   updateUserProfile,
   updateProfilePhoto,
 } from "../../services/auth-service";
-import { User } from "../../services/interfaces/Auth";  // <-- corrigido
+import { User } from "../../services/interfaces/Auth";
 
 const ProfileEditPage: React.FC = () => {
   const history = useHistory();
@@ -39,9 +39,10 @@ const ProfileEditPage: React.FC = () => {
   const [photoUrl, setPhotoUrl] = useState<string>(profilePlaceholder);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
-  // usar Partial<User> para inicializar apenas os campos que interessam
   const [form, setForm] = useState<Partial<User>>({
     nome_completo: "",
+    data_nascimento: "",
+    telefone: "",
     celular: "",
     cpf: "",
     email: "",
@@ -54,20 +55,26 @@ const ProfileEditPage: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      const user = await getUserByToken();
-      setForm({
-        nome_completo: user.nome_completo,
-        celular: user.celular,
-        cpf: user.cpf,
-        email: user.email,
-        cep: user.cep,
-        rua: user.rua,
-        bairro: user.bairro,
-        cidade: user.cidade,
-        uf: user.uf,
-      });
-      if ((user as any).avatar_url) {
-        setPhotoUrl((user as any).avatar_url);
+      try {
+        const user = await getUserByToken();
+
+        setForm({
+          nome_completo: user.nome_completo,
+          data_nascimento: user.data_nascimento,
+          telefone: user.telefone,
+          celular: user.celular,
+          cpf: user.cpf,
+          email: user.email,
+          cep: user.cep,
+          rua: user.rua,
+          bairro: user.bairro,
+          cidade: user.cidade,
+          uf: user.uf,
+        });
+
+        setPhotoUrl(user.avatar_url ?? profilePlaceholder);
+      } catch (err) {
+        console.error("Erro ao carregar usuário:", err);
       }
     })();
   }, []);
@@ -82,10 +89,23 @@ const ProfileEditPage: React.FC = () => {
   };
 
   const handleSave = async () => {
-    await updateUserProfile(form);
-    if (photoFile) {
-      await updateProfilePhoto(photoFile);
+    console.log("handleSave iniciado", { form, photoFile });
+    try {
+      const updatedUser = await updateUserProfile(form);
+      console.log("Perfil atualizado:", updatedUser);
+
+      if (photoFile) {
+        const newUrl = await updateProfilePhoto(photoFile);
+        console.log("Foto atualizada, nova URL:", newUrl);
+        // atualiza localmente para preview imediato
+        setPhotoUrl(`${newUrl}?cb=${Date.now()}`);
+      }
+    } catch (err) {
+      console.error("Erro ao salvar perfil/foto:", err);
+      return;
     }
+
+    // só volta depois de tudo
     history.goBack();
   };
 
@@ -95,14 +115,12 @@ const ProfileEditPage: React.FC = () => {
         fullscreen
         style={{ "--background": "#ffffff" } as React.CSSProperties}
       >
-        {/* HEADER FIXO */}
         <AppHeader
           title="Editar Perfil"
           backgroundColor="#868950"
           textColor="#FFFFFF"
         />
 
-        {/* ÁREA ROLÁVEL ABAIXO DO HEADER */}
         <ScrollArea onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 0)}>
           <ProfileWrapper scrolled={scrolled}>
             <PhotoContainer>
@@ -124,6 +142,7 @@ const ProfileEditPage: React.FC = () => {
                 <EditContainer>
                   <TitleSection>Editar Perfil</TitleSection>
 
+                  {/* Campos do formulário */}
                   <FieldWrapper>
                     <label>Nome Completo</label>
                     <input
@@ -136,9 +155,31 @@ const ProfileEditPage: React.FC = () => {
                   </FieldWrapper>
 
                   <FieldWrapper>
+                    <label>Data de Nascimento</label>
+                    <input
+                      type="date"
+                      value={form.data_nascimento}
+                      onChange={(e) =>
+                        setForm({ ...form, data_nascimento: e.target.value })
+                      }
+                    />
+                  </FieldWrapper>
+
+                  <FieldWrapper>
+                    <label>Telefone</label>
+                    <input
+                      placeholder="(11) 91234-5678"
+                      value={form.telefone}
+                      onChange={(e) =>
+                        setForm({ ...form, telefone: e.target.value })
+                      }
+                    />
+                  </FieldWrapper>
+
+                  <FieldWrapper>
                     <label>Celular</label>
                     <input
-                      placeholder="(11) 99876‑5432"
+                      placeholder="(11) 99876-5432"
                       value={form.celular}
                       onChange={(e) =>
                         setForm({ ...form, celular: e.target.value })
@@ -149,7 +190,7 @@ const ProfileEditPage: React.FC = () => {
                   <FieldWrapper>
                     <label>CPF</label>
                     <input
-                      placeholder="123.456.789‑10"
+                      placeholder="123.456.789-10"
                       value={form.cpf}
                       onChange={(e) =>
                         setForm({ ...form, cpf: e.target.value })
@@ -158,10 +199,10 @@ const ProfileEditPage: React.FC = () => {
                   </FieldWrapper>
 
                   <FieldWrapper>
-                    <label>E‑mail</label>
+                    <label>E-mail</label>
                     <input
                       type="email"
-                      placeholder="joaoatualizado@example.com"
+                      placeholder="seuemail@example.com"
                       value={form.email}
                       onChange={(e) =>
                         setForm({ ...form, email: e.target.value })
@@ -173,7 +214,7 @@ const ProfileEditPage: React.FC = () => {
                     <FieldWrapper style={{ flex: 1 }}>
                       <label>CEP</label>
                       <input
-                        placeholder="12345‑678"
+                        placeholder="12345-678"
                         value={form.cep}
                         onChange={(e) =>
                           setForm({ ...form, cep: e.target.value })
@@ -232,7 +273,9 @@ const ProfileEditPage: React.FC = () => {
                   </FieldWrapper>
 
                   <SaveButtonWrapper>
-                    <SalvarButton onClick={handleSave}>SALVAR</SalvarButton>
+                    <SalvarButton type="button" onClick={handleSave}>
+                      SALVAR
+                    </SalvarButton>
                   </SaveButtonWrapper>
                 </EditContainer>
               </InputTextTheme>

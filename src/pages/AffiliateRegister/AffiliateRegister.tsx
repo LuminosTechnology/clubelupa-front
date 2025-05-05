@@ -64,7 +64,7 @@ const AffiliateRegister: React.FC = () => {
       });
 
       // Se deu tudo certo, vamos para a tela de sucesso
-      history.push("/affiliate-register-success");
+      history.push("/affiliate/register/success");
     } catch (error: any) {
       // Se o backend retornou algum erro, tratamos aqui
       const backendErrors = error.response?.data?.errors || {};
