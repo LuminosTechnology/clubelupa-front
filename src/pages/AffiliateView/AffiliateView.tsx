@@ -75,7 +75,12 @@ const AffiliateView: React.FC = () => {
               trocar por experiências incríveis!
             </Description>
 
-            <CTAButton bg={store.color}>ESCANEAR NOTA</CTAButton>
+            <CTAButton
+              bg={store.color}
+              onClick={() => history.push('/affiliate/scanner')}
+            >
+              ESCANEAR NOTA
+            </CTAButton>
 
             {/* seções fixas */}
             <Section>
