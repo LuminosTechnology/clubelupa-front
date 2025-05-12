@@ -27,6 +27,7 @@ import UpgradePlan from "./pages/UpgradePlan/UpgradePlan";
 import LupoCoins from "./pages/LupoCoins/LupoCoins";
 import Experience from "./pages/Experience/Experience";
 import Favorites from "./pages/Favorites/Favorites";
+import ScannerNote from "./pages/ScannerNote/ScannerNote";
 
 import { getToken } from "./services/auth-service";
 
@@ -93,6 +94,7 @@ const App: React.FC = () => {
           <Route exact path="/myplan/upgrade" component={UpgradePlan} />
           <Route exact path="/experience" component={Experience} />
           <Route exact path="/favorites" component={Favorites} />
+          <Route exact path="/affiliate/scanner" component={ScannerNote} />
           <Route exact path="/home" component={Home} />
 
           <Redirect exact from="/" to={isAuthenticated ? "/home" : "/login"} />

@@ -33,7 +33,7 @@ export const stores: Store[] = [
   { id: 1, name: "Alameda Simple Organic", category: "Cosméticos", schedule: "Seg‑Sex 09:00 às 18:00", benefits: "10% de desconto", color: "#E6C178", img: sampleImg },
   { id: 2, name: "Bio Verde", category: "Alimentação", schedule: "Seg‑Sab 08:00 às 20:00", benefits: "Brinde na compra", color: "#8E9455", img: sampleImg },
   { id: 3, name: "Casa Natural", category: "Saúde", schedule: "Seg‑Sex 10:00 às 19:00", benefits: "Frete grátis", color: "#E0A075", img: sampleImg },
-  { id: 4, name: "Universidade Positivo", category: "Casa", schedule: "Todos os dias 09:00 às 21:00", benefits: "Amostra grátis", color: "#E6C178", img: sampleImg },
+  { id: 4, name: "Universidade Positivo", category: "Casa", schedule: "Todos os dias 09:00 às 21:00", benefits: "O Simple Organic é o lugar ideal ", color: "#E6C178", img: sampleImg },
 ];
 
 const AffiliateStoresPage: React.FC = () => {

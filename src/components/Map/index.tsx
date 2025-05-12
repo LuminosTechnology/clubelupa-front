@@ -2,7 +2,7 @@
  * src/pages/Map/index.tsx
  *   – mantém TODOS os campos do objeto original:
  *     id • name • address • distance • hours • image • location
- *     (e ainda traz category • schedule • benefits • color • img)
+ *     (e ainda traz category • schedule • benefits • color • img • value)
  * ─────────────────────────────────────────────────────────────── */
 import React, { useEffect, useState } from 'react';
 import {
@@ -35,8 +35,9 @@ interface ExtraFields {
   address: string;
   distance: string;
   hours: string;
-  image: string; // pode ser o mesmo img ou um diferente
+  image: string;
   location: { lat: number; lng: number };
+  value: number;                      // ← valor do afiliado
 }
 
 const extraById: Record<number, ExtraFields> = {
@@ -46,7 +47,8 @@ const extraById: Record<number, ExtraFields> = {
     hours: 'Aberto agora • Fecha às 23:00',
     image:
       'https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060',
-    location: { lat: -25.4415, lng: -49.291 }
+    location: { lat: -25.4415, lng: -49.291 },
+    value: 150
   },
   2: {
     address: 'Av. Exemplo, 456',
@@ -54,7 +56,8 @@ const extraById: Record<number, ExtraFields> = {
     hours: 'Aberto agora • Fecha às 21:00',
     image:
       'https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060',
-    location: { lat: -25.4352, lng: -49.3004 }
+    location: { lat: -25.4352, lng: -49.3004 },
+    value: 90
   },
   3: {
     address: 'Praça Exemplo, 789',
@@ -62,20 +65,22 @@ const extraById: Record<number, ExtraFields> = {
     hours: 'Aberto agora • Fecha às 20:00',
     image:
       'https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060',
-    location: { lat: -25.4398, lng: -49.3201 }
+    location: { lat: -25.4398, lng: -49.3201 },
+    value: 120
   },
   4: {
-    address: ' Av. Prof. Pedro Viriato Parigot de Souza, 5300',
+    address: 'Av. Prof. Pedro Viriato Parigot de Souza, 5300',
     distance: '900 m',
-    hours: 'Aberto agora • Fecha às 22:00', 
+    hours: 'Aberto agora • Fecha às 22:00',
     image:
       'https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060',
-    location: { lat: -25.4489, lng: -49.3558 }
+    location: { lat: -25.44108, lng: -49.34735 },
+    value: 200
   }
 };
 
 /* 3. Tipo completo para o mapa                                              */
-interface Restaurant extends Store, ExtraFields {
+export interface Restaurant extends Store, ExtraFields {
   checkedIn?: boolean;
 }
 
@@ -88,9 +93,10 @@ const restaurants: Restaurant[] = stores.map((s) => ({
 /* -------------------------------------------------------------------------- */
 interface MapProps {
   apiKey: string;
+  onViewMore: (r: Restaurant) => void;   // ← callback para a Home
 }
 
-const Map: React.FC<MapProps> = ({ apiKey }) => {
+const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
   const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(
     null
   );
@@ -228,10 +234,13 @@ const Map: React.FC<MapProps> = ({ apiKey }) => {
               <p>{selected.address}</p>
               <p>{selected.distance}</p>
               <p>{selected.hours}</p>
+              <p><strong>Vale {selected.value} pontos</strong></p>
             </RestaurantDetails>
           </RestaurantInfo>
 
-          <ViewMoreButton>Ver mais sobre</ViewMoreButton>
+          <ViewMoreButton onClick={() => onViewMore(selected)}>
+            Ver mais sobre
+          </ViewMoreButton>
 
           {!selected.checkedIn && (
             <>

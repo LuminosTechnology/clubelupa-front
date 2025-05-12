@@ -62,6 +62,7 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
   // Monta itens de menu dinamicamente
   const menuItems = useMemo(() => {
     const items = [
+      { label: 'Home', path: '/home' },
       { label: 'Perfil', path: '/profile' },
       { label: 'Afiliados', path: '/affiliates' },
       { label: 'Troca de LupaCoins', path: '/lupacoins' },
