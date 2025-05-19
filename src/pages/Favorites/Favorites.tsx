@@ -1,9 +1,18 @@
-// src/pages/AffiliateStores/Favorites.tsx
-import React, { useState } from "react";
-import { IonPage, IonContent } from "@ionic/react";
+/* ──────────────────────────────────────────────────────────────
+   src/pages/AffiliateStores/Favorites.tsx
+   ────────────────────────────────────────────────────────────── */
+import React, { useCallback, useMemo, useState } from "react";
+import {
+  IonPage,
+  IonContent,
+  IonRefresher,
+  IonRefresherContent,
+  useIonViewWillEnter,
+} from "@ionic/react";
+import { Link } from "react-router-dom";
 
 import AppHeader from "../../components/SimpleHeader";
-import SearchBar from '../../components/SearchButton/SearchBar';
+import SearchBar from "../../components/SearchButton/SearchBar";
 
 import {
   ScrollArea,
@@ -19,28 +28,56 @@ import {
 import searchIcon from "../../assets/lupa-search.svg";
 import sampleImg from "../../assets/sample-store.png";
 
-export interface Store {
-  id: number;
-  name: string;
-  category: string;
-  schedule: string;
-  benefits: string;
-  color: string;
-  img: string;
-}
+import {
+  getFavorites,
+  FavoriteStore,
+} from "../../services/favoritesService";
 
-export const stores: Store[] = [
-  { id: 1, name: "Alameda Simple Organic", category: "Cosméticos", schedule: "Seg-Sex 09:00 às 18:00", benefits: "10% de desconto", color: "#E6C178", img: sampleImg },
-  { id: 2, name: "Bio Verde", category: "Alimentação", schedule: "Seg-Sab 08:00 às 20:00", benefits: "Brinde na compra", color: "#8E9455", img: sampleImg },
-  { id: 3, name: "Casa Natural", category: "Saúde", schedule: "Seg-Sex 10:00 às 19:00", benefits: "Frete grátis", color: "#E0A075", img: sampleImg },
-  { id: 4, name: "Eco Shop", category: "Casa", schedule: "Todos os dias 09:00 às 21:00", benefits: "Amostra grátis", color: "#E6C178", img: sampleImg },
-];
+/* Paleta por categoria */
+const categoryColors: Record<string, string> = {
+  Cosméticos: "#E6C178",
+  Alimentação: "#8E9455",
+  Saúde: "#E0A075",
+  Casa: "#E6C178",
+  default: "#E6C178",
+};
 
 const Favorites: React.FC = () => {
   const [query, setQuery] = useState("");
+  const [stores, setStores] = useState<FavoriteStore[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredStores = stores.filter(s =>
-    s.name.toLowerCase().includes(query.toLowerCase().trim())
+  /* ----------------------------------------------------------------
+     Recarrega favoritos sempre que a view ganha foco (soft refresh)
+     ---------------------------------------------------------------- */
+  const loadFavorites = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getFavorites();
+      setStores(data);
+    } catch (err) {
+      console.error("[Favorites] Erro ao buscar favoritos:", err);
+      setError("Não foi possível carregar seus favoritos. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useIonViewWillEnter(loadFavorites); // executa toda vez que volta para esta tela
+
+  /* ----------------------------------------------------------------
+     Filtro pelo campo de busca
+     ---------------------------------------------------------------- */
+  const filteredStores = useMemo(
+    () =>
+      (stores ?? []).filter((s) =>
+        (s?.nome_local ?? "")
+          .toLowerCase()
+          .includes(query.toLowerCase().trim())
+      ),
+    [stores, query]
   );
 
   return (
@@ -51,7 +88,21 @@ const Favorites: React.FC = () => {
         textColor="#FFFFFF"
       />
 
-      <IonContent fullscreen style={{ "--background": "#FFFFFF" } as React.CSSProperties}>
+      <IonContent
+        fullscreen
+        style={{ "--background": "#FFFFFF" } as React.CSSProperties}
+      >
+        {/* pull-to-refresh manual, além do soft refresh automático */}
+        <IonRefresher
+          slot="fixed"
+          onIonRefresh={(e) => loadFavorites().finally(() => e.detail.complete())}
+        >
+          <IonRefresherContent
+            pullingText="Puxe para atualizar"
+            refreshingSpinner="circles"
+          />
+        </IonRefresher>
+
         <ScrollArea>
           <Container>
             <SearchBar
@@ -61,18 +112,47 @@ const Favorites: React.FC = () => {
               iconSrc={searchIcon}
             />
 
+            {error && <p style={{ color: "red", paddingLeft: 20 }}>{error}</p>}
+
             <ListWrapper>
-              {filteredStores.map(store => (
-                <StoreCard key={store.id}>
-                  <StoreImage src={store.img} alt={store.name} />
-                  <StoreInfo style={{ background: store.color }}>
-                    <StoreLine>Alameda Simple Organic</StoreLine>
-                    <StoreLine>Cosméticos</StoreLine>
-                    <StoreLine>Horário de funcionamento</StoreLine>
-                    <StoreLineLink href="/home">Benefícios</StoreLineLink>
-                  </StoreInfo>
-                </StoreCard>
-              ))}
+              {filteredStores.map((store) => {
+                const cardColor =
+                  categoryColors[store.categoria ?? ""] ??
+                  categoryColors.default;
+
+                return (
+                  <StoreCard key={store.id}>
+                    {/* foto */}
+                    <StoreImage
+                      src={store.profile_photo || sampleImg}
+                      alt={store.nome_local ?? "Estabelecimento"}
+                    />
+
+                    {/* informações */}
+                    <StoreInfo style={{ background: cardColor }}>
+                      <StoreLine>{store.nome_local ?? "—"}</StoreLine>
+                      <StoreLine>{store.categoria ?? "—"}</StoreLine>
+                      <StoreLine>
+                        {store.horario_funcionamento ?? "—"}
+                      </StoreLine>
+
+                      {/* link para a página de detalhes */}
+                      <StoreLineLink
+                        as={Link}
+                        to={`/affiliate-view/${store.id}`}
+                      >
+                        Ver benefícios
+                      </StoreLineLink>
+                    </StoreInfo>
+                  </StoreCard>
+                );
+              })}
+
+              {!loading && filteredStores.length === 0 && (
+                <p style={{ paddingLeft: 20 }}>
+                  Nenhum estabelecimento encontrado.
+                </p>
+              )}
             </ListWrapper>
           </Container>
         </ScrollArea>
