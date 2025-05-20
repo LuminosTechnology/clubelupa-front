@@ -88,7 +88,6 @@ export const LupaIcons = styled.div<{ $expanded: boolean }>`
 export const LevelContainer = styled.div<{ $expanded: boolean }>`
   color: #fff;
   margin: ${({ $expanded }) =>
-    /* laterais 40 px quando expandido p/ alinhar com conteúdo */
     $expanded ? "45px 40px 24px" : "18px 20px 24px"};
 `;
 export const LevelRow = styled.div`
@@ -146,7 +145,7 @@ export const LupaPoints = styled.div`
   display: flex;
   align-items: center;
   margin-left: 8px;
-  margin-bottom:3px;
+  margin-bottom: 3px;
   .lupa-footer-icon {
     width: 34px;
     height: 34px;
@@ -161,7 +160,7 @@ export const LupaPoints = styled.div`
 `;
 export const PointsValue = styled.span`
   font-size: 14px;
-  font-weight: 400; /* sem bold */
+  font-weight: 400;
   color: #fff;
 `;
 export const PointsLabel = styled.span`
@@ -176,8 +175,14 @@ export const ExpandedContent = styled.div<{ $expanded: boolean }>`
   transform: translateY(${({ $expanded }) => ($expanded ? 0 : "20px")});
   visibility: ${({ $expanded }) => ($expanded ? "visible" : "hidden")};
   transition: all 0.3s ease;
+
   padding: 20px 40px;
   margin-top: 30px;
+
+  /* rolagem — igual aos outros footers */
+  max-height: calc(75vh - 200px); /* 200 = header + margem interna */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 `;
 
 /* ---------- conquistas ---------- */
