@@ -1,36 +1,34 @@
 /* ────────────────────────────────────────────
- * src/components/Footer/index.tsx
+ * Footer principal do usuário – V7
  * ──────────────────────────────────────────── */
 import React, { useEffect, useRef, useState } from "react";
-import { IonIcon } from "@ionic/react";
+import { useLocation, useHistory } from "react-router-dom";
+
 import {
   FooterContainer,
-  WhiteLine,
   UserImageContainer,
   UserImage,
   UserName,
-  LupaIcons,
   ExpandedContent,
-  LevelContainer,
-  ProgressBar,
-  ExperienceText,
-  Achievements,
-  AchievementCircle,
-  AchievementTitle,
+  QuickActions,
+  ActionItem,
+  ActionIcon,
+  ActionTitle,
   InfoList,
-  LevelInfo,
-  LevelRow,
-  ProgressBarContainer,
-  AchievementsContain,
-  LupaPoints,
-  PointsValue,
-  PointsLabel,
+  LevelBadge,
+  CollapsedNav,
+  NavButton,
+  CloseFooterBtn,
 } from "./footer.style";
 
-import lupaIcon from "../../assets/icon-lupa.svg";
-import lupaIcon2 from "../../assets/icon-lupa2.svg";
-import lupaFooter from "../../assets/lupa-footer.svg"; /* novo ícone */
+import homeHome       from "../../assets/home-home.svg";
+import homeLupa       from "../../assets/home-lupa.svg";
+import homeNivel      from "../../assets/moeda_vazia.png";
+import homeConquistas from "../../assets/home-conquistas.svg";
+import homeLugares    from "../../assets/home-lugares.svg";
+import footerClose from "../../assets/footer-close.svg";
 
+import FooterAchievements from "../Footer-Achievements/FooterAchievements";
 import { getUserByToken } from "../../services/auth-service";
 import type { User } from "../../services/interfaces/Auth";
 
@@ -45,6 +43,9 @@ interface FooterProps {
 const Footer: React.FC<FooterProps> = ({
   userData = { nivel: 1, experiencia: 750, proximo_nivel: 1000 },
 }) => {
+  const location = useLocation();
+  const history  = useHistory();
+
   /* ─────────── usuário logado ─────────── */
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   useEffect(() => {
@@ -58,134 +59,180 @@ const Footer: React.FC<FooterProps> = ({
     })();
   }, []);
 
-  /* ─────────── drawer ─────────── */
-  const [height, setHeight] = useState(177);
-  const [isDragging, setIsDragging] = useState(false);
-  const dragRef = useRef({ startY: 0, startHeight: 177 });
-
-  const minHeight = 177;
+  /* ─────────── drawer principal ───────── */
+  const minHeight = 120;
   const maxHeight = window.innerHeight * 0.8;
-  const isExpanded = height > minHeight + 100;
 
+  const [height, setHeight]       = useState(minHeight);
+  const [isDragging, setDragging] = useState(false);
+  const dragRef = useRef({ startY: 0, startHeight: minHeight });
+
+  const isCollapsed = height <= minHeight + 2;      // tolerância de 2 px
+const isExpanded  = !isCollapsed;
+
+  /* ─────────── conquistas grid ────────── */
+  const [achievementsOpen,    setAchievementsOpen]    = useState(false);
+  const [achievementsTrigger, setAchievementsTrigger] = useState(0);
+
+  const collapseFooter = () => {
+  setAchievementsOpen(false);
+  setHeight(minHeight);
+};
+
+  useEffect(() => {
+    setAchievementsOpen(false);
+    setHeight(minHeight);
+    setDragging(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (achievementsOpen) setHeight(minHeight);
+  }, [achievementsOpen]);
+
+  /* ─── gestos ─────────────────────────── */
   const handleTouchStart = (e: React.TouchEvent) => {
-    setIsDragging(true);
-    dragRef.current = { startY: e.touches[0].clientY, startHeight: height };
+  if (achievementsOpen) return;
+
+  setDragging(true);
+
+  // ponto onde o dedo toca e a altura atual do footer
+  dragRef.current = {
+    startY: e.touches[0].clientY,
+    startHeight: height,
   };
+};
+
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return;
-    const delta = dragRef.current.startY - e.touches[0].clientY;
-    setHeight(
-      Math.max(minHeight, Math.min(maxHeight, dragRef.current.startHeight + delta))
+  if (!isDragging || achievementsOpen) return;
+
+  // quanto o dedo se moveu
+  const delta = dragRef.current.startY - e.touches[0].clientY;
+
+  // nova altura, limitada entre min e max
+  setHeight(
+    Math.max(
+      minHeight,
+      Math.min(maxHeight, dragRef.current.startHeight + delta)
+    )
+  );
+};
+  const handleTouchEnd = () => {
+  if (achievementsOpen) return;
+  setDragging(false);
+
+  /* ------------- só 2 alturas possíveis ------------- */
+  // se soltou até 60 px acima do mínimo => cola no minHeight
+  if (height <= minHeight + 60) {
+    setHeight(minHeight);
+  } else {
+    setHeight(maxHeight);
+  }
+};
+
+  /* ─────────── helpers ────────────────── */
+  const progressPct = Math.min(
+    1,
+    (userData.experiencia! / userData.proximo_nivel!) * 150
+  );
+
+  const daysUsing = () => {
+    if (!currentUser?.created_at) return 0;
+    return Math.ceil(
+      Math.abs(Date.now() - new Date(currentUser.created_at).getTime()) /
+        (1000 * 60 * 60 * 24)
     );
   };
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-    setHeight(height > minHeight + (maxHeight - minHeight) / 2 ? maxHeight : minHeight);
-  };
 
-  const progressPercent = `${Math.min(
-    100,
-    (userData.experiencia! / userData.proximo_nivel!) * 100
-  )}%`;
-
-  const lupaIcons = [lupaIcon2, lupaIcon2, lupaIcon2, lupaIcon, lupaIcon];
-
-  const calculateDaysSinceCreation = () => {
-    if (!currentUser?.created_at) return 0;
-    const diff =
-      Math.abs(Date.now() - new Date(currentUser.created_at).getTime()) /
-      (1000 * 60 * 60 * 24);
-    return Math.ceil(diff);
-  };
-
+  /* ─────────── render ─────────────────── */
   return (
-    <FooterContainer
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      style={{
-        height,
-        transition: isDragging ? "none" : "height 0.3s ease",
-      }}
-    >
-      <WhiteLine />
+    <>
+      <FooterContainer
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        style={{ height, transition: isDragging ? "none" : "height 0.3s ease" }}
+      >
+        {/* foto + anel de nível + moedinha */}
+        <UserImageContainer $progress={progressPct}>
+          <UserImage
+            src={
+              currentUser?.avatar_url ||
+              currentUser?.profile_photo ||
+              "/src/assets/profile-pic.svg"
+            }
+          />
+          <LevelBadge>
+            <img src={homeNivel} alt="Moeda de nível" />
+            <span>{userData.nivel}</span>
+          </LevelBadge>
+        </UserImageContainer>
 
-      {/* Foto & nome ---------------------------------------------------- */}
-      <UserImageContainer>
-        <UserImage
-          src={
-            currentUser?.avatar_url ||
-            currentUser?.profile_photo ||
-            "/src/assets/profile-pic.svg"
-          }
-        />
-      </UserImageContainer>
-      <UserName>{currentUser?.nome_completo ?? "Usuário"}</UserName>
+        {/* nome somente quando expandido */}
+        {isExpanded && (
+          <UserName>{currentUser?.nome_completo ?? "Usuário"}</UserName>
+        )}
 
-      {/* Ícones de lupa (apenas quando expandido) ----------------------- */}
-      <LupaIcons $expanded={isExpanded}>
-        {lupaIcons.map((icon, i) => (
-          <img key={i} src={icon} alt={`Lupa ${i}`} width={24} height={24} />
-        ))}
-      </LupaIcons>
+        {/* navegação colapsada */}
+        {isCollapsed && (
+          <CollapsedNav>
+            <NavButton
+              $pos="left"
+              onClick={() => history.push("/affiliates")}
+              aria-label="Buscar"
+            >
+              <img src={homeLupa} alt="Ícone de busca" />
+            </NavButton>
+            <NavButton
+              $pos="right"
+              onClick={() => history.push("/lupacoins")}
+              aria-label="Home"
+            >
+              <img src={homeHome} alt="Ícone home" />
+            </NavButton>
+          </CollapsedNav>
+        )}
 
-      {/* Barra de nível ------------------------------------------------- */}
-      <LevelContainer $expanded={isExpanded}>
-        <LevelRow>
-          <LevelInfo>
-            <h2>{userData.nivel}</h2>
-            <p>NÍVEL</p>
-          </LevelInfo>
+        {/* conteúdo expandido */}
+        {isExpanded && (
+          <ExpandedContent>
+            <QuickActions>
+              <ActionItem
+                onClick={() => {
+                  setAchievementsOpen(true);
+                  setAchievementsTrigger((n) => n + 1);
+                }}
+              >
+                <ActionIcon src={homeConquistas} alt="Conquistas" />
+                <ActionTitle>Conquistas</ActionTitle>
+              </ActionItem>
 
-          <ProgressBarContainer>
-            <ProgressBar $percent={progressPercent} />
-            <ExperienceText>
-              {userData.experiencia}/{userData.proximo_nivel}
-            </ExperienceText>
-          </ProgressBarContainer>
+              <ActionItem onClick={() => history.push("/favorites")}>
+                <ActionIcon src={homeLugares} alt="Lugares favoritos" />
+                <ActionTitle>Lugares Favoritos</ActionTitle>
+              </ActionItem>
+            </QuickActions>
 
-          {/* Moedas Lupa: exibidas só quando NÃO expandido -------------- */}
-          {!isExpanded && (
-            <LupaPoints>
-              <img
-                src={lupaFooter}
-                alt="Moeda Lupa"
-                className="lupa-footer-icon"
-              />
-              <div>
-                <PointsValue>{userData.experiencia}</PointsValue>
-                <PointsLabel>Moedas Lupa</PointsLabel>
-              </div>
-            </LupaPoints>
-          )}
-        </LevelRow>
-      </LevelContainer>
+            <InfoList>
+              <li>Lugares visitados com Lupa: 10</li>
+              <li>Benefícios já utilizados: 20</li>
+              <li>LupaCoins acumuladas: 30</li>
+              <li>Dias usando o Lupa: {daysUsing()}</li>
+            </InfoList>
 
-      {/* Conteúdo extra -------------------------------------------------- */}
-      <ExpandedContent $expanded={isExpanded}>
-        <Achievements>
-          {[
-            { title: "Descobertas", icon: "bulb" },
-            { title: "Conquistas", icon: "trophy-outline" },
-            { title: "Medalhas", icon: "medal-outline" },
-          ].map((item, i) => (
-            <AchievementsContain key={i}>
-              <AchievementCircle>
-                <IonIcon icon={item.icon} style={{ fontSize: 24 }} />
-              </AchievementCircle>
-              <AchievementTitle>{item.title}</AchievementTitle>
-            </AchievementsContain>
-          ))}
-        </Achievements>
+            <CloseFooterBtn onClick={collapseFooter}>
+            <img src={footerClose} alt="Fechar footer" />
+            </CloseFooterBtn>
+          </ExpandedContent>
+        )}
+      </FooterContainer>
 
-        <InfoList>
-          <li>Lugares visitados com Lupa: 10</li>
-          <li>Benefícios já utilizados: 20</li>
-          <li>LupaCoins acumuladas: 30</li>
-          <li>Dias usando o Lupa: {calculateDaysSinceCreation()}</li>
-        </InfoList>
-      </ExpandedContent>
-    </FooterContainer>
+      {/* grid de conquistas */}
+      <FooterAchievements
+        visible={achievementsOpen}
+        expandTrigger={achievementsTrigger}
+        onClose={() => setAchievementsOpen(false)}
+      />
+    </>
   );
 };
 
