@@ -1,7 +1,61 @@
 /* ────────────────────────────────────────────
- * Estilos – Footer V7
+ * Estilos – Footer V7 + blur + confetes
  * ──────────────────────────────────────────── */
-import styled, { css } from "styled-components";
+import styled, { css, keyframes } from "styled-components";
+
+/* ---------- animações ---------- */
+const fadeIn = keyframes`
+  from { opacity: 0; }
+  to   { opacity: 1; }
+`;
+const fadeOut = keyframes`
+  from { opacity: 1; }
+  to   { opacity: 0; }
+`;
+/* confete “caindo” */
+const confettiFall = keyframes`
+  0%   { transform: translateY(-100vh) rotate(0deg);   opacity: 1; }
+  100% { transform: translateY(100vh)  rotate(720deg); opacity: 0; }
+`;
+
+/* ---------- blur + texto ---------- */
+export const BlurOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: ${fadeIn} 0.3s ease-out forwards,
+             ${fadeOut} 0.3s ease-in  forwards 2.7s;
+  pointer-events: none;           /* não captura cliques */
+`;
+
+const pop = keyframes`
+  from { transform: scale(0.6); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+`;
+
+export const CongratsText = styled.h1`
+  font-size: 48px;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 0 10px #00000080;
+  animation: ${pop} 0.3s ease-out forwards,
+             ${fadeOut} 0.3s ease-in forwards 2.7s;
+`;
+
+/* cada “pedaço” de confete */
+export const ConfettiPiece = styled.span`
+  position: absolute;
+  top: -10px;
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+  animation: ${confettiFall} 3s ease-out forwards;
+  pointer-events: none;
+`;
 
 /* ---------- estrutura base ---------- */
 export const FooterContainer = styled.div`
@@ -27,7 +81,7 @@ export const UserImageContainer = styled.div<{ $progress: number }>`
   width: 110px;
   height: 110px;
   border-radius: 50%;
-  padding: 5px; /* espessura da barra */
+  padding: 5px;
   background: ${({ $progress }) =>
     `conic-gradient(#D7A07D ${$progress}%, #bfc1c2 ${$progress}% 100%)`};
   display: flex;
@@ -137,9 +191,8 @@ export const ActionTitle = styled.span`
 `;
 
 /* ---------- info list ---------- */
-/* bloco centralizado, mas texto alinhado à esquerda */
 export const InfoList = styled.ul`
-  display: inline-block;         /* <-- era inline-block */
+  display: inline-block;
   text-align: left;
   padding: 0;
   margin: 0 auto;
@@ -153,10 +206,10 @@ export const InfoList = styled.ul`
   }
 `;
 
-/* ---------- botão fechar (52 × 52) ---------- */
+/* ---------- botão fechar ---------- */
 export const CloseFooterBtn = styled.button`
-  display: block;         /* força quebrar linha */
-  margin: 20px auto 0;    /* 20 px abaixo dos textos e centralizado */
+  display: block;
+  margin: 20px auto 0;
   background: none;
   border: none;
   padding: 0;

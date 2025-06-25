@@ -1,5 +1,5 @@
 /* ────────────────────────────────────────────
- * Footer principal do usuário – V7
+ * Footer principal do usuário – V7 + blur + confetes
  * ──────────────────────────────────────────── */
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useHistory } from "react-router-dom";
@@ -19,6 +19,9 @@ import {
   CollapsedNav,
   NavButton,
   CloseFooterBtn,
+  BlurOverlay,
+  CongratsText,
+  ConfettiPiece,
 } from "./footer.style";
 
 import homeHome       from "../../assets/home-home.svg";
@@ -26,7 +29,7 @@ import homeLupa       from "../../assets/home-lupa.svg";
 import homeNivel      from "../../assets/moeda_vazia.png";
 import homeConquistas from "../../assets/home-conquistas.svg";
 import homeLugares    from "../../assets/home-lugares.svg";
-import footerClose from "../../assets/footer-close.svg";
+import footerClose    from "../../assets/footer-close.svg";
 
 import FooterAchievements from "../Footer-Achievements/FooterAchievements";
 import { getUserByToken } from "../../services/auth-service";
@@ -67,17 +70,17 @@ const Footer: React.FC<FooterProps> = ({
   const [isDragging, setDragging] = useState(false);
   const dragRef = useRef({ startY: 0, startHeight: minHeight });
 
-  const isCollapsed = height <= minHeight + 2;      // tolerância de 2 px
-const isExpanded  = !isCollapsed;
+  const isCollapsed = height <= minHeight + 2;
+  const isExpanded  = !isCollapsed;
 
   /* ─────────── conquistas grid ────────── */
   const [achievementsOpen,    setAchievementsOpen]    = useState(false);
   const [achievementsTrigger, setAchievementsTrigger] = useState(0);
 
   const collapseFooter = () => {
-  setAchievementsOpen(false);
-  setHeight(minHeight);
-};
+    setAchievementsOpen(false);
+    setHeight(minHeight);
+  };
 
   useEffect(() => {
     setAchievementsOpen(false);
@@ -91,48 +94,33 @@ const isExpanded  = !isCollapsed;
 
   /* ─── gestos ─────────────────────────── */
   const handleTouchStart = (e: React.TouchEvent) => {
-  if (achievementsOpen) return;
-
-  setDragging(true);
-
-  // ponto onde o dedo toca e a altura atual do footer
-  dragRef.current = {
-    startY: e.touches[0].clientY,
-    startHeight: height,
+    if (achievementsOpen) return;
+    setDragging(true);
+    dragRef.current = { startY: e.touches[0].clientY, startHeight: height };
   };
-};
 
   const handleTouchMove = (e: React.TouchEvent) => {
-  if (!isDragging || achievementsOpen) return;
+    if (!isDragging || achievementsOpen) return;
+    const delta = dragRef.current.startY - e.touches[0].clientY;
+    setHeight(
+      Math.max(
+        minHeight,
+        Math.min(maxHeight, dragRef.current.startHeight + delta)
+      )
+    );
+  };
 
-  // quanto o dedo se moveu
-  const delta = dragRef.current.startY - e.touches[0].clientY;
-
-  // nova altura, limitada entre min e max
-  setHeight(
-    Math.max(
-      minHeight,
-      Math.min(maxHeight, dragRef.current.startHeight + delta)
-    )
-  );
-};
   const handleTouchEnd = () => {
-  if (achievementsOpen) return;
-  setDragging(false);
-
-  /* ------------- só 2 alturas possíveis ------------- */
-  // se soltou até 60 px acima do mínimo => cola no minHeight
-  if (height <= minHeight + 60) {
-    setHeight(minHeight);
-  } else {
-    setHeight(maxHeight);
-  }
-};
+    if (achievementsOpen) return;
+    setDragging(false);
+    if (height <= minHeight + 60) setHeight(minHeight);
+    else setHeight(maxHeight);
+  };
 
   /* ─────────── helpers ────────────────── */
   const progressPct = Math.min(
-    1,
-    (userData.experiencia! / userData.proximo_nivel!) * 150
+    90,
+    (userData.experiencia! / userData.proximo_nivel!) * 150   // → saturado em 100
   );
 
   const daysUsing = () => {
@@ -143,9 +131,47 @@ const isExpanded  = !isCollapsed;
     );
   };
 
+  /* ─────────── blur / parabéns + confete ─ */
+  const [showBlur, setShowBlur] = useState(false);
+
+  useEffect(() => {
+    if (progressPct >= 100) {
+      setShowBlur(true);
+
+      const timer = setTimeout(() => {
+        setShowBlur(false);
+      }, 3300); // 0,3 s fade-in + 2,7 s visível + 0,3 s fade-out
+
+      return () => clearTimeout(timer);
+    }
+  }, [progressPct]);
+
+  /* ---------- confetes ---------- */
+  const colors = ["#ff595e", "#ffca3a", "#8ac926", "#1982c4", "#6a4c93", "#ffffff"];
+  const confettiCount = 40;
+
   /* ─────────── render ─────────────────── */
   return (
     <>
+      {showBlur && (
+        <BlurOverlay>
+          <CongratsText>PARABÉNS!</CongratsText>
+
+          {/* peças de confete */}
+          {Array.from({ length: confettiCount }).map((_, i) => (
+            <ConfettiPiece
+              key={i}
+              style={{
+                left: `${Math.random() * 100}%`,
+                backgroundColor: colors[Math.floor(Math.random() * colors.length)],
+                animationDelay: `${Math.random()}s`,
+                transform: `rotate(${Math.random() * 360}deg)`,
+              }}
+            />
+          ))}
+        </BlurOverlay>
+      )}
+
       <FooterContainer
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -220,7 +246,7 @@ const isExpanded  = !isCollapsed;
             </InfoList>
 
             <CloseFooterBtn onClick={collapseFooter}>
-            <img src={footerClose} alt="Fechar footer" />
+              <img src={footerClose} alt="Fechar footer" />
             </CloseFooterBtn>
           </ExpandedContent>
         )}
