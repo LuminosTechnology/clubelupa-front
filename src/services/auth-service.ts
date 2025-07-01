@@ -78,7 +78,6 @@ export const getUserByToken = async (): Promise<User> => {
   });
 
   const user = response.data.user;
-  // Mapeia profile_photo para avatar_url, se quiser manter nome único no frontend
   return {
     ...user,
     avatar_url: user.profile_photo ?? user.avatar_url ?? ""

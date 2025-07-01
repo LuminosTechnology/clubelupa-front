@@ -23,7 +23,7 @@ import {
   ViewMore,
 } from "./LupoCoins.style";
 
-import voucherIcon from "../../assets/Coins.svg";
+import voucherIcon from "../../assets/moeda.svg";
 
 const LupoCoins: React.FC = () => {
   const [showFooter, setShowFooter] = useState(false);
@@ -44,7 +44,7 @@ const LupoCoins: React.FC = () => {
   return (
     <IonPage>
       <AppHeader
-        title="Meus LupaCoins"
+        title="Minhas Moedas Lupa"
         backgroundColor="#E0A075"
         textColor="#FFFFFF"
       />
@@ -55,7 +55,7 @@ const LupoCoins: React.FC = () => {
 
             <BalanceContainer>
               <BalanceLabel>Você tem:</BalanceLabel>
-              <BalanceAmount>155&nbsp;LupaCoins</BalanceAmount>
+              <BalanceAmount>155&nbsp;Moedas Lupa</BalanceAmount>
             </BalanceContainer>
 
             <ListWrapper>

@@ -1,7 +1,5 @@
-/* ────────────────────────────────────────────
- * src/pages/AffiliateView/AffiliateView.style.ts
- * ──────────────────────────────────────────── */
-import styled from 'styled-components';
+// src/pages/AffiliateView/AffiliateView.style.ts
+import styled, { keyframes, css } from 'styled-components';
 
 /* área de scroll */
 export const ScrollArea = styled.div`
@@ -34,6 +32,8 @@ export const BackButtonWrapper = styled.button<{ color: string }>`
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 `;
 export const BackButton = styled.img`
   width: 20px;
@@ -45,7 +45,43 @@ export const InfoContainer = styled.div`
   padding: 24px;
 `;
 
-/* título + like */
+/* keyframes de bump */
+const bump = keyframes`
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.3); }
+  100% { transform: scale(1); }
+`;
+
+/* botão de like cinza que vira colorido ao clicar */
+export const LikeButton = styled.button.attrs({ type: 'button' })<{
+  liked: boolean;
+  animate: boolean;
+}>`
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+
+  img {
+    width: 38px;
+    height: 38px;
+
+    /* cinza quando não curtido, sem filtro quando curtido */
+    filter: ${({ liked }) =>
+      liked ? 'none' : 'grayscale(100%)'};
+    transition: filter 200ms ease-in-out;
+
+    ${({ animate }) =>
+      animate &&
+      css`
+        animation: ${bump} 300ms ease-out both;
+      `}
+  }
+`;
+
 export const TitleWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -59,11 +95,6 @@ export const Title = styled.h1<{ color: string }>`
   color: ${({ color }) => color};
   line-height: 1.2;
   max-width: 80%;
-`;
-export const LikeIcon = styled.img`
-  width: 38px;
-  height: 38px;
-  flex-shrink: 0;
 `;
 
 /* descrição */
@@ -170,7 +201,7 @@ export const HistoryRow = styled.div`
   margin-top: 8px;
   margin-bottom: 4px;
 `;
-export const HistoryIcon = styled(LinkIcon)``;  /* reaproveita estilos */
+export const HistoryIcon = styled(LinkIcon)``;
 export const HistTitle = styled.h3<{ color: string }>`
   font-size: 14px;
   font-weight: 700;

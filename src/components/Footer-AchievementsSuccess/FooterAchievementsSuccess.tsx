@@ -1,41 +1,47 @@
 import React, { useEffect, useRef, useState } from "react";
 import { IonIcon } from "@ionic/react";
+import { shareSocialOutline } from "ionicons/icons";
+
 import {
   FooterContainer,
-  WhiteLine,
   ExpandedContent,
   HeartWrapper,
   Heading,
   Description,
   ShareButton,
+  CloseBtn,               // import do novo botão
 } from "./footerAchievementsSuccess.style";
 
-import champagneGif from "../../assets/gifs/champanhe-bg.gif";        // ← novo GIF
-import { shareSocialOutline } from "ionicons/icons";
+import champagneGif from "../../assets/gifs/champanhe-bg.gif";
+import footerClose from "../../assets/footer-close.svg";  // ícone de fechar
 
 interface Props {
   visible: boolean;
+  icon: string;
+  title: string;
   onClose?: () => void;
 }
 
 const FooterAchievementsSuccess: React.FC<Props> = ({
   visible,
+  icon,
+  title,
   onClose,
 }) => {
   const minHeight = 0;
   const maxHeight = window.innerHeight * 0.75;
-
   const ref = useRef<HTMLDivElement>(null);
+
   const [height, setHeight] = useState(visible ? maxHeight : minHeight);
   const [dragging, setDragging] = useState(false);
   const drag = useRef({ startY: 0, startHeight: minHeight });
 
-  /* abre/fecha conforme prop */
+  // abre/fecha conforme prop
   useEffect(() => {
     setHeight(visible ? maxHeight : minHeight);
   }, [visible, maxHeight, minHeight]);
 
-  /* drag handlers */
+  // handlers de drag
   const start = (e: React.TouchEvent) => {
     if (!ref.current) return;
     const grip = e.touches[0].clientY - ref.current.getBoundingClientRect().top;
@@ -69,27 +75,28 @@ const FooterAchievementsSuccess: React.FC<Props> = ({
         overflow: "hidden",
       }}
     >
-      <WhiteLine />
+      {/* Removida a WhiteLine */}
 
       <ExpandedContent $expanded={height > minHeight + 20}>
-        <h2 style={{ color: "white", margin: "0 0 35px" }}>Conquistas</h2>
-
         <HeartWrapper>
-          {/* GIF champanhe */}
-          <img src={champagneGif} alt="Celebração" width={180} height={180} />
+          <img src={icon || champagneGif} alt={title} width={180} height={180} />
         </HeartWrapper>
 
-        <Heading>Parabéns</Heading>
+        <Heading>{title}</Heading>
 
         <Description>
-          Você recebeu sua conquista por ter visitado todos os
-          estabelecimentos afiliados ao Lupa do Bairro Cabral
+          Parabéns! Você desbloqueou a conquista <strong>{title}</strong>.
         </Description>
 
-        <ShareButton>
+        <ShareButton onClick={() => {/* lógica de compartilhamento */}}>
           <IonIcon icon={shareSocialOutline} style={{ fontSize: 20, marginRight: 12 }} />
           COMPARTILHAR CONQUISTA
         </ShareButton>
+
+        {/* Novo botão de fechar */}
+        <CloseBtn onClick={onClose}>
+          <img src={footerClose} alt="Fechar conquistas" />
+        </CloseBtn>
       </ExpandedContent>
     </FooterContainer>
   );

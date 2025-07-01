@@ -1,47 +1,72 @@
+/* ────────────────────────────────────────────
+ * Drawer de Conquistas – v2 (ajustado)
+ * ──────────────────────────────────────────── */
 import React, { useEffect, useRef, useState } from "react";
 import {
   FooterContainer,
-  WhiteLine,
   ExpandedContent,
-  Header,
   Grid,
-  Circle,
+  AchievementWrapper,
+  Icon,
   Label,
+  CloseBtn,
 } from "./footerAchievements.style";
 
-import heartSvg from "../../assets/heart-conquistas.svg";
+import embaixadorSvg   from "../../assets/embaixador.svg";
+import frequentadorSvg from "../../assets/frequentador.svg";
+import exploradorSvg   from "../../assets/explorador.svg";
+import cinefiloSvg     from "../../assets/cinefilo.svg";
+import pegadaSvg       from "../../assets/pegada.svg";
+import footerClose     from "../../assets/footer-close.svg";
+
 import FooterAchievementsSuccess from
   "../Footer-AchievementsSuccess/FooterAchievementsSuccess";
 
 interface Props {
-  visible: boolean;               // controlado pelo Footer principal
-  expandTrigger: number;          // mantém como estava (abre grid)
+  visible: boolean;
+  expandTrigger: number;
   onClose?: () => void;
 }
+
+type Achievement = {
+  title: string;
+  icon: string;
+  progress: number;   // 0–100
+  earned: boolean;
+};
 
 const FooterAchievements: React.FC<Props> = ({
   visible,
   expandTrigger,
   onClose,
 }) => {
-  /* drawer GRID ---------------------------------------------------- */
   const minHeight = 0;
   const maxHeight = window.innerHeight * 0.75;
   const ref = useRef<HTMLDivElement>(null);
 
   const [height, setHeight] = useState(minHeight);
-  const [dragging, setDragging] = useState(false);
+  const [dragging, setDrag] = useState(false);
   const drag = useRef({ startY: 0, startHeight: minHeight });
+
+  // controla qual medalha foi clicada
+  const [selected, setSelected] = useState<Achievement | null>(null);
+  // abre o footer de sucesso
+  const [successOpen, setSuccessOpen] = useState(false);
 
   useEffect(() => {
     if (visible || expandTrigger > 0) setHeight(maxHeight);
     else setHeight(minHeight);
   }, [visible, expandTrigger, maxHeight, minHeight]);
 
+  // quando o success abre, fecha o drawer de conquistas
+  useEffect(() => {
+    if (successOpen) setHeight(minHeight);
+  }, [successOpen]);
+
   const start = (e: React.TouchEvent) => {
     if (!ref.current || !visible) return;
     if (e.touches[0].clientY - ref.current.getBoundingClientRect().top > 40) return;
-    setDragging(true);
+    setDrag(true);
     drag.current = { startY: e.touches[0].clientY, startHeight: height };
   };
   const move = (e: React.TouchEvent) => {
@@ -51,37 +76,31 @@ const FooterAchievements: React.FC<Props> = ({
   };
   const end = () => {
     if (!dragging) return;
-    setDragging(false);
-    const mid = minHeight + (maxHeight - minHeight) / 2;
+    setDrag(false);
+    const mid = (minHeight + maxHeight) / 2;
     const final = height > mid ? maxHeight : minHeight;
     setHeight(final);
-    if (final === minHeight && onClose) onClose(); // fecha GRID
+    if (final === minHeight && onClose) onClose();
   };
-
-  /* drawer SUCESSO ------------------------------------------------- */
-  const [successOpen, setSuccessOpen] = useState(false);
-
-  /* colapsa grid ao abrir sucesso */
-  useEffect(() => {
-    if (successOpen) setHeight(minHeight);
-  }, [successOpen, minHeight]);
 
   const closeAll = () => {
-    setSuccessOpen(false);   // fecha sucesso
-    if (onClose) onClose();  // fecha grid
+    setSuccessOpen(false);
+    setSelected(null);
+    if (onClose) onClose();
   };
 
-  /* mock achievements -------------------------------------------- */
-  const achievements = [
-    "Descobridor da Rua Prudente",
-    "Rei dos roteiros",
-    "Barão do Cabral",
-    "Explorador de museus",
+  const achievements: Achievement[] = [
+    { title: "Embaixador",             icon: embaixadorSvg,   progress: 100, earned: true  },
+    { title: "Frequentador\nPremium",  icon: frequentadorSvg, progress: 100, earned: true  },
+    { title: "Explorador\nUrbano",     icon: exploradorSvg,   progress: 100, earned: true  },
+    { title: "Cinéfilo",               icon: cinefiloSvg,     progress: 100, earned: true  },
+    { title: "Primeira\nPegada",       icon: pegadaSvg,       progress: 100, earned: true  },
+    { title: "Acervo\nEspecial",       icon: exploradorSvg,   progress: 80,  earned: false },
   ];
 
   return (
     <>
-      {/* GRID – renderiza só se 'visible' e sucesso fechado */}
+      {/* Drawer de Conquistas */}
       {visible && !successOpen && (
         <FooterContainer
           ref={ref}
@@ -94,36 +113,53 @@ const FooterAchievements: React.FC<Props> = ({
             overflow: "hidden",
           }}
         >
-          <WhiteLine />
-
           <ExpandedContent $expanded={height > minHeight + 20}>
-            <Header>Conquistas</Header>
-
             <Grid>
-              {achievements.map((title) => (
-                <div
-                  key={title}
-                  onClick={() => {
-                    if (title === "Rei dos roteiros") setSuccessOpen(true);
-                  }}
-                  style={{ cursor: title === "Rei dos roteiros" ? "pointer" : "default" }}
-                >
-                  <Circle>
-                    <img src={heartSvg} alt="Conquista" width={72} height={72} />
-                  </Circle>
-                  <Label>{title}</Label>
+              {achievements.map((ach) => (
+                <div key={ach.title}>
+                  <AchievementWrapper
+                    $earned={ach.earned}
+                    $progress={ach.progress}
+                    // só abre o success se já conquistado
+                    onClick={() => {
+                      if (ach.earned) {
+                        setSelected(ach);
+                        setSuccessOpen(true);
+                      }
+                    }}
+                    style={{ cursor: ach.earned ? "pointer" : "default" }}
+                  >
+                    <Icon
+                      $src={ach.icon}
+                      $earned={ach.earned}
+                    />
+                  </AchievementWrapper>
+                  <Label>{ach.title}</Label>
                 </div>
               ))}
             </Grid>
+
+            <CloseBtn
+              onClick={() => {
+                setHeight(minHeight);
+                if (onClose) onClose();
+              }}
+            >
+              <img src={footerClose} alt="Fechar conquistas" />
+            </CloseBtn>
           </ExpandedContent>
         </FooterContainer>
       )}
 
-      {/* SUCESSO */}
-      <FooterAchievementsSuccess
-        visible={successOpen}
-        onClose={closeAll}
-      />
+      {/* Drawer de Sucesso */}
+      {selected && (
+        <FooterAchievementsSuccess
+          visible={successOpen}
+          icon={selected.icon}
+          title={selected.title}
+          onClose={closeAll}
+        />
+      )}
     </>
   );
 };

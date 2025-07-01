@@ -1,6 +1,8 @@
-// src/pages/AffiliateEdit/AffiliateEdit.tsx
-import React, { useState, useRef } from "react";
-import { IonPage, IonContent } from "@ionic/react";
+/* ──────────────────────────────────────────────────────────────
+ * Edição do primeiro afiliado vinculado ao token
+ * ────────────────────────────────────────────────────────────── */
+import React, { useEffect, useRef, useState } from "react";
+import { IonPage, IonContent, IonSpinner } from "@ionic/react";
 import { useHistory } from "react-router-dom";
 
 import AppHeader from "../../components/SimpleHeader";
@@ -16,6 +18,7 @@ import {
   EditContainer,
   TitleSection,
   FieldWrapper,
+  TextAreaWrapper,
   CepRow,
   BuscarButton,
   SaveButtonWrapper,
@@ -25,50 +28,133 @@ import {
 } from "./AffiliateEdit.style";
 
 import { AffiliateData } from "../../services/interfaces/Affiliate";
+import {
+  getMyFirstAffiliate,
+  updateAffiliate,
+  uploadAffiliatePhoto,
+} from "../../services/affiliateService";
+
+/* ---------- estado (todos campos opcionais) ------------------- */
+type FormState = Partial<AffiliateData> & {
+  benefits?: string;
+};
+
+const emptyForm: FormState = {
+  nome_local: "",
+  celular: "",
+  horario_funcionamento: "",
+  email: "",
+  cep: "",
+  bairro: "",
+  rua: "",
+  cidade: "",
+  uf: "",
+  categoria: "",
+  demais_categorias: "",
+  instagram: "",
+  site: "",
+  benefits: "",
+};
 
 const AffiliateEdit: React.FC = () => {
   const history = useHistory();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [scrolled, setScrolled] = useState(false);
-  const [photoUrl, setPhotoUrl] = useState<string>(profilePlaceholder);
+  const [loading, setLoading] = useState(true);
 
-  const [form, setForm] = useState<AffiliateData>({
-    nome_local: "",
-    celular: "",
-    horario_funcionamento: "",
-    email: "",
-    cep: "",
-    bairro: "",
-    rua: "",
-    cidade: "",
-    uf: "",
-    categoria: "",
-    demais_categorias: "",
-    instagram: "",
-    site: "",
-  });
+  const [affiliateId, setAffiliateId] = useState<number | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoUrl, setPhotoUrl] = useState(profilePlaceholder);
+  const [form, setForm] = useState<FormState>(emptyForm);
 
+  /* ─── fetch inicial ─────────────────────────────────────────── */
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await getMyFirstAffiliate();
+        if (!data) {
+          history.goBack();
+          return;
+        }
+
+        setAffiliateId(data.id);
+        setForm({ ...emptyForm, ...data, benefits: data.benefits ?? "" });
+
+        if (data.foto_perfil || data.profile_photo) {
+          setPhotoUrl(data.foto_perfil ?? data.profile_photo);
+        }
+      } catch (err) {
+        console.error("[AffiliateEdit] Erro:", err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [history]);
+
+  /* ─── handlers ──────────────────────────────────────────────── */
   const onEditPhotoClick = () => fileInputRef.current?.click();
 
   const handlePhotoChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    if (!e.target.files?.[0]) return;
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoFile(file);
     setPhotoUrl(URL.createObjectURL(file));
   };
 
-  const handleSave = () => {
-    // Aqui você pode chamar sua API para salvar os dados
-    console.log("Dados do afiliado:", form);
-    history.goBack();
+  const handleCepBuscar = async () => {
+    if (!form.cep) return;
+    try {
+      const res = await fetch(
+        `https://viacep.com.br/ws/${form.cep.replace(/\D/g, "")}/json/`
+      );
+      const data = await res.json();
+      if (!data.erro) {
+        setForm((prev) => ({
+          ...prev,
+          bairro: data.bairro,
+          rua: data.logradouro,
+          cidade: data.localidade,
+          uf: data.uf,
+        }));
+      }
+    } catch (e) {
+      console.error("[AffiliateEdit] CEP:", e);
+    }
   };
 
+  const handleSave = async () => {
+    if (!affiliateId) return;
+    try {
+      if (photoFile) await uploadAffiliatePhoto(affiliateId, photoFile);
+
+      await updateAffiliate(affiliateId, form as AffiliateData);
+      history.goBack();
+    } catch (e) {
+      console.error("[AffiliateEdit] Salvar:", e);
+    }
+  };
+
+  /* ─── loading ──────────────────────────────────────────────── */
+  if (loading) {
+    return (
+      <IonPage>
+        <AppHeader
+          title="Editar Perfil Comercial"
+          backgroundColor="#868950"
+          textColor="#FFF"
+        />
+        <IonContent fullscreen>
+          <IonSpinner name="crescent" />
+        </IonContent>
+      </IonPage>
+    );
+  }
+
+  /* ─── UI ────────────────────────────────────────────────────── */
   return (
     <IonPage>
-      <IonContent
-        fullscreen
-        style={{ "--background": "#ffffff" } as React.CSSProperties}
-      >
+      <IonContent fullscreen style={{ "--background": "#ffffff" } as any}>
         {/* HEADER FIXO */}
         <AppHeader
           title="Editar Perfil Comercial"
@@ -76,9 +162,9 @@ const AffiliateEdit: React.FC = () => {
           textColor="#FFFFFF"
         />
 
-        {/* ÁREA ROLÁVEL ABAIXO DO HEADER */}
+        {/* ÁREA ROLÁVEL */}
         <ScrollArea onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 0)}>
-          {/* FOTO DE PERFIL FIXA/DESAPARECE AO ROLAR */}
+          {/* FOTO */}
           <ProfileWrapper scrolled={scrolled}>
             <PhotoContainer>
               <ProfilePhoto src={photoUrl} alt="Foto de perfil" />
@@ -93,18 +179,18 @@ const AffiliateEdit: React.FC = () => {
             </PhotoContainer>
           </ProfileWrapper>
 
-          {/* CONTEÚDO DO FORMULÁRIO */}
+          {/* FORMULÁRIO */}
           <Content>
             <GreenLabelTheme>
               <InputTextTheme>
                 <EditContainer>
                   <TitleSection>Editar Perfil Comercial</TitleSection>
 
+                  {/* ---- campos ---- */}
                   <FieldWrapper>
                     <label>Nome do Local</label>
                     <input
-                      placeholder="Nome do Local"
-                      value={form.nome_local}
+                      value={form.nome_local ?? ""}
                       onChange={(e) =>
                         setForm({ ...form, nome_local: e.target.value })
                       }
@@ -114,8 +200,7 @@ const AffiliateEdit: React.FC = () => {
                   <FieldWrapper>
                     <label>Celular</label>
                     <input
-                      placeholder="(41) 99999‑9999"
-                      value={form.celular}
+                      value={form.celular ?? ""}
                       onChange={(e) =>
                         setForm({ ...form, celular: e.target.value })
                       }
@@ -125,8 +210,7 @@ const AffiliateEdit: React.FC = () => {
                   <FieldWrapper>
                     <label>Horário de Funcionamento</label>
                     <input
-                      placeholder="Seg‑Sex 09:00 às 18:00"
-                      value={form.horario_funcionamento}
+                      value={form.horario_funcionamento ?? ""}
                       onChange={(e) =>
                         setForm({
                           ...form,
@@ -137,36 +221,34 @@ const AffiliateEdit: React.FC = () => {
                   </FieldWrapper>
 
                   <FieldWrapper>
-                    <label>E‑mail</label>
+                    <label>E-mail</label>
                     <input
                       type="email"
-                      placeholder="contato@exemplo.com"
-                      value={form.email}
+                      value={form.email ?? ""}
                       onChange={(e) =>
                         setForm({ ...form, email: e.target.value })
                       }
                     />
                   </FieldWrapper>
 
+                  {/* CEP + buscar */}
                   <CepRow>
                     <FieldWrapper style={{ flex: 1 }}>
                       <label>CEP</label>
                       <input
-                        placeholder="01234‑567"
-                        value={form.cep}
+                        value={form.cep ?? ""}
                         onChange={(e) =>
                           setForm({ ...form, cep: e.target.value })
                         }
                       />
                     </FieldWrapper>
-                    <BuscarButton>BUSCAR</BuscarButton>
+                    <BuscarButton onClick={handleCepBuscar}>BUSCAR</BuscarButton>
                   </CepRow>
 
                   <FieldWrapper>
                     <label>Bairro</label>
                     <input
-                      placeholder="Centro"
-                      value={form.bairro}
+                      value={form.bairro ?? ""}
                       onChange={(e) =>
                         setForm({ ...form, bairro: e.target.value })
                       }
@@ -176,8 +258,7 @@ const AffiliateEdit: React.FC = () => {
                   <FieldWrapper>
                     <label>Rua</label>
                     <input
-                      placeholder="Rua Exemplo"
-                      value={form.rua}
+                      value={form.rua ?? ""}
                       onChange={(e) =>
                         setForm({ ...form, rua: e.target.value })
                       }
@@ -187,8 +268,7 @@ const AffiliateEdit: React.FC = () => {
                   <FieldWrapper>
                     <label>Cidade</label>
                     <input
-                      placeholder="Curitiba"
-                      value={form.cidade}
+                      value={form.cidade ?? ""}
                       onChange={(e) =>
                         setForm({ ...form, cidade: e.target.value })
                       }
@@ -198,9 +278,8 @@ const AffiliateEdit: React.FC = () => {
                   <FieldWrapper>
                     <label>UF</label>
                     <input
-                      placeholder="PR"
                       maxLength={2}
-                      value={form.uf}
+                      value={form.uf ?? ""}
                       onChange={(e) =>
                         setForm({
                           ...form,
@@ -213,8 +292,7 @@ const AffiliateEdit: React.FC = () => {
                   <FieldWrapper>
                     <label>Categoria Principal</label>
                     <input
-                      placeholder="Cosméticos"
-                      value={form.categoria}
+                      value={form.categoria ?? ""}
                       onChange={(e) =>
                         setForm({ ...form, categoria: e.target.value })
                       }
@@ -224,22 +302,29 @@ const AffiliateEdit: React.FC = () => {
                   <FieldWrapper>
                     <label>Demais Categorias</label>
                     <input
-                      placeholder="Infantil, Sustentável"
-                      value={form.demais_categorias}
+                      value={form.demais_categorias ?? ""}
                       onChange={(e) =>
-                        setForm({
-                          ...form,
-                          demais_categorias: e.target.value,
-                        })
+                        setForm({ ...form, demais_categorias: e.target.value })
                       }
                     />
                   </FieldWrapper>
 
+                  {/* BENEFÍCIOS */}
+                  <TextAreaWrapper>
+                    <label>Benefício Concedido</label>
+                    <textarea
+                      rows={6}
+                      value={form.benefits ?? ""}
+                      onChange={(e) =>
+                        setForm({ ...form, benefits: e.target.value })
+                      }
+                    />
+                  </TextAreaWrapper>
+
                   <FieldWrapper>
                     <label>Instagram</label>
                     <input
-                      placeholder="@seuperfil"
-                      value={form.instagram}
+                      value={form.instagram ?? ""}
                       onChange={(e) =>
                         setForm({ ...form, instagram: e.target.value })
                       }
@@ -250,8 +335,7 @@ const AffiliateEdit: React.FC = () => {
                     <label>Site</label>
                     <input
                       type="url"
-                      placeholder="https://www.exemplo.com"
-                      value={form.site}
+                      value={form.site ?? ""}
                       onChange={(e) =>
                         setForm({ ...form, site: e.target.value })
                       }
@@ -259,9 +343,7 @@ const AffiliateEdit: React.FC = () => {
                   </FieldWrapper>
 
                   <SaveButtonWrapper>
-                    <SalvarButton onClick={handleSave}>
-                      SALVAR
-                    </SalvarButton>
+                    <SalvarButton onClick={handleSave}>SALVAR</SalvarButton>
                   </SaveButtonWrapper>
                 </EditContainer>
               </InputTextTheme>

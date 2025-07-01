@@ -1,10 +1,4 @@
-/* ───────────────────────────────────────────────────────────────
- * src/pages/Map/index.tsx
- *   – mantém TODOS os campos do objeto original:
- *     id • name • address • distance • hours • image • location
- *     (e ainda traz category • schedule • benefits • color • img • value)
- * ─────────────────────────────────────────────────────────────── */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   MapContainer,
   MapWrapper,
@@ -15,88 +9,54 @@ import {
   ViewMoreButton,
   CheckInButton,
   CheckInMessage,
-  CloseButton
-} from './map.style';
-import { Geolocation } from '@capacitor/geolocation';
-import { GoogleMap } from '@capacitor/google-maps';
-import lupaMarker from '../../assets/lupa-search.svg';
-import { close, accessibilityOutline } from 'ionicons/icons';
-import { IonIcon } from '@ionic/react';
+  CloseButton,
+} from "./map.style";
+import { Geolocation } from "@capacitor/geolocation";
+import { GoogleMap } from "@capacitor/google-maps";
+import lupaMarker from "../../assets/comercio.svg";
+import sampleImg from "../../assets/sample-store.png";
+import { close, accessibilityOutline } from "ionicons/icons";
+import { IonIcon } from "@ionic/react";
 
-/* -------------------------------------------------------------------------- */
-/* 1. Mock original da lista (não mexemos nele)                               */
-import {
-  stores,   // id • name • category • schedule • benefits • color • img
-  Store
-} from '../../pages/AffiliateStores/AffiliateStoresPage';
+import { getAllAffiliates } from "../../services/affiliateService";
+import { AffiliateData } from "../../services/interfaces/Affiliate";
 
-/* 2. Complemento EXCLUSIVO do mapa – garante TODOS os campos                */
+/* ---------------- extras específicos do mapa ------------------- */
 interface ExtraFields {
   address: string;
   distance: string;
   hours: string;
   image: string;
   location: { lat: number; lng: number };
-  value: number;                      // ← valor do afiliado
+  value: number;
 }
 
 const extraById: Record<number, ExtraFields> = {
   1: {
-    address: 'Rua Exemplo, 123',
-    distance: '2.5 km',
-    hours: 'Aberto agora • Fecha às 23:00',
+    address: "Rua Exemplo, 123",
+    distance: "2.5 km",
+    hours: "Aberto agora • Fecha às 23:00",
     image:
-      'https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060',
+      "https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060",
     location: { lat: -25.4415, lng: -49.291 },
-    value: 150
+    value: 150,
   },
-  2: {
-    address: 'Av. Exemplo, 456',
-    distance: '1.8 km',
-    hours: 'Aberto agora • Fecha às 21:00',
-    image:
-      'https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060',
-    location: { lat: -25.4352, lng: -49.3004 },
-    value: 90
-  },
-  3: {
-    address: 'Praça Exemplo, 789',
-    distance: '3.1 km',
-    hours: 'Aberto agora • Fecha às 20:00',
-    image:
-      'https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060',
-    location: { lat: -25.4398, lng: -49.3201 },
-    value: 120
-  },
-  4: {
-    address: 'Av. Prof. Pedro Viriato Parigot de Souza, 5300',
-    distance: '900 m',
-    hours: 'Aberto agora • Fecha às 22:00',
-    image:
-      'https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060',
-    location: { lat: -25.44108, lng: -49.34735 },
-    value: 200
-  }
+
 };
 
-/* 3. Tipo completo para o mapa                                              */
-export interface Restaurant extends Store, ExtraFields {
+/* ---------------- tipagens finais ----------------------------------------*/
+export interface Restaurant extends AffiliateData, ExtraFields {
   checkedIn?: boolean;
 }
 
-/* 4. Une mock + extras                                                      */
-const restaurants: Restaurant[] = stores.map((s) => ({
-  ...s,
-  ...extraById[s.id]
-}));
-
-/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------*/
 interface MapProps {
   apiKey: string;
-  onViewMore: (r: Restaurant) => void;   // ← callback para a Home
+  onViewMore: (r: Restaurant) => void;
 }
 
 const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(
     null
   );
@@ -108,12 +68,31 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
   const DEFAULT_LOCATION = { lat: -25.4415, lng: -49.291 };
   const CHECKIN_RADIUS = 500; // m
 
-  /* ─── localização ─────────────────────────────────────────────────── */
+  /* ─── carrega afiliados ───────────────────────────────────────────────── */
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await getAllAffiliates();
+        const full = data
+          .filter((a) => extraById[a.id])
+          .map<Restaurant>((a) => ({
+            ...a,
+            ...extraById[a.id],
+            image: extraById[a.id].image ?? a.foto_perfil ?? sampleImg,
+          }));
+        setRestaurants(full);
+      } catch (err) {
+        console.error("[MAP] Falha ao carregar afiliados:", err);
+      }
+    })();
+  }, []);
+
+  /* ─── localização do usuário ─────────────────────────────────────────── */
   useEffect(() => {
     (async () => {
       try {
         const { coords } = await Geolocation.getCurrentPosition({
-          enableHighAccuracy: true
+          enableHighAccuracy: true,
         });
         setUserLoc({ lat: coords.latitude, lng: coords.longitude });
       } catch {
@@ -122,37 +101,39 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
     })();
   }, []);
 
-  /* ─── mapa + marcadores ───────────────────────────────────────────── */
+  /* ─── inicia o mapa e marcadores ─────────────────────────────────────── */
   useEffect(() => {
     (async () => {
-      if (!userLoc) return;
+      if (!userLoc || !restaurants.length) return;
 
-      const el = document.getElementById('map');
+      const el = document.getElementById("map");
       if (!el) return;
 
       const gMap = await GoogleMap.create({
-        id: 'affiliates-map',
+        id: "affiliates-map",
         element: el,
         apiKey,
         config: {
           center: userLoc,
           zoom: 15,
           disableDefaultUI: true,
-          clickableIcons: false
-        }
+          clickableIcons: false,
+        },
       });
 
+      // marker do usuário
       await gMap.addMarker({
         coordinate: userLoc,
         iconUrl: accessibilityOutline,
-        iconSize: { width: 32, height: 32 }
+        iconSize: { width: 32, height: 32 },
       });
 
+      // markers dos afiliados
       for (const r of restaurants) {
         await gMap.addMarker({
           coordinate: r.location,
           iconUrl: lupaMarker,
-          iconSize: { width: 40, height: 40 }
+          iconSize: { width: 40, height: 40 },
         });
       }
 
@@ -169,31 +150,9 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
 
       setMap(gMap);
     })();
-  }, [userLoc, apiKey]);
+  }, [userLoc, restaurants, apiKey]);
 
-  /* ─── check-in ─────────────────────────────────────────────────────── */
-  const handleCheckIn = () => {
-    if (!selected || !userLoc) return;
-
-    setLoading(true);
-    const d = haversine(
-      userLoc.lat,
-      userLoc.lng,
-      selected.location.lat,
-      selected.location.lng
-    );
-
-    if (d <= CHECKIN_RADIUS) {
-      setSelected({ ...selected, checkedIn: true });
-      setCheckInMessage('✅ Check-in realizado!');
-    } else {
-      setCheckInMessage('❌ Você está muito longe.');
-    }
-
-    setLoading(false);
-    setTimeout(() => setCheckInMessage(null), 3000);
-  };
-
+  /* ─── check-in ───────────────────────────────────────────────────────── */
   const haversine = (
     lat1: number,
     lon1: number,
@@ -211,7 +170,29 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
     return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
   };
 
-  /* ─── UI ──────────────────────────────────────────────────────────── */
+  const handleCheckIn = () => {
+    if (!selected || !userLoc) return;
+
+    setLoading(true);
+    const d = haversine(
+      userLoc.lat,
+      userLoc.lng,
+      selected.location.lat,
+      selected.location.lng
+    );
+
+    if (d <= CHECKIN_RADIUS) {
+      setSelected({ ...selected, checkedIn: true });
+      setCheckInMessage("✅ Check-in realizado!");
+    } else {
+      setCheckInMessage("❌ Você está muito longe.");
+    }
+
+    setLoading(false);
+    setTimeout(() => setCheckInMessage(null), 3000);
+  };
+
+  /* ─── UI ─────────────────────────────────────────────────────────────── */
   return (
     <MapWrapper>
       <MapContainer id="map" />
@@ -227,14 +208,20 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
             <IonIcon icon={close} />
           </CloseButton>
 
+          {/* imagem de ponta a ponta */}
           <RestaurantInfo>
-            <RestaurantImage src={selected.image} alt={selected.name} />
+            <RestaurantImage
+              src={selected.image}
+              alt={selected.nome_fantasia}
+            />
             <RestaurantDetails>
-              <h3>{selected.name}</h3>
+              <h3>{selected.nome_local || selected.nome_fantasia}</h3>
               <p>{selected.address}</p>
               <p>{selected.distance}</p>
               <p>{selected.hours}</p>
-              <p><strong>Vale {selected.value} pontos</strong></p>
+              <p>
+                <strong>Vale {selected.value} pontos</strong>
+              </p>
             </RestaurantDetails>
           </RestaurantInfo>
 
@@ -245,7 +232,7 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
           {!selected.checkedIn && (
             <>
               <CheckInButton onClick={handleCheckIn} disabled={loading}>
-                {loading ? 'Carregando…' : 'Check-in'}
+                {loading ? "Carregando…" : "Check-in"}
               </CheckInButton>
               {checkInMessage && (
                 <CheckInMessage>{checkInMessage}</CheckInMessage>

@@ -4,7 +4,7 @@ export const StyledButton = styled.button<{ variant?: 'primary' | 'secondary' }>
   max-height: 43px;
   padding: 0 65px;
   line-height: 100%;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   background-color: white;
   color: ${props => props.variant === 'secondary' ? '#E0A075' : '#8E9455'};

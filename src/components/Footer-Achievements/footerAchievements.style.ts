@@ -1,38 +1,24 @@
-import styled from "styled-components";
+/* ────────────────────────────────────────────
+ * Styles – Conquistas v2 (ajustado)
+ * ──────────────────────────────────────────── */
+import styled, { css } from "styled-components";
 
-/* Mesma base do FooterContainer original ----------------------- */
+/* Drawer base ----------------------------------------------------- */
 export const FooterContainer = styled.div`
   position: fixed;
   bottom: 0;
   width: 100%;
-  background-color: #8e9455;
-  border-top-left-radius: 30px;
-  border-top-right-radius: 30px;
-  box-shadow: 0px -3px 10px #00000080;
+  background: #8e9455;
+  border-top-left-radius: 70px;
+  border-top-right-radius: 70px;
+  box-shadow: 0 -3px 20px #00000040;
   z-index: 12;
   touch-action: none;
-  user-select: none;
 `;
 
-/* Linha branca (drag handle) igual ao original ----------------- */
-export const WhiteLine = styled.div`
-  width: 180px;
-  height: 6px;
-  background-color: white;
-  position: absolute;
-  top: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-radius: 10px;
-`;
-
-/* Conteúdo animado --------------------------------------------- */
+/* Conteúdo -------------------------------------------------------- */
 export const ExpandedContent = styled.div<{ $expanded: boolean }>`
-  max-height: calc(75vh - 50px);
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-
-  padding: 60px 40px 40px;
+  padding: 50px 40px 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -44,41 +30,77 @@ export const ExpandedContent = styled.div<{ $expanded: boolean }>`
   transition: all 0.3s ease;
 `;
 
-/* Cabeçalho “Conquistas” --------------------------------------- */
-export const Header = styled.h2`
-  font-size: 20px;
-  font-weight: 700;
-  color: white;
-  margin: 0 0 40px;
-`;
-
-/* Grid 2×n ------------------------------------------------------ */
+/* Grid ------------------------------------------------------------ */
 export const Grid = styled.div`
   width: 100%;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  row-gap: 48px;
-  column-gap: 20px;
+  gap: 28px 20px;
   justify-items: center;
 `;
 
-/* Círculo com ícone ------------------------------------------- */
-export const Circle = styled.div`
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
-
+/* Medalha + anel progressivo ------------------------------------- */
+export const AchievementWrapper = styled.div<{
+  $progress: number;
+  $earned: boolean;
+}>`
+  width: 104px;
+  height: 104px;
+  border-radius: 100%;
+      /* espessura do anel */
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 16px;
+  margin: 0 auto 8px;
+
+  /* só desenha o anel quando ainda não conquistado */
+  ${({ $earned, $progress }) =>
+    !$earned &&
+    css`
+      background: conic-gradient(
+        #D7A07D ${$progress}%,
+        #BFC1C2 ${$progress}% 100%
+      );
+    `}
 `;
 
-/* Label -------------------------------------------------------- */
+/* Ícone interno --------------------------------------------------- */
+export const Icon = styled.div<{ $src: string; $earned: boolean }>`
+  width: 96px;           /* deixa 4px de “anel” à volta */
+  height: 96px;
+  border-radius: 100%;
+  background: url(${({ $src }) => $src}) center / cover no-repeat;
+
+  /* cinza + opacidade se ainda não conquistou */
+  ${({ $earned }) =>
+    !$earned &&
+    css`
+      filter: grayscale(1) blur(2px);
+      opacity: 1;
+    `}
+`;
+
+/* Título ---------------------------------------------------------- */
 export const Label = styled.p`
-  color: white;
+  white-space: pre-line;
+  color: #fff;
   font-weight: 700;
   font-size: 15px;
   line-height: 1.2;
   margin: 0;
+`;
+
+/* Botão fechar ---------------------------------------------------- */
+export const CloseBtn = styled.button`
+  display: block;
+  margin: 20px auto 0;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
+  img {
+    width: 52px;
+    height: 52px;
+  }
 `;

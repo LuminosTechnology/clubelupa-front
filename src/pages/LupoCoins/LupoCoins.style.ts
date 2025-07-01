@@ -39,7 +39,7 @@ export const BalanceAmount = styled.p`
 export const VouncherWrapper = styled.div`
   display: flex;
   width: 100%;
-  height: 110px;
+  height: 120px;
   background: #E0A075;
   border-radius: 0 20px 20px 0;
   overflow: hidden;
@@ -52,15 +52,15 @@ export const IconContainer = styled.div`
   justify-content: center;
 
   & > img {
-    width: 69px;
-    height: 65px;
+    width: 100px;
+    height: 100px;
   }
 `;
 
 export const ContentContainer = styled.div`
   flex: 1;
   padding: 16px;
-  border-left: 3px solid #ffffff;
+  border-left: 0px solid #ffffff;
   display: flex;
   flex-direction: column;
   justify-content: center;

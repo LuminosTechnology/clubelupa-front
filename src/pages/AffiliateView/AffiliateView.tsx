@@ -1,9 +1,6 @@
-/* ────────────────────────────────────────────
- * src/pages/AffiliateView/AffiliateView.tsx
- * ──────────────────────────────────────────── */
-import React from 'react';
-import { IonPage, IonContent } from '@ionic/react';
-import { useHistory, useParams } from 'react-router-dom';
+import React, { useCallback, useEffect, useState } from "react";
+import { IonPage, IonContent, IonLoading } from "@ionic/react";
+import { useHistory, useParams } from "react-router-dom";
 
 import {
   ScrollArea,
@@ -13,7 +10,7 @@ import {
   InfoContainer,
   TitleWrapper,
   Title,
-  LikeIcon,
+  LikeButton,
   Description,
   CTAButton,
   Section,
@@ -29,15 +26,22 @@ import {
   HistoryIcon,
   HistTitle,
   HistText,
-} from './AffiliateView.style';
+} from "./AffiliateView.style";
 
-import backButtonVerde from '../../assets/arrow-left.svg';
-import heartIcon from '../../assets/like.svg';
+import backButtonVerde from "../../assets/arrow-left.svg";
+import heartIcon from "../../assets/like.svg";
+import sampleImg from "../../assets/sample-store.png";
 
-import InstaIcon from '../../components/icons/InstaIcon';
-import LupaIcon from '../../components/icons/LupaIcon';
+import InstaIcon from "../../components/icons/InstaIcon";
+import LupaIcon from "../../components/icons/LupaIcon";
 
-import { stores, Store } from '../AffiliateStores/AffiliateStoresPage';
+import { getAffiliateById } from "../../services/affiliateService";
+import {
+  addFavorite,
+  removeFavorite,
+  getFavorites,
+} from "../../services/favoritesService";
+import { AffiliateData } from "../../services/interfaces/Affiliate";  
 
 interface Params {
   id: string;
@@ -46,104 +50,173 @@ interface Params {
 const AffiliateView: React.FC = () => {
   const history = useHistory();
   const { id } = useParams<Params>();
-  const store: Store | undefined = stores.find((s) => s.id === Number(id));
+
+  const [store, setStore] = useState<AffiliateData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [liked, setLiked] = useState(false);
+  const [animating, setAnimating] = useState(false);
+
+  /* ─── carrega o afiliado ───────────────────────────────────────── */
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await getAffiliateById(id);
+        setStore(data);
+      } catch (err) {
+        console.error("[AffiliateView] Falha ao buscar afiliado:", err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [id]);
+
+  /* ─── favoritos ────────────────────────────────────────────────── */
+  useEffect(() => {
+    if (!store) return;
+    (async () => {
+      try {
+        const favs = await getFavorites();
+        setLiked(favs.some((f) => f.id === store.id));
+      } catch (err) {
+        console.error("[AffiliateView] Erro ao verificar favoritos:", err);
+      }
+    })();
+  }, [store]);
+
+  const handleLike = useCallback(async () => {
+    if (!store) return;
+    setAnimating(true);
+    try {
+      if (!liked) {
+        await addFavorite(store.id);
+        setLiked(true);
+      } else {
+        await removeFavorite(store.id);
+        setLiked(false);
+      }
+    } catch (e) {
+      console.error("Erro ao (des)favoritar:", e);
+    } finally {
+      setTimeout(() => setAnimating(false), 300);
+    }
+  }, [liked, store]);
+
+  /* ─── loading / erro ───────────────────────────────────────────── */
+  if (loading) {
+    return (
+      <IonPage>
+        <IonLoading isOpen message="Carregando…" />
+      </IonPage>
+    );
+  }
 
   if (!store) return null;
 
+  /* ─── helpers p/ nomenclatura antiga ───────────────────────────── */
+  const color = store.color ?? "#E6C178";
+  const img = store.foto_perfil ?? sampleImg;
+  const name = store.nome_local || store.nome_fantasia;
+  const category = store.categoria;
+  const schedule = store.horario_funcionamento;
+
   return (
     <IonPage>
-      <IonContent fullscreen style={{ '--background': '#ffffff' } as any}>
+      <IonContent fullscreen style={{ "--background": "#ffffff" } as any}>
         <ScrollArea>
-          <PhotoHeader image={store.img}>
-            <BackButtonWrapper
-              color={store.color}
-              onClick={() => history.goBack()}
-              aria-label="Voltar"
-            >
+          <PhotoHeader image={img}>
+            <BackButtonWrapper color={color} onClick={() => history.goBack()}>
               <BackButton src={backButtonVerde} alt="Voltar" />
             </BackButtonWrapper>
           </PhotoHeader>
 
           <InfoContainer>
             <TitleWrapper>
-              <Title color={store.color}>{store.name}</Title>
-              <LikeIcon src={heartIcon} alt="Curtir" />
+              <Title color={color}>{name}</Title>
+              <LikeButton
+                onClick={handleLike}
+                liked={liked}
+                animate={animating}
+                aria-label={liked ? "Descurtir" : "Curtir"}
+              >
+                <img src={heartIcon} alt="Coração" />
+              </LikeButton>
             </TitleWrapper>
 
             <Description>
-              Sócio Lupa, escaneie ou insira aqui sua nota para acumular moedas e
-              trocar por experiências incríveis!
+              Sócio Lupa, escaneie ou insira aqui sua nota para acumular moedas
+              e trocar por experiências incríveis!
             </Description>
 
-            <CTAButton
-              bg={store.color}
-              onClick={() => history.push('/affiliate/scanner')}
-            >
+            <CTAButton bg={color} onClick={() => history.push("/affiliate/scanner")}>
               ESCANEAR NOTA
             </CTAButton>
 
-            {/* seções fixas */}
-            <Section>
-              <SectionTitle color={store.color}>Categoria</SectionTitle>
-              <SectionText>{store.category}</SectionText>
-            </Section>
+            {/* seções dinâmicas */}
+            {!!category && (
+              <Section>
+                <SectionTitle color={color}>Categoria</SectionTitle>
+                <SectionText>{category}</SectionText>
+              </Section>
+            )}
 
             <Section>
-              <SectionTitle color={store.color}>Estrutura</SectionTitle>
+              <SectionTitle color={color}>Estrutura</SectionTitle>
               <SectionText>Física e online</SectionText>
             </Section>
 
             <Section>
-              <SectionTitle color={store.color}>Endereço</SectionTitle>
+              <SectionTitle color={color}>Endereço</SectionTitle>
               <SectionText>
-                Alameda Prudente de Moraes, 1213
+                {store.rua ?? "Rua"} {store.bairro && `– ${store.bairro}`}
                 <br />
-                Centro, Curitiba – PR
+                {store.cidade ?? ""} {store.uf ?? ""}
               </SectionText>
             </Section>
 
-            <Section>
-              <SectionTitle color={store.color}>
-                Horário de atendimento
-              </SectionTitle>
-              <SectionText>{store.schedule}</SectionText>
-            </Section>
+            {!!schedule && (
+              <Section>
+                <SectionTitle color={color}>Horário de atendimento</SectionTitle>
+                <SectionText>{schedule}</SectionText>
+              </Section>
+            )}
 
-            {/* link com ícone Instagram */}
-            <LinkRow>
-              <LinkIcon color={store.color}>
-                <InstaIcon size={18} />
-              </LinkIcon>
-              <LinkText href="#" color={store.color}>
-                Acesse o instagram
-              </LinkText>
-            </LinkRow>
+            {!!store.instagram && (
+              <LinkRow>
+                <LinkIcon color={color}>
+                  <InstaIcon size={18} />
+                </LinkIcon>
+                <LinkText
+                  href={`https://instagram.com/${store.instagram.replace("@", "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  color={color}
+                >
+                  Acesse o instagram
+                </LinkText>
+              </LinkRow>
+            )}
 
-            {/* links SEM ícone */}
-            <PlainLinkRow>
-              <PlainLink href="#" color={store.color}>
-                Acesse o site
-              </PlainLink>
-            </PlainLinkRow>
+            {!!store.site && (
+              <PlainLinkRow>
+                <PlainLink href={store.site} target="_blank" color={color}>
+                  Acesse o site
+                </PlainLink>
+              </PlainLinkRow>
+            )}
 
-            {/* link em negrito sempre sublinhado */}
-            <BoldLink href="#" color={store.color}>
+            <BoldLink href="#" color={color}>
               SOBRE A MARCA AUTORAL / ESTABELECIMENTO
             </BoldLink>
 
-            {/* história com ícone ao lado */}
+            {/* descrição estática de exemplo */}
             <HistoryRow>
-              <HistoryIcon color={store.color}>
+              <HistoryIcon color={color}>
                 <LupaIcon size={18} />
               </HistoryIcon>
-              <HistTitle color={store.color}>História:</HistTitle>
+              <HistTitle color={color}>História:</HistTitle>
             </HistoryRow>
             <HistText>
-              Fundada em 2016 pela publicitária Patricia Lima, a marca foi
-              lançada oficialmente na maior semana de moda do Brasil: São Paulo
-              Fashion Week. Ao levar o conceito de cosméticos orgânicos e
-              veganos para a passarela, se tornou a marca orgânica mais
-              conhecida do Brasil (…)
+              Fundada em 2016 pela publicitária Patricia Lima…
             </HistText>
           </InfoContainer>
         </ScrollArea>

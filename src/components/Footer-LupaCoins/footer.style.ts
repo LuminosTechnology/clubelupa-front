@@ -1,79 +1,82 @@
-// src/components/Footer-Voucher/footer.style.ts
-import styled from 'styled-components';
+/* ────────────────────────────────────────────
+ * Styles – Footer Voucher (com botão fechar)
+ * ──────────────────────────────────────────── */
+import styled from "styled-components";
 
+/* Drawer base ----------------------------------------------------- */
 export const FooterContainer = styled.div`
   position: fixed;
   bottom: 0;
   width: 100%;
-  background-color: #8E9455;
+  background: #8e9455;
   border-top-left-radius: 30px;
   border-top-right-radius: 30px;
-  box-shadow: 0px -3px 10px 0px #00000080;
+  box-shadow: 0 -3px 10px #00000080;
   z-index: 10;
   touch-action: none;
   user-select: none;
 `;
 
-export const WhiteLine = styled.div`
-  width: 180px;
-  height: 6px;
-  background-color: white;
-  position: absolute;
-  top: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 5;
-  border-radius: 10px;
-`;
-
+/* Conteúdo interno ------------------------------------------------ */
 export const ExpandedContent = styled.div<{ $expanded: boolean }>`
   max-height: calc(75vh - 50px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 0 40px;
 
+  padding: 0 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
 
   opacity: ${({ $expanded }) => ($expanded ? 1 : 0)};
-  visibility: ${({ $expanded }) => ($expanded ? 'visible' : 'hidden')};
-  transform: translateY(${({ $expanded }) => ($expanded ? '0' : '20px')});
+  visibility: ${({ $expanded }) => ($expanded ? "visible" : "hidden")};
+  transform: translateY(${({ $expanded }) => ($expanded ? "0" : "20px")});
   transition: all 0.3s ease;
-  z-index: 5;
 `;
 
+/* Ícone da moeda -------------------------------------------------- */
 export const VoucherIcon = styled.img`
-  width: 69px;
-  height: 65px;
-  margin-top: 63px;       /* ícone 63px abaixo do topo */
-  margin-bottom: 30px;    /* título 30px abaixo do ícone */
+  width: 100px;
+  height: 100px;
+  margin-top: 63px;      /* 63 px abaixo do topo */
+  margin-bottom: 20px;   /* título 30 px abaixo */
 `;
 
+/* Textos ---------------------------------------------------------- */
 export const Title = styled.h2`
   font-size: 16px;
   font-weight: 700;
-  color: white;
-  margin: 0;
-  margin-bottom: 40px;    /* "Alameda..." 40px acima de "Experiência Lupa" */
+  color: #fff;
+  margin: 0 0 40px 0;
 `;
 
 export const SectionTitle = styled.h3`
   font-size: 16px;
   font-weight: 700;
-  color: white;
-  margin: 0;
-  margin-bottom: 17px;    /* texto 17px abaixo de "Experiência Lupa" */
+  color: #fff;
+  margin: 0 0 17px 0;
 `;
 
 export const Text = styled.p<{ bold?: boolean }>`
   font-size: 16px;
   font-weight: ${({ bold }) => (bold ? 700 : 400)};
-  color: white;
-  margin: 0;
-  margin-bottom: 17px;    /* 17px entre os dois textos e do título acima */
+  color: #fff;
+  margin: 0 0 17px 0;
   line-height: 1.4;
 `;
 
+/* Botão fechar ---------------------------------------------------- */
+export const CloseBtn = styled.button`
+  display: block;
+  margin: 20px auto 0;    /* 20 px abaixo do botão de troca */
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 
+  img {
+    width: 52px;
+    height: 52px;
+  }
+`;

@@ -1,14 +1,26 @@
+/* ────────────────────────────────────────────
+ * Register.tsx
+ * ──────────────────────────────────────────── */
 import React, { useState } from "react";
-import { IonPage, IonContent, IonButton, IonIcon } from "@ionic/react";
-import InputMask from "react-input-mask";
-import { register } from "../../services/auth-service";
+import { IonPage, IonContent } from "@ionic/react";
 import { useHistory } from "react-router-dom";
-import { Container, ErrorMessage } from "./register.style";
-import arrowLeft from '../../assets/arrow-left.svg';
+
+import {
+  Container,
+  ErrorMessage,
+  ButtonContainer,
+  TermsWrapper,
+  TermsLink,
+  DividerOr,
+  LoginLinkContainer,
+} from "./register.style";
+
 import FloatingInput from "../../components/FloatingInput";
 import Button from "../../components/Button";
-import { ButtonContainer } from "../Login/login.style";
 import BackButton from "../../components/BackButton";
+import Link from "../../components/Link";
+
+import { register } from "../../services/auth-service";
 
 const Register: React.FC = () => {
   const [user, setUser] = useState({
@@ -23,78 +35,61 @@ const Register: React.FC = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const history = useHistory();
 
+  /* ─────────── validação ─────────── */
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
-    if (!user.nome_completo) {
-      newErrors.nome_completo = 'Nome é obrigatório';
-    }
-    if (!user.data_nascimento) {
-      newErrors.data_nascimento = 'Data de nascimento é obrigatória';
-    }
-    if (!user.telefone) {
-      newErrors.telefone = 'Telefone é obrigatório';
-    }
-    if (!user.email) {
-      newErrors.email = 'Email é obrigatório';
-    }
-    if (!user.password) {
-      newErrors.password = 'Senha é obrigatória';
-    }
-    if (!user.password_confirmation) {
-      newErrors.password_confirmation = 'Confirmação de senha é obrigatória';
-    }
-    if (user.password !== user.password_confirmation) {
-      newErrors.password_confirmation = 'As senhas não coincidem';
-    }
+    if (!user.nome_completo) newErrors.nome_completo = "Nome é obrigatório";
+    if (!user.data_nascimento) newErrors.data_nascimento = "Data de nascimento é obrigatória";
+    if (!user.telefone) newErrors.telefone = "Telefone é obrigatório";
+    if (!user.email) newErrors.email = "Email é obrigatório";
+    if (!user.password) newErrors.password = "Senha é obrigatória";
+    if (!user.password_confirmation) newErrors.password_confirmation = "Confirmação de senha é obrigatória";
+    if (user.password !== user.password_confirmation)
+      newErrors.password_confirmation = "As senhas não coincidem";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
+  
+  /* ─────────── ação de cadastro ─────────── */
   const handleRegister = async () => {
     if (!validateForm()) return;
 
     try {
       await register(user);
-      history.push("/register-success");
+      history.push("/register/success");
     } catch (error: any) {
       const backendErrors = error.response?.data?.errors || {};
 
-      // Transform backend error messages
-      const transformedErrors = Object.keys(backendErrors).reduce((acc, key) => {
-        // Check for array of error messages
-        const errorMessage = Array.isArray(backendErrors[key])
-          ? backendErrors[key][0]
-          : backendErrors[key];
-
-        if (key === 'email' && errorMessage === 'The email has already been taken.') {
-          acc[key] = 'Este email já está cadastrado';
-        } else {
-          acc[key] = errorMessage;
-        }
+      const transformed = Object.keys(backendErrors).reduce((acc, key) => {
+        const msg = Array.isArray(backendErrors[key]) ? backendErrors[key][0] : backendErrors[key];
+        acc[key] =
+          key === "email" && msg === "The email has already been taken."
+            ? "Este email já está cadastrado"
+            : msg;
         return acc;
       }, {} as { [key: string]: string });
 
-      setErrors(transformedErrors);
+      setErrors(transformed);
     }
   };
 
+  /* ─────────── UI ─────────── */
   return (
     <IonPage>
-      <IonContent
-        style={{
-          "--background": "#E6C178",
-        }}
-      >
+      <IonContent style={{ "--background": "#E6C178" }}>
         <Container>
           <BackButton />
+
+          {/* título */}
           <h2>Cadastre-se</h2>
 
+          {/* campos */}
           <FloatingInput
             label="Nome Completo"
             value={user.nome_completo}
-            onChange={(value) => setUser({ ...user, nome_completo: value })}
+            onChange={(v) => setUser({ ...user, nome_completo: v })}
             error={!!errors.nome_completo}
           />
           {errors.nome_completo && <ErrorMessage>{errors.nome_completo}</ErrorMessage>}
@@ -102,7 +97,7 @@ const Register: React.FC = () => {
           <FloatingInput
             label="Data de Nascimento"
             value={user.data_nascimento}
-            onChange={(value) => setUser({ ...user, data_nascimento: value })}
+            onChange={(v) => setUser({ ...user, data_nascimento: v })}
             type="date"
             error={!!errors.data_nascimento}
           />
@@ -111,7 +106,7 @@ const Register: React.FC = () => {
           <FloatingInput
             label="Telefone"
             value={user.telefone}
-            onChange={(value) => setUser({ ...user, telefone: value })}
+            onChange={(v) => setUser({ ...user, telefone: v })}
             error={!!errors.telefone}
             mask="(99)99999-9999"
           />
@@ -120,7 +115,7 @@ const Register: React.FC = () => {
           <FloatingInput
             label="Email"
             value={user.email}
-            onChange={(value) => setUser({ ...user, email: value })}
+            onChange={(v) => setUser({ ...user, email: v })}
             type="email"
             error={!!errors.email}
           />
@@ -129,7 +124,7 @@ const Register: React.FC = () => {
           <FloatingInput
             label="Senha"
             value={user.password}
-            onChange={(value) => setUser({ ...user, password: value })}
+            onChange={(v) => setUser({ ...user, password: v })}
             isPassword
             error={!!errors.password}
           />
@@ -138,23 +133,46 @@ const Register: React.FC = () => {
           <FloatingInput
             label="Confirmar Senha"
             value={user.password_confirmation}
-            onChange={(value) => setUser({ ...user, password_confirmation: value })}
+            onChange={(v) => setUser({ ...user, password_confirmation: v })}
             isPassword
             error={!!errors.password_confirmation}
           />
           {errors.password_confirmation && <ErrorMessage>{errors.password_confirmation}</ErrorMessage>}
 
           {Object.keys(errors).length > 0 && (
-            <ErrorMessage style={{ marginBottom: '16px' }}>
+            <ErrorMessage style={{ marginBottom: "16px" }}>
               Por favor, corrija os erros acima para continuar.
             </ErrorMessage>
           )}
 
+          {/* botão criar conta */}
           <ButtonContainer>
             <Button onClick={handleRegister} variant="secondary">
               CRIAR CONTA
             </Button>
           </ButtonContainer>
+
+          {/* consentimento + link */}
+          <TermsWrapper>
+            <div>Ao entrar, você concorda com nossos</div>
+            <TermsLink
+              onClick={() =>
+                window.open("https://www.google.com", "_blank", "noopener")
+              }
+            >
+              Termos e política de privacidade
+            </TermsLink>
+          </TermsWrapper>
+
+          {/* divisor */}
+          <DividerOr>ou</DividerOr>
+
+          {/* link para login */}
+          <LoginLinkContainer>
+            <Link onClick={() => history.push("/login")}>
+              Já possui uma conta? Fazer Login
+            </Link>
+          </LoginLinkContainer>
         </Container>
       </IonContent>
     </IonPage>

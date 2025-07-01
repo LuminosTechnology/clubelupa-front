@@ -1,10 +1,15 @@
-import React from 'react';
-import { IonPage, IonContent } from '@ionic/react';
-import { useHistory } from 'react-router-dom';
-import AppHeader from '../../components/SimpleHeader';
-import Button from '../../components/Button';
-import styled from 'styled-components';
+/* ──────────────────────────────────────────────────────────────
+ * src/pages/AffiliateArea/index.tsx
+ * Área privada do Afiliado – busca automaticamente o primeiro
+ * afiliado vinculado ao token (não precisa de :id na rota)
+ * ────────────────────────────────────────────────────────────── */
+import React, { useEffect, useState } from "react";
+import { IonPage, IonContent, IonSpinner } from "@ionic/react";
+import { useHistory } from "react-router-dom";
+import styled from "styled-components";
 
+import AppHeader from "../../components/SimpleHeader";
+import Button from "../../components/Button";
 import {
   AreaContainer,
   ProfileWrapper,
@@ -15,39 +20,77 @@ import {
   OptionIcon,
   Divider,
   LogoutContainer,
-} from './AffiliateArea.style';
+} from "./AffiliateArea.style";
 
-import { logout } from '../../services/auth-service';
-import profilePic from '../../assets/profile-pic.svg';
-import editIcon from '../../assets/edit.svg';
-import publicidadeIcon from '../../assets/publicidade.svg';
-import relatoriosIcon from '../../assets/relatorios.svg';
-import emailIcon from '../../assets/email.svg';
-import instagramIcon from '../../assets/insta.svg';
+import {
+  getMyFirstAffiliate,          
+} from "../../services/affiliateService";
+import { logout } from "../../services/auth-service";
 
-/** Botão “Sair” centralizado */
+import editIcon from "../../assets/edit.svg";
+import publicidadeIcon from "../../assets/publicidade.svg";
+import relatoriosIcon from "../../assets/relatorios.svg";
+import emailIcon from "../../assets/email.svg";
+import instagramIcon from "../../assets/insta.svg";
+
+/* ─── Botão “Sair” centralizado ───────────────────────────────── */
 const LogoutButton = styled(Button)`
   display: block;
   margin: 0 auto;
-  background-color: #8E9455 !important;
+  background-color: #8e9455 !important;
   color: #ffffff !important;
 `;
 
 const AffiliateArea: React.FC = () => {
   const history = useHistory();
+  const [affiliate, setAffiliate] = useState<any>(null);
 
+  /* ─── carrega o primeiro afiliado do token ───────────────────── */
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await getMyFirstAffiliate();
+        setAffiliate(data);
+      } catch (e) {
+        console.error("[AffiliateArea] Erro ao carregar afiliado:", e);
+      }
+    })();
+  }, []);
+
+  /* ─── ações ──────────────────────────────────────────────────── */
   const handleLogout = async () => {
-    try {
-      await logout();
-    } finally {
-      history.goBack();
-    }
+    await logout();
+    history.goBack();
   };
 
   const goToEdit = () => {
-    history.push('/affiliate/area/edit');
+    if (affiliate?.id) {
+      history.push("/affiliate/area/edit");
+    }
   };
 
+  /* ─── loading state ──────────────────────────────────────────── */
+  if (!affiliate) {
+    return (
+      <IonPage>
+        <AppHeader
+          title="Área dos Afiliados"
+          backgroundColor="#868950"
+          textColor="#FFF"
+        />
+        <IonContent className="ion-padding" fullscreen>
+          <IonSpinner name="crescent" />
+        </IonContent>
+      </IonPage>
+    );
+  }
+
+  /* ─── helpers ────────────────────────────────────────────────── */
+  const displayName = affiliate.nome_local || affiliate.nome_fantasia;
+  const profilePhoto =
+    affiliate.foto_perfil || affiliate.profile_photo || "/assets/profile-pic.svg";
+
+  /* ─── UI ─────────────────────────────────────────────────────── */
   return (
     <IonPage>
       <AppHeader
@@ -57,14 +100,14 @@ const AffiliateArea: React.FC = () => {
       />
 
       <ProfileWrapper>
-        <ProfilePhoto src={profilePic} alt="Foto de perfil" />
+        <ProfilePhoto src={profilePhoto} alt="Foto de perfil" />
       </ProfileWrapper>
 
-      <IonContent fullscreen style={{ '--background': '#FFFFFF' }}>
+      <IonContent fullscreen style={{ "--background": "#FFFFFF" } as any}>
         <AreaContainer>
-          <Name>Alameda Simple Organic</Name>
-          <SubInfo>xxx.xxx.xxx/0001‑xx</SubInfo>
-          <SubInfo>alameda@alameda.com.br</SubInfo>
+          <Name>{displayName}</Name>
+          {!!affiliate.cnpj && <SubInfo>{affiliate.cnpj}</SubInfo>}
+          {!!affiliate.email && <SubInfo>{affiliate.email}</SubInfo>}
 
           <Option primary onClick={goToEdit}>
             <OptionIcon src={editIcon} alt="Ícone Editar Perfil" />
@@ -82,23 +125,23 @@ const AffiliateArea: React.FC = () => {
             <OptionIcon src={relatoriosIcon} alt="Ícone Relatórios" />
             Relatórios
           </Option>
-          {/* 80px de espaço abaixo dessas três opções */}
-          <Divider style={{ marginBottom: '80px' }} />
+          <Divider style={{ marginBottom: "80px" }} />
 
-          {/* Email e Instagram */}
-          <Option>
-            <OptionIcon src={emailIcon} alt="Ícone Email" />
-            contato@clubelupa.com.br
-          </Option>
-          <Option>
-            <OptionIcon src={instagramIcon} alt="Ícone Instagram" />
-            ClubeLupa
-          </Option>
+          {!!affiliate.email && (
+            <Option>
+              <OptionIcon src={emailIcon} alt="Ícone Email" />
+              {affiliate.email}
+            </Option>
+          )}
+          {!!affiliate.instagram && (
+            <Option>
+              <OptionIcon src={instagramIcon} alt="Ícone Instagram" />
+              {affiliate.instagram}
+            </Option>
+          )}
 
           <LogoutContainer>
-            <LogoutButton onClick={handleLogout}>
-              Sair
-            </LogoutButton>
+            <LogoutButton onClick={handleLogout}>Sair</LogoutButton>
           </LogoutContainer>
         </AreaContainer>
       </IonContent>

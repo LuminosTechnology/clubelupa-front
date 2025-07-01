@@ -44,7 +44,7 @@ interface FooterProps {
 }
 
 const Footer: React.FC<FooterProps> = ({
-  userData = { nivel: 1, experiencia: 750, proximo_nivel: 1000 },
+  userData = { nivel: 10, experiencia: 750, proximo_nivel: 1000 },
 }) => {
   const location = useLocation();
   const history  = useHistory();
@@ -119,7 +119,7 @@ const Footer: React.FC<FooterProps> = ({
 
   /* ─────────── helpers ────────────────── */
   const progressPct = Math.min(
-    90,
+    100,
     (userData.experiencia! / userData.proximo_nivel!) * 150   // → saturado em 100
   );
 
@@ -189,7 +189,7 @@ const Footer: React.FC<FooterProps> = ({
           />
           <LevelBadge>
             <img src={homeNivel} alt="Moeda de nível" />
-            <span>{userData.nivel}</span>
+            
           </LevelBadge>
         </UserImageContainer>
 

@@ -1,74 +1,81 @@
 import styled from 'styled-components';
-export const HeaderContainer = styled.div<{ $bgColor: string }>`
-  height: 138.9px;
-  width: 100%;
-  background-color: #F0F0EF;
-  border-bottom-left-radius: 35px;
-  border-bottom-right-radius: 35px;
-  padding: 30px;
+
+/**
+ * Container absoluto (sem cor), apenas posiciona o BarWrapper
+ */
+export const HeaderContainer = styled.div`
+  position: absolute;
+  top: 55px;       /* 55px do topo */
+  left: 0;
+  right: 0;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-  z-index: 2;
-  box-shadow: 0px -3px 10px 0px #00000080;
-
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 35px;
-    background-color: #F0F0EF;
-    border-bottom-left-radius: 35px;
-    border-bottom-right-radius: 35px;
-  }
+  justify-content: center;  /* centraliza o filho */
+  z-index: 10;
 `;
 
-export const SearchContainer = styled.div`
+/**
+ * Fundo branco arredondado envolvendo SEARCH + MENU
+ */
+ export const BarWrapper = styled.div`
+   width: 364px;
+   height: 50px;
+   background: #ffffff;
+   border-radius: 100px;
+   display: flex;
+   align-items: center;
+  justify-content: space-between;    /* <— adiciona isso */
+   padding: 0 12px;
+   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+ `;
+
+/**
+ * Caixinha interna do input, com largura e altura definidas
+ * e borda preta 24% opacity
+ */
+export const SearchWrapper = styled.div`
+  width: 257px;               /* largura do input envolta */
+  height: 36px;               /* altura do input envolta */
   display: flex;
   align-items: center;
-  background: #F0F0EF;
-  border-radius: 8px;
-  padding: 0 15px;
-  flex: 1;
-  margin-right: 30px;
-  height: 43px;
-  position: relative;
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.24);
   border-radius: 100px;
-  border: 1px solid #868950;
+  padding: 0 12px;
 `;
 
+/**
+ * Ícone de lupa dentro do SearchWrapper
+ */
+export const SearchIcon = styled.img`
+  width: 28px;                /* largura do ícone */
+  height: 28px;               /* altura do ícone */
+`;
+
+/**
+ * Input transparente, ocupando o restante do SearchWrapper
+ */
 export const SearchInput = styled.input`
+  flex: 1;
+  height: 25px;               /* altura do campo de texto */
+  margin-left: 8px;
   background: transparent;
   border: none;
-  color: #CBCCCE;
-  flex: 1;
-  font-family: 'Karla', sans-serif;
-  font-size: 12px;
   outline: none;
-  padding: 0 15px;
+  font-size: 14px;
+  color: #666666;
 
   &::placeholder {
     color: #CBCCCE;
   }
 `;
 
-export const SearchIcon = styled.img`
-  width: 20px;
-  height: 20px;
-`;
-
+/**
+ * Ícone de menu à direita, ainda dentro do BarWrapper
+ */
 export const MenuIcon = styled.img`
-  width: 44px;
-  height: auto;
-  margin-left: 16px;
+  width: 46px;
+  height: 24px;
   cursor: pointer;
-  transition: opacity 0.2s ease;
-  color: #868950;
-
   &:hover {
     opacity: 0.8;
   }

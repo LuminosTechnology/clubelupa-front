@@ -14,17 +14,9 @@ export const FooterContainer = styled.div`
   user-select: none;
 `;
 
-export const WhiteLine = styled.div`
-  width: 180px;
-  height: 6px;
-  background: #fff;
-  position: absolute;
-  top: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-radius: 10px;
-`;
+/* Removida a WhiteLine */
 
+/* Conteúdo interno */
 export const ExpandedContent = styled.div<{ $expanded: boolean }>`
   max-height: calc(75vh - 50px);
   overflow-y: auto;
@@ -61,7 +53,7 @@ export const Heading = styled.h3`
 export const Description = styled.p`
   color: white;
   font-size: 16px;
-  font-weight: 700; /* bold */
+  font-weight: 700;
   line-height: 1.4;
   max-width: 320px;
   margin: 0 0 50px;
@@ -70,6 +62,21 @@ export const Description = styled.p`
 export const ShareButton = styled(Button)`
   width: 100%;
   background: #fff;
-  color: #8e9455 !important;     /* texto na cor pedida */
+  color: #8e9455 !important;
   font-weight: 700;
+`;
+
+/* Novo: botão de fechar */
+export const CloseBtn = styled.button`
+  display: block;
+  margin: 20px auto 0;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
+  img {
+    width: 52px;
+    height: 52px;
+  }
 `;

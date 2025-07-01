@@ -7,21 +7,24 @@ import { useHistory } from "react-router-dom";
 
 import {
   Container,
+  DividerOr,              
   ErrorMessage,
   ForgotPasswordWrapper,
   FormWrapper,
-  IconLoginButton,
-  LinkContainer,
+  FormTitle,
   LogoWrapper,
+  LoginButtonWrapper,
   RegisterContainer,
+  TermsWrapper,
+  TermsLink,
 } from "./login.style";
 
 import FloatingInput from "../../components/FloatingInput";
 import Link from "../../components/Link";
+import Button from "../../components/Button";
 import { login } from "../../services/auth-service";
 
 import Logo from "../../assets/Logo.svg";
-import LupaIcon from "../../assets/icon-lupa2.svg";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -68,13 +71,15 @@ const Login: React.FC = () => {
     <IonPage>
       <IonContent style={{ "--background": "#9fa369" }}>
         <Container>
-          {/* topo */}
+          {/* logo */}
           <LogoWrapper>
             <img src={Logo} alt="Logo" style={{ width: 160 }} />
           </LogoWrapper>
 
-          {/* centro */}
+          {/* formulário de login */}
           <FormWrapper>
+            <FormTitle>Entrar</FormTitle>
+
             <FloatingInput
               label="Email"
               value={email}
@@ -93,49 +98,50 @@ const Login: React.FC = () => {
             />
             {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
 
-            {/* link esqueci senha à direita */}
             <ForgotPasswordWrapper>
               <Link onClick={() => history.push("/forgot-password")}>
                 Esqueci minha senha
               </Link>
             </ForgotPasswordWrapper>
 
-            {/* ainda não tem conta */}
-            <RegisterContainer>
-              <Link onClick={handleRegister}>
-                Ainda não tem conta? Cadastre-se
-              </Link>
-            </RegisterContainer>
-
-            {/* botão-ícone de login */}
-            <IconLoginButton onClick={handleLogin} aria-label="Entrar">
-              <img src={LupaIcon} alt="Entrar" />
-            </IconLoginButton>
-
-            {errors.form && (
-              <ErrorMessage
-                style={{
-                  fontSize: 16,
-                  fontWeight: "bold",
-                  textAlign: "center",
-                }}
-              >
-                {errors.form}
-              </ErrorMessage>
-            )}
+            <LoginButtonWrapper>
+              <Button onClick={handleLogin}>ENTRAR</Button>
+            </LoginButtonWrapper>
           </FormWrapper>
 
-          {/* rodapé: termos */}
-          <LinkContainer>
+          {/* consentimento */}
+          <TermsWrapper>
             <div>Ao entrar, você concorda com nossos</div>
-            <Link
+            <TermsLink
               onClick={() =>
                 window.open("https://www.google.com", "_blank", "noopener")
               }
             >
               Termos e política de privacidade
+            </TermsLink>
+          </TermsWrapper>
+
+          {/* divisor “ou” */}
+          <DividerOr>ou</DividerOr>
+
+          {/* registro */}
+          <RegisterContainer>
+            <Link onClick={handleRegister}>
+              Ainda não tem conta? Cadastre-se
             </Link>
-          </LinkContainer>
+          </RegisterContainer>
+
+          {errors.form && (
+            <ErrorMessage
+              style={{
+                fontSize: 16,
+                fontWeight: "bold",
+                textAlign: "center",
+              }}
+            >
+              {errors.form}
+            </ErrorMessage>
+          )}
         </Container>
       </IonContent>
     </IonPage>

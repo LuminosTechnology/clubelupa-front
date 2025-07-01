@@ -1,31 +1,39 @@
 import React, { useState } from 'react';
-import { HeaderContainer, SearchInput, SearchContainer, MenuIcon, SearchIcon } from './header.style';
+import {
+  HeaderContainer,
+  BarWrapper,
+  SearchWrapper,
+  SearchIcon,
+  SearchInput,
+  MenuIcon,
+} from './header.style';
 import SlideMenu from '../SlideMenu';
-import menuIcon from '../../assets/Menu.svg';
-import searchIcon from '../../assets/lupa-search.svg';
 
-interface HeaderProps {
-  backgroundColor?: string;
-}
+import newSearchIcon from '../../assets/new_search.svg';
+import newMenuIcon   from '../../assets/new_menu.svg';
 
-const Header: React.FC<HeaderProps> = ({ backgroundColor = 'var(--ion-color-primary)' }) => {
+const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <>
-      <HeaderContainer $bgColor={backgroundColor}>
-        <SearchContainer>
-          <SearchIcon src={searchIcon} alt="Search" />
-          <SearchInput
-            placeholder="O que você procura hoje?"
+      <HeaderContainer>
+        <BarWrapper>
+          {/* input com borda preta */}
+          <SearchWrapper>
+            <SearchIcon src={newSearchIcon} alt="Buscar" />
+            <SearchInput placeholder="O que você procura hoje?" />
+          </SearchWrapper>
+
+          {/* ícone de menu */}
+          <MenuIcon
+            src={newMenuIcon}
+            alt="Menu"
+            onClick={() => setIsMenuOpen(true)}
           />
-        </SearchContainer>
-        <MenuIcon
-          src={menuIcon}
-          alt="Menu"
-          onClick={() => setIsMenuOpen(true)}
-        />
+        </BarWrapper>
       </HeaderContainer>
+
       <SlideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
     </>
   );

@@ -68,6 +68,26 @@ export const FieldWrapper = styled.div`
   gap: 4px;
 `;
 
+export const TextAreaWrapper = styled(FieldWrapper)`
+  textarea {
+    background: transparent;
+    color: #000;
+    font-size: 16px;
+    border: 1px solid #868950;
+    border-radius: 4px;
+    padding: 8px;
+    resize: vertical;
+    min-height: 120px;
+  }
+  textarea::placeholder {
+    color: #bfbfbf;
+  }
+  textarea:focus {
+    outline: none;
+    border-color: #868950;
+  }
+`;
+
 export const InputTextTheme = styled.div`
   input {
     background: transparent !important;

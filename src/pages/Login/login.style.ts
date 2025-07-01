@@ -2,82 +2,70 @@
  * src/pages/Login/login.style.ts
  * ──────────────────────────────────────────── */
 import styled from "styled-components";
+import Link from "../../components/Link";
 
-/* layout root */
+/* raiz */
 export const Container = styled.div`
-  position: relative;            /* referência p/ logo absoluta  */
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   align-items: center;
   min-height: 100vh;
   width: 100%;
-  padding: 40px 20px;            /* laterais + rodapé */
+  padding: 0 20px 40px;   /* ← padding lateral de 20 px */
 `;
 
-/* topo: logo — 100 px do topo sem deslocar o restante  */
+/* logo — 90 px do topo */
 export const LogoWrapper = styled.div`
-  position: absolute;
-  top: 100px;                    /* espaçamento desejado */
-  left: 0;
-  right: 0;
+  margin-top: 90px;
   display: flex;
   justify-content: center;
 `;
 
-/* zona central do formulário  */
+/* formulário — 50 px abaixo do logo */
 export const FormWrapper = styled.div`
+  margin-top: 50px;
   width: 100%;
   max-width: 320px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
-
-  /* empurra o formulário para ficar logo abaixo da logo —
-   * evita sobreposição sem “empurrar” o bottom link  */
-  margin-top: 260px;             /* ajuste fino conforme altura real da logo */
 `;
 
-/* botão-ícone de login */
-export const IconLoginButton = styled.button`
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  width: 30px;
-  height: 30px;
-  margin-top: 24px;              /* espaço extra solicitado */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  img {
-    width: 100%;
-    height: 100%;
-  }
+/* título */
+export const FormTitle = styled.h2`
+  align-self: flex-start;
+  font-size: 25px;
+  font-weight: 700;
+  font-family: inherit;
+  color: #ffffff;
+  margin: 0 0 40px 0; /* 40 + gap 20 (inputs) = 60 px */
 `;
 
-/* wrapper “esqueci minha senha” (direita do input) */
+/* link esqueci senha */
 export const ForgotPasswordWrapper = styled.div`
   width: 100%;
   display: flex;
   justify-content: flex-end;
-  margin-top: -6px;
+  margin-top: 9px;
 `;
 
-/* “ainda não tem conta?” — distância maior do input */
-export const RegisterContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+/* botão “ENTRAR” */
+export const LoginButtonWrapper = styled.div`
+  margin-top: 60px;
   width: 100%;
-  margin-top: 32px;              /* maior que antes */
-  gap: 16px;
+  max-width: 200px;
+
+  button {
+    width: 100%;
+  }
 `;
 
-/* termos de privacidade no rodapé */
-export const LinkContainer = styled.div`
+/* consentimento */
+export const TermsWrapper = styled.div`
+  margin-top: 30px;
+  width: 100%;
+  max-width: 320px;
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -88,6 +76,50 @@ export const LinkContainer = styled.div`
   }
 `;
 
+/* link consentimento */
+export const TermsLink = styled(Link)`
+  color: #D3E0A2;
+  font-size: 16px;
+`;
+
+/* ────────── divisor “ou” ──────────
+ * ocupa toda a largura, ignorando o padding lateral de 20 px do Container */
+export const DividerOr = styled.div`
+  margin: 30px -20px 0;            /* -20 px compensa o padding do container */
+  width: calc(100% + 40px);        /* expande 20 px para cada lado */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 300;
+  font-size: 16px;
+  letter-spacing: 2px;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    border-top: 1px solid #ffffff;
+    opacity: 0.7;
+  }
+
+  &::before {
+    margin-right: 12px;
+  }
+  &::after {
+    margin-left: 12px;
+  }
+`;
+
+/* registro — 17 px abaixo do divisor */
+export const RegisterContainer = styled.div`
+  margin-top: 17px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+`;
+
 /* mensagens de erro */
 export const ErrorMessage = styled.div`
   color: #ff4646;
@@ -95,19 +127,4 @@ export const ErrorMessage = styled.div`
   margin-top: 8px;
   width: 100%;
   text-align: left;
-`;
-
-/* ──────────────────────────────────────────
- * Compat: outras telas importam ButtonContainer
- * ────────────────────────────────────────── */
-export const ButtonContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  gap: 30px;
-
-  ion-button {
-    max-width: 300px;
-  }
 `;
