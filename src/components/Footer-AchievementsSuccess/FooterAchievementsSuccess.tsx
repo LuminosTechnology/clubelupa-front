@@ -12,7 +12,7 @@ import {
   CloseBtn,               // import do novo botão
 } from "./footerAchievementsSuccess.style";
 
-import champagneGif from "../../assets/gifs/champanhe-bg.gif";
+
 import footerClose from "../../assets/footer-close.svg";  // ícone de fechar
 
 interface Props {
@@ -79,7 +79,7 @@ const FooterAchievementsSuccess: React.FC<Props> = ({
 
       <ExpandedContent $expanded={height > minHeight + 20}>
         <HeartWrapper>
-          <img src={icon || champagneGif} alt={title} width={180} height={180} />
+          <img src={icon } alt={title} width={180} height={180} />
         </HeartWrapper>
 
         <Heading>{title}</Heading>
