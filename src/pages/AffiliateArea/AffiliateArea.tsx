@@ -22,13 +22,11 @@ import {
   LogoutContainer,
 } from "./AffiliateArea.style";
 
-import {
-  getMyFirstAffiliate,          
-} from "../../services/affiliateService";
+import { getMyFirstAffiliate } from "../../services/affiliateService";
 import { logout } from "../../services/auth-service";
 
 import editIcon from "../../assets/edit.svg";
-import publicidadeIcon from "../../assets/publicidade.svg";
+import publicidadeIcon from "../../assets/relatorios.svg";
 import relatoriosIcon from "../../assets/relatorios.svg";
 import emailIcon from "../../assets/email.svg";
 import instagramIcon from "../../assets/insta.svg";
@@ -88,7 +86,9 @@ const AffiliateArea: React.FC = () => {
   /* ─── helpers ────────────────────────────────────────────────── */
   const displayName = affiliate.nome_local || affiliate.nome_fantasia;
   const profilePhoto =
-    affiliate.foto_perfil || affiliate.profile_photo || "/assets/profile-pic.svg";
+    affiliate.foto_perfil ||
+    affiliate.profile_photo ||
+    "/assets/profile-pic.svg";
 
   /* ─── UI ─────────────────────────────────────────────────────── */
   return (

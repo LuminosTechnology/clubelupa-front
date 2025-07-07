@@ -81,7 +81,7 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
       { label: "Home", path: "/home" },
       { label: "Perfil", path: "/profile" },
       { label: "Afiliados", path: "/affiliates" },
-      { label: "Troca de LupaCoins", path: "/lupacoins" },
+      { label: "Troca de Moedas Lupa", path: "/lupacoins" },
       { label: "Meu Plano", path: "/myplan" },
       { label: "Meus Favoritos", path: "/favorites" },
       { label: "Histórico", path: "/experience" },
@@ -128,7 +128,10 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
         {/* botão de logout */}
         <LogoutButton onClick={handleLogout}>
           Desconectar
-          <IonIcon icon={logOut} style={{ width: 25, height: 25, marginLeft: 10 }} />
+          <IonIcon
+            icon={logOut}
+            style={{ width: 25, height: 25, marginLeft: 10 }}
+          />
         </LogoutButton>
       </MenuContainer>
     </>

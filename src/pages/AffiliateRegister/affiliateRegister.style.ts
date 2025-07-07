@@ -7,6 +7,11 @@ export const AffiliateContainer = styled.div`
   width: 100%;
   padding: 50px;
 
+  gap: 0.5rem;
+
+  height: 100%;
+  overflow: auto;
+
   h2 {
     color: white;
   }
@@ -56,4 +61,26 @@ export const AffiliateButtonContainer = styled.div`
   margin-top: 32px;
   display: flex;
   justify-content: center;
+`;
+
+export const AffiliateRadioInputWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+`;
+
+export const AffiliateRadioInputContainer = styled.div<{
+  direction?: "row" | "column";
+}>`
+  display: flex;
+  flex-direction: ${({ direction }) => (direction ? direction : "row")};
+  gap: 1rem;
+`;
+
+export const RadioOption = styled.div`
+  background-color: blue;
+  display: flex;
+  align-items: center;
 `;

@@ -2,24 +2,24 @@ import api from "./api";
 import { AffiliateData } from "./interfaces/Affiliate";
 import { getToken } from "./auth-service";
 
-
 const withAuth = async () => ({
   headers: { Authorization: `Bearer ${await getToken()}` },
 });
 
 /** Retorna o primeiro afiliado associado ao token ou null. */
 export const getMyFirstAffiliate = async (): Promise<AffiliateData | null> => {
-  const { data } = await api.get(
-    "/affiliates",
-    await withAuth(),          
-  );
+  const token = await getToken();
+  const { data } = await api.get("/affiliates", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   const list: AffiliateData[] = Array.isArray(data)
     ? data
     : Array.isArray((data as any)?.affiliates)
     ? (data as any).affiliates
     : [];
-
 
   return list.length ? list[0] : null;
 };

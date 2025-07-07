@@ -15,11 +15,11 @@ import {
 } from "./footer.style";
 
 import Button from "../Button";
-import voucherSvg   from "../../assets/moeda.svg";
-import footerClose  from "../../assets/footer-close.svg";
+import voucherSvg from "../../assets/moeda.svg";
+import footerClose from "../../assets/footer-close.svg";
 
 const ExchangeButton = styled(Button)`
-  margin-top: 30px;  /* entre o segundo texto e o botão */
+  margin-top: 30px; /* entre o segundo texto e o botão */
 `;
 
 interface FooterVoucherProps {
@@ -36,7 +36,7 @@ const FooterLupaCoins: React.FC<FooterVoucherProps> = ({
   const maxHeight = window.innerHeight * 0.75;
   const footerRef = useRef<HTMLDivElement>(null);
 
-  const [height, setHeight]   = useState(minHeight);
+  const [height, setHeight] = useState(minHeight);
   const [isDragging, setDrag] = useState(false);
   const dragRef = useRef({ startY: 0, startHeight: minHeight });
 
@@ -58,7 +58,10 @@ const FooterLupaCoins: React.FC<FooterVoucherProps> = ({
     if (!isDragging) return;
     const delta = dragRef.current.startY - e.touches[0].clientY;
     setHeight(
-      Math.max(minHeight, Math.min(maxHeight, dragRef.current.startHeight + delta))
+      Math.max(
+        minHeight,
+        Math.min(maxHeight, dragRef.current.startHeight + delta)
+      )
     );
   };
 
@@ -92,17 +95,13 @@ const FooterLupaCoins: React.FC<FooterVoucherProps> = ({
         <SectionTitle>Experiência Lupa</SectionTitle>
 
         <Text>
-          Escolha entre o tônico “Self Love”, um sabonete facial, uma mini argila ou a
-          pastilha dental “Tasty” nas compras acima de R$250!
+          Escolha entre o tônico “Self Love”, um sabonete facial, uma mini
+          argila ou a pastilha dental “Tasty” nas compras acima de R$250!
         </Text>
 
-        <Text>
-          Você quer trocar 155 LupaCoins por essa experiência?
-        </Text>
+        <Text>Você quer trocar 155 Moedas Lupa por essa experiência?</Text>
 
-        <ExchangeButton>
-          QUERO TROCAR MINHAS LUPACOINS
-        </ExchangeButton>
+        <ExchangeButton>QUERO TROCAR MINHAS MOEDAS LUPA</ExchangeButton>
 
         {/* botão fechar */}
         <CloseBtn onClick={collapse}>

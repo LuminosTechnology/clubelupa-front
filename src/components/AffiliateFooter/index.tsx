@@ -2,8 +2,8 @@
  * src/components/AffiliateFooter/index.tsx
  * — Versão que chama `onAction` ao clicar em IR AO ESTABELECIMENTO
  * ──────────────────────────────────────────── */
-import React, { useRef, useState } from 'react';
-import { IonIcon } from '@ionic/react';
+import React, { useRef, useState } from "react";
+import { IonIcon } from "@ionic/react";
 import {
   FooterContainer,
   WhiteLine,
@@ -15,24 +15,24 @@ import {
   Tagline,
   Description,
   ActionButton,
-  SocialLink
-} from './footerAffiliate.style';
+  SocialLink,
+} from "./footerAffiliate.style";
 
-import lupaIcon from '../../assets/icon-lupa.svg';
-import lupaIcon2 from '../../assets/icon-lupa2.svg';
-import { Restaurant } from '../../components/Map';
-import { logoInstagram } from 'ionicons/icons';
+import lupaIcon from "../../assets/icon-lupa.svg";
+import lupaIcon2 from "../../assets/icon-lupa2.svg";
+import { Restaurant } from "../../components/Map";
+import { logoInstagram } from "ionicons/icons";
 
 interface AffiliateFooterProps {
   affiliate: Restaurant;
   onClose: () => void;
-  onAction: () => void;    // ← callback para “ir ao estabelecimento”
+  onAction: () => void; // ← callback para “ir ao estabelecimento”
 }
 
 const AffiliateFooter: React.FC<AffiliateFooterProps> = ({
   affiliate,
   onClose,
-  onAction
+  onAction,
 }) => {
   const minHeight = 177;
   const maxHeight = window.innerHeight * 0.8;
@@ -48,7 +48,10 @@ const AffiliateFooter: React.FC<AffiliateFooterProps> = ({
     if (!isDragging) return;
     const delta = dragRef.current.startY - e.touches[0].clientY;
     setHeight(
-      Math.max(minHeight, Math.min(maxHeight, dragRef.current.startHeight + delta))
+      Math.max(
+        minHeight,
+        Math.min(maxHeight, dragRef.current.startHeight + delta)
+      )
     );
   };
   const handleTouchEnd = () => {
@@ -64,7 +67,7 @@ const AffiliateFooter: React.FC<AffiliateFooterProps> = ({
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
-      style={{ height, transition: isDragging ? 'none' : 'height 0.3s ease' }}
+      style={{ height, transition: isDragging ? "none" : "height 0.3s ease" }}
     >
       <WhiteLine />
 
@@ -84,12 +87,12 @@ const AffiliateFooter: React.FC<AffiliateFooterProps> = ({
       {/* conteúdo principal */}
       <ExpandedContent>
         <Tagline>
-          Conheça o {affiliate.name} e ganhe {affiliate.value} Lupacoins!
+          Conheça o {affiliate.name} e ganhe {affiliate.value} Moedas Lupa!
         </Tagline>
 
         <Description>
           {affiliate.benefits ||
-            `O ${affiliate.name} é o lugar ideal para você… Faça seu Check-in no estabelecimento para ganhar suas Lupacoins
+            `O ${affiliate.name} é o lugar ideal para você… Faça seu Check-in no estabelecimento para ganhar suas Moedas Lupa!
             e receba o benefício EXCLUSIVO que só o Lupa proporciona.`}
         </Description>
 
@@ -99,7 +102,9 @@ const AffiliateFooter: React.FC<AffiliateFooterProps> = ({
           &nbsp;Acesse o instagram
         </SocialLink>
 
-        <SocialLink href="#" target="_blank">Acesse o site</SocialLink>
+        <SocialLink href="#" target="_blank">
+          Acesse o site
+        </SocialLink>
 
         {/* botão ação */}
         <ActionButton variant="secondary" onClick={onAction}>

@@ -1,6 +1,12 @@
 import api from "./api";
 import { Preferences } from "@capacitor/preferences";
-import { ForgotPasswordRequest, LoginUserRequest, LoginUserResponse, ResetPasswordRequest, User } from "./interfaces/Auth";
+import {
+  ForgotPasswordRequest,
+  LoginUserRequest,
+  LoginUserResponse,
+  ResetPasswordRequest,
+  User,
+} from "./interfaces/Auth";
 
 const AUTH_TOKEN_KEY = "auth_token";
 
@@ -25,7 +31,10 @@ export const register = async (data: any) => {
 };
 
 export const registerAffiliate = async (data: any) => {
-  console.log("[Auth Service] Attempting affiliate registration with data:", data);
+  console.log(
+    "[Auth Service] Attempting affiliate registration with data:",
+    data
+  );
   const response = await api.post("/afiliados/cadastro", data);
   console.log("[Auth Service] Registration response:", response.data);
   return response;
@@ -35,7 +44,9 @@ export const logout = async () => {
   console.log("[Auth Service] Attempting logout");
   const token = await getToken();
   if (!token) {
-    console.error("[Auth Service] Token not found, cannot proceed with logout.");
+    console.error(
+      "[Auth Service] Token not found, cannot proceed with logout."
+    );
     return;
   }
   console.log("[Auth Service] Logging out with token:", token);
@@ -74,25 +85,24 @@ export const getUserByToken = async (): Promise<User> => {
   if (!token) throw new Error("Token não encontrado");
 
   const response = await api.get<{ user: User }>("/profile", {
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   });
 
   const user = response.data.user;
   return {
     ...user,
-    avatar_url: user.profile_photo ?? user.avatar_url ?? ""
+    avatar_url: user.profile_photo ?? user.avatar_url ?? "",
   };
 };
 
-
-export const updateUserProfile = async (userData: Partial<User>): Promise<User> => {
+export const updateUserProfile = async (
+  userData: Partial<User>
+): Promise<User> => {
   const token = await getToken();
   if (!token) throw new Error("Token não encontrado");
-  const response = await api.put<{ user: User }>(
-    "/profile",
-    userData,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
+  const response = await api.put<{ user: User }>("/profile", userData, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return response.data.user;
 };
 
@@ -101,16 +111,11 @@ export const updateProfilePhoto = async (file: File): Promise<string> => {
   if (!token) throw new Error("Token não encontrado");
   const formData = new FormData();
   formData.append("profile_photo", file);
-  const response = await api.post<{ url: string }>(
-    "/profile/photo",
-    formData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data"
-      }
-    }
-  );
+  const response = await api.post<{ url: string }>("/profile/photo", formData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return response.data.url;
 };
-

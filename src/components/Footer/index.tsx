@@ -24,12 +24,12 @@ import {
   ConfettiPiece,
 } from "./footer.style";
 
-import homeHome       from "../../assets/home-home.svg";
-import homeLupa       from "../../assets/home-lupa.svg";
-import homeNivel      from "../../assets/moeda_vazia.png";
+import homeHome from "../../assets/home-home.svg";
+import homeLupa from "../../assets/home-lupa.svg";
+import homeNivel from "../../assets/moeda_vazia.png";
 import homeConquistas from "../../assets/home-conquistas.svg";
-import homeLugares    from "../../assets/home-lugares.svg";
-import footerClose    from "../../assets/footer-close.svg";
+import homeLugares from "../../assets/home-lugares.svg";
+import footerClose from "../../assets/footer-close.svg";
 
 import FooterAchievements from "../Footer-Achievements/FooterAchievements";
 import { getUserByToken } from "../../services/auth-service";
@@ -47,7 +47,7 @@ const Footer: React.FC<FooterProps> = ({
   userData = { nivel: 10, experiencia: 750, proximo_nivel: 1000 },
 }) => {
   const location = useLocation();
-  const history  = useHistory();
+  const history = useHistory();
 
   /* ─────────── usuário logado ─────────── */
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -66,15 +66,15 @@ const Footer: React.FC<FooterProps> = ({
   const minHeight = 120;
   const maxHeight = window.innerHeight * 0.8;
 
-  const [height, setHeight]       = useState(minHeight);
+  const [height, setHeight] = useState(minHeight);
   const [isDragging, setDragging] = useState(false);
   const dragRef = useRef({ startY: 0, startHeight: minHeight });
 
   const isCollapsed = height <= minHeight + 2;
-  const isExpanded  = !isCollapsed;
+  const isExpanded = !isCollapsed;
 
   /* ─────────── conquistas grid ────────── */
-  const [achievementsOpen,    setAchievementsOpen]    = useState(false);
+  const [achievementsOpen, setAchievementsOpen] = useState(false);
   const [achievementsTrigger, setAchievementsTrigger] = useState(0);
 
   const collapseFooter = () => {
@@ -120,7 +120,7 @@ const Footer: React.FC<FooterProps> = ({
   /* ─────────── helpers ────────────────── */
   const progressPct = Math.min(
     100,
-    (userData.experiencia! / userData.proximo_nivel!) * 150   // → saturado em 100
+    (userData.experiencia! / userData.proximo_nivel!) * 150 // → saturado em 100
   );
 
   const daysUsing = () => {
@@ -147,7 +147,14 @@ const Footer: React.FC<FooterProps> = ({
   }, [progressPct]);
 
   /* ---------- confetes ---------- */
-  const colors = ["#ff595e", "#ffca3a", "#8ac926", "#1982c4", "#6a4c93", "#ffffff"];
+  const colors = [
+    "#ff595e",
+    "#ffca3a",
+    "#8ac926",
+    "#1982c4",
+    "#6a4c93",
+    "#ffffff",
+  ];
   const confettiCount = 40;
 
   /* ─────────── render ─────────────────── */
@@ -163,7 +170,8 @@ const Footer: React.FC<FooterProps> = ({
               key={i}
               style={{
                 left: `${Math.random() * 100}%`,
-                backgroundColor: colors[Math.floor(Math.random() * colors.length)],
+                backgroundColor:
+                  colors[Math.floor(Math.random() * colors.length)],
                 animationDelay: `${Math.random()}s`,
                 transform: `rotate(${Math.random() * 360}deg)`,
               }}
@@ -189,7 +197,6 @@ const Footer: React.FC<FooterProps> = ({
           />
           <LevelBadge>
             <img src={homeNivel} alt="Moeda de nível" />
-            
           </LevelBadge>
         </UserImageContainer>
 
@@ -241,7 +248,7 @@ const Footer: React.FC<FooterProps> = ({
             <InfoList>
               <li>Lugares visitados com Lupa: 10</li>
               <li>Benefícios já utilizados: 20</li>
-              <li>LupaCoins acumuladas: 30</li>
+              <li>Moedas Lupa acumuladas: 30</li>
               <li>Dias usando o Lupa: {daysUsing()}</li>
             </InfoList>
 

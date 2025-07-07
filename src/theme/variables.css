@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Karla:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Karla:wght@400;500;600;700&display=swap");
 
 :root {
   --ion-safe-area-top: env(safe-area-inset-top);
@@ -10,16 +10,16 @@
   --app-text-color: #000000;
 
   /* Theme Colors */
-  --ion-color-primary: #9FA369;
-  --ion-color-secondary: #E6C178;
-  --ion-color-tertiary: #E0A075;
+  --ion-color-primary: #9fa369;
+  --ion-color-secondary: #e6c178;
+  --ion-color-tertiary: #e0a075;
 
-  --orange: #E0A075;
-  --green: #9FA369;
-  --yellow: #E6C178;
+  --orange: #e0a075;
+  --green: #9fa369;
+  --yellow: #e6c178;
 
   /* Typography */
-  --ion-font-family: 'Karla', sans-serif;
+  --ion-font-family: "Karla", sans-serif;
   --ion-default-font-size: 16px;
   --ion-font-weight-normal: 400;
 }

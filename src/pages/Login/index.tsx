@@ -7,7 +7,7 @@ import { useHistory } from "react-router-dom";
 
 import {
   Container,
-  DividerOr,              
+  DividerOr,
   ErrorMessage,
   ForgotPasswordWrapper,
   FormWrapper,
@@ -99,7 +99,7 @@ const Login: React.FC = () => {
             {errors.password && <ErrorMessage>{errors.password}</ErrorMessage>}
 
             <ForgotPasswordWrapper>
-              <Link onClick={() => history.push("/forgot-password")}>
+              <Link onClick={() => history.push("/forgot/password")}>
                 Esqueci minha senha
               </Link>
             </ForgotPasswordWrapper>
