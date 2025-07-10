@@ -73,14 +73,28 @@ const App: React.FC = () => {
     <IonApp>
       <IonReactRouter>
         <IonRouterOutlet>
-          <Route exact path="/login" render={() => isAuthenticated ? <Redirect to="/home" /> : <Login />} />
+          <Route
+            exact
+            path="/login"
+            render={() =>
+              isAuthenticated ? <Redirect to="/home" /> : <Login />
+            }
+          />
           <Route exact path="/register" component={Register} />
           <Route exact path="/register/success" component={RegisterSuccess} />
+          <Route
+            exact
+            path="/register/affiliate"
+            component={AffiliateRegister}
+          />
           <Route exact path="/lupacoins" component={LupoCoins} />
           <Route exact path="/forgot/password" component={ForgotPassword} />
           <Route exact path="/change/password" component={ChangePassword} />
-          <Route exact path="/affiliate/register" component={AffiliateRegister} />
-          <Route exact path="/affiliate/register/success" component={AffiliateRegisterSuccess} />
+          <Route
+            exact
+            path="/affiliate/register/success"
+            component={AffiliateRegisterSuccess}
+          />
           <Route exact path="/affiliate/area" component={AffiliateArea} />
           <Route exact path="/affiliate/area/edit" component={AffiliateEdit} />
           <Route exact path="/affiliates" component={AffiliateStores} />

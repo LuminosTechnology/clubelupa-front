@@ -1,24 +1,32 @@
-import React, { useState } from "react";
 import {
-  IonPage,
   IonContent,
-  IonRadioGroup,
+  IonPage,
   IonRadio,
+  IonRadioGroup,
+  IonSelectOption,
   IonText,
 } from "@ionic/react";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import {
-  AffiliateContainer,
-  AffiliateErrorMessage,
   AffiliateButtonContainer,
-  AffiliateRadioInputWrapper,
+  AffiliateContainer,
+  AffiliateDataContainer,
+  AffiliateErrorMessage,
   AffiliateRadioInputContainer,
-  RadioOption,
+  BaseDataContainer,
+  CustomSelect,
+  FormDataContainer,
+  FormInputRow,
+  InputLabelContainer,
+  SearchCEPButton,
+  TermsLink,
+  TermsParagraph,
 } from "./affiliateRegister.style";
 
 import BackButton from "../../components/BackButton";
-import FloatingInput from "../../components/FloatingInput";
 import Button from "../../components/Button";
+import FloatingInput from "../../components/FloatingInput";
 
 // Importa a função que criamos no auth-service
 import { registerAffiliate } from "../../services/auth-service";
@@ -26,20 +34,16 @@ import { registerAffiliate } from "../../services/auth-service";
 const AffiliateRegister: React.FC = () => {
   const history = useHistory();
   const [hasPhysicalAddress, setHasPhysicalAddress] = useState(false);
+  const [hasCodeApproval, setHasCodeApproval] = useState(false);
   const [affiliate, setAffiliate] = useState({
-    // nome_fantasia: "",
-    cnpj: "",
-    tempo_empresa: "", // <-- mudamos para tempo_empresa
+    nome_completo: "",
+    data_nascimento: "",
+    telefone: "",
     email: "",
-    // telefone: "",
 
-    razao_social: "",
     nome_marca: "",
-    instagram: "",
-    site: "",
-    whatsapp: "",
+    categoria: "",
 
-    horario_funcionamento: "",
     cep: "",
     rua: "",
     numeroEndereco: "",
@@ -48,8 +52,13 @@ const AffiliateRegister: React.FC = () => {
     cidade: "",
     uf: "",
 
-    tipo_atividade: "",
-    envio_produtos: "",
+    instagram: "",
+    site: "",
+
+    password: "",
+    password_confirmation: "",
+
+    codigo_aprovacao: "",
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -60,18 +69,11 @@ const AffiliateRegister: React.FC = () => {
     // if (!affiliate.nome_fantasia) {
     //   newErrors.nome_fantasia = "Nome Fantasia é obrigatório";
     // }
-    if (!affiliate.razao_social) {
-      newErrors.razao_social = "Razão Social é obrigatório";
-    }
+
     if (!affiliate.nome_marca) {
       newErrors.nome_marca = "Nome da Marca é obrigatório";
     }
-    if (!affiliate.cnpj) {
-      newErrors.cnpj = "CNPJ é obrigatório";
-    }
-    if (!affiliate.tempo_empresa) {
-      newErrors.tempo_empresa = "Tempo de empresa é obrigatório";
-    }
+
     if (!affiliate.email) {
       newErrors.email = "Email é obrigatório";
     }
@@ -80,10 +82,6 @@ const AffiliateRegister: React.FC = () => {
     // }
 
     if (hasPhysicalAddress) {
-      if (!affiliate.horario_funcionamento) {
-        newErrors.horario_funcionamento =
-          "Horário de funcionamento é obrigatório";
-      }
       if (!affiliate.cep) newErrors.cep = "CEP é obrigatório";
       if (!affiliate.rua) newErrors.rua = "Rua é obrigatório";
       if (!affiliate.numeroEndereco)
@@ -91,6 +89,11 @@ const AffiliateRegister: React.FC = () => {
       if (!affiliate.bairro) newErrors.bairro = "Bairro é obrigatório";
       if (!affiliate.cidade) newErrors.cidade = "Cidade é obrigatório";
       if (!affiliate.uf) newErrors.uf = "UF é obrigatório";
+    }
+
+    if (!affiliate.instagram && !affiliate.site) {
+      newErrors.site = "Insira pelo menos um site ou instagram.";
+      newErrors.instagram = "Insira pelo menos um site ou instagram.";
     }
 
     setErrors(newErrors);
@@ -102,14 +105,8 @@ const AffiliateRegister: React.FC = () => {
     if (!validateForm()) return;
 
     try {
-      // Faz a chamada para a função de cadastro de afiliado
-      // Repare que "tempo_empresa" no state bate com "tempo_empresa" do backend
       await registerAffiliate({
-        // nome_fantasia: affiliate.nome_fantasia,
-        cnpj: affiliate.cnpj,
-        tempo_empresa: affiliate.tempo_empresa,
-        // telefone: affiliate.telefone,
-        email: affiliate.email, // se o backend precisa deste campo
+        email: affiliate.email,
       });
 
       // Se deu tudo certo, vamos para a tela de sucesso
@@ -160,305 +157,332 @@ const AffiliateRegister: React.FC = () => {
         <AffiliateContainer>
           <BackButton />
           <h2>Cadastre-se para ser um afiliado</h2>
-
-          {/* Razão Social */}
-          <FloatingInput
-            label="Razão Social"
-            value={affiliate.razao_social}
-            onChange={(value) =>
-              setAffiliate({ ...affiliate, razao_social: value })
-            }
-            error={!!errors.razao_social}
-          />
-          {errors.razao_social && (
-            <AffiliateErrorMessage>{errors.razao_social}</AffiliateErrorMessage>
-          )}
-
-          {/* CNPJ */}
-          <FloatingInput
-            label="CNPJ"
-            value={affiliate.cnpj}
-            onChange={(value) => setAffiliate({ ...affiliate, cnpj: value })}
-            error={!!errors.cnpj}
-            mask="99.999.999/9999-99"
-          />
-          {errors.cnpj && (
-            <AffiliateErrorMessage>{errors.cnpj}</AffiliateErrorMessage>
-          )}
-
-          {/* Tempo de empresa */}
-          <FloatingInput
-            label="Tempo de empresa (em meses ou anos)"
-            value={affiliate.tempo_empresa}
-            onChange={(value) =>
-              setAffiliate({ ...affiliate, tempo_empresa: value })
-            }
-            error={!!errors.tempo_empresa}
-          />
-          {errors.tempo_empresa && (
-            <AffiliateErrorMessage>
-              {errors.tempo_empresa}
-            </AffiliateErrorMessage>
-          )}
-
-          {/* Nome da Marca */}
-          <FloatingInput
-            label="Nome da Marca"
-            value={affiliate.nome_marca}
-            onChange={(value) =>
-              setAffiliate({ ...affiliate, nome_marca: value })
-            }
-            error={!!errors.nome_marca}
-          />
-          {errors.nome_marca && (
-            <AffiliateErrorMessage>{errors.nome_marca}</AffiliateErrorMessage>
-          )}
-
-          {/* Instagram */}
-          <FloatingInput
-            label="Instagram (opcional)"
-            value={`@${affiliate.instagram}`}
-            onChange={(value) =>
-              setAffiliate({
-                ...affiliate,
-                instagram: formatInstagramHandle(value),
-              })
-            }
-            error={!!errors.instagram}
-          />
-          {errors.instagram && (
-            <AffiliateErrorMessage>{errors.instagram}</AffiliateErrorMessage>
-          )}
-
-          {/* Site */}
-          <FloatingInput
-            label="Site (opcional)"
-            value={affiliate.site}
-            onChange={(value) =>
-              setAffiliate({
-                ...affiliate,
-                site: value,
-              })
-            }
-            error={!!errors.site}
-          />
-          {errors.site && (
-            <AffiliateErrorMessage>{errors.site}</AffiliateErrorMessage>
-          )}
-
-          {/* Email (se necessário no backend) */}
-          <FloatingInput
-            label="Email"
-            value={affiliate.email}
-            onChange={(value) => setAffiliate({ ...affiliate, email: value })}
-            type="email"
-            error={!!errors.email}
-          />
-          {errors.email && (
-            <AffiliateErrorMessage>{errors.email}</AffiliateErrorMessage>
-          )}
-
-          {/* Telefone
-          <FloatingInput
-            label="Telefone"
-            value={affiliate.telefone}
-            onChange={(value) =>
-              setAffiliate({ ...affiliate, telefone: value })
-            }
-            mask="(99)99999-9999"
-            error={!!errors.telefone}
-          />
-          {errors.telefone && (
-            <AffiliateErrorMessage>{errors.telefone}</AffiliateErrorMessage>
-          )} */}
-
-          {/* Whatsapp */}
-          <FloatingInput
-            label="WhatsApp"
-            value={affiliate.whatsapp}
-            onChange={(value) =>
-              setAffiliate({ ...affiliate, whatsapp: value })
-            }
-            mask="(99)99999-9999"
-            error={!!errors.whatsapp}
-          />
-          {errors.whatsapp && (
-            <AffiliateErrorMessage>{errors.whatsapp}</AffiliateErrorMessage>
-          )}
-
-          <AffiliateRadioInputWrapper>
-            <IonText>Possui endereço físico?</IonText>
-            <IonRadioGroup
-              value={hasPhysicalAddress ? "true" : "false"}
-              onIonChange={(e) =>
-                setHasPhysicalAddress(e.detail.value === "true")
-              }
-            >
-              <AffiliateRadioInputContainer>
-                <IonRadio value="true" labelPlacement="end" color="dark">
-                  Sim
-                </IonRadio>
-                <IonRadio value="false" labelPlacement="end" color="dark">
-                  Não
-                </IonRadio>
-              </AffiliateRadioInputContainer>
-            </IonRadioGroup>
-          </AffiliateRadioInputWrapper>
-
-          {hasPhysicalAddress && (
-            <>
-              {/* Horário de Funcionamento */}
+          <FormDataContainer>
+            <BaseDataContainer>
               <FloatingInput
-                label="Horário de Funcionamento"
-                value={affiliate.horario_funcionamento}
-                onChange={(value) =>
-                  setAffiliate({ ...affiliate, horario_funcionamento: value })
+                label="Nome Completo"
+                value={affiliate.nome_completo}
+                onChange={(v) =>
+                  setAffiliate({ ...affiliate, nome_completo: v })
                 }
-                error={!!errors.horario_funcionamento}
+                error={!!errors.nome_completo}
               />
-              {errors.horario_funcionamento && (
+              {errors.nome_completo && (
                 <AffiliateErrorMessage>
-                  {errors.horario_funcionamento}
+                  {errors.nome_completo}
                 </AffiliateErrorMessage>
               )}
 
-              {/* CEP */}
               <FloatingInput
-                label="CEP"
-                value={affiliate.cep}
-                onChange={(value) => setAffiliate({ ...affiliate, cep: value })}
-                mask="99999-999"
-                error={!!errors.cep}
-              />
-              {errors.cep && (
-                <AffiliateErrorMessage>{errors.cep}</AffiliateErrorMessage>
-              )}
-
-              {/* Rua */}
-              <FloatingInput
-                label="Rua"
-                value={affiliate.rua}
-                onChange={(value) => setAffiliate({ ...affiliate, rua: value })}
-                error={!!errors.rua}
-              />
-              {errors.rua && (
-                <AffiliateErrorMessage>{errors.rua}</AffiliateErrorMessage>
-              )}
-
-              {/* Numero */}
-              <FloatingInput
-                label="Número"
-                value={affiliate.numeroEndereco}
-                onChange={(value) =>
-                  setAffiliate({ ...affiliate, numeroEndereco: value })
+                label="Data de Nascimento"
+                value={affiliate.data_nascimento}
+                onChange={(v) =>
+                  setAffiliate({ ...affiliate, data_nascimento: v })
                 }
-                error={!!errors.numeroEndereco}
-                type="number"
+                type="date"
+                error={!!errors.data_nascimento}
               />
-              {errors.numeroEndereco && (
+              {errors.data_nascimento && (
                 <AffiliateErrorMessage>
-                  {errors.numeroEndereco}
+                  {errors.data_nascimento}
                 </AffiliateErrorMessage>
               )}
 
-              {/* Complemento */}
               <FloatingInput
-                label="Complemento (opcional)"
-                value={affiliate.complemento}
-                onChange={(value) =>
-                  setAffiliate({ ...affiliate, complemento: value })
-                }
-                error={!!errors.complemento}
+                label="Telefone"
+                value={affiliate.telefone}
+                onChange={(v) => setAffiliate({ ...affiliate, telefone: v })}
+                error={!!errors.telefone}
+                mask="(99)99999-9999"
               />
-              {errors.complemento && (
+              {errors.telefone && (
+                <AffiliateErrorMessage>{errors.telefone}</AffiliateErrorMessage>
+              )}
+
+              <FloatingInput
+                label="Email"
+                value={affiliate.email}
+                onChange={(v) => setAffiliate({ ...affiliate, email: v })}
+                type="email"
+                error={!!errors.email}
+              />
+              {errors.email && (
+                <AffiliateErrorMessage>{errors.email}</AffiliateErrorMessage>
+              )}
+            </BaseDataContainer>
+
+            <AffiliateDataContainer>
+              {/* Nome da Marca */}
+              <FloatingInput
+                label="Nome da Marca"
+                value={affiliate.nome_marca}
+                onChange={(value) =>
+                  setAffiliate({ ...affiliate, nome_marca: value })
+                }
+                error={!!errors.nome_marca}
+              />
+              {errors.nome_marca && (
                 <AffiliateErrorMessage>
-                  {errors.complemento}
+                  {errors.nome_marca}
                 </AffiliateErrorMessage>
               )}
 
-              {/* Bairro */}
+              <InputLabelContainer>
+                <IonText color="light">Selecione uma categoria</IonText>
+                <CustomSelect
+                  placeholder="Categoria"
+                  value={affiliate.categoria}
+                  fill="solid"
+                  onIonChange={(e) =>
+                    setAffiliate({ ...affiliate, categoria: e.detail.value })
+                  }
+                >
+                  <IonSelectOption value="arte">Arte</IonSelectOption>
+                  <IonSelectOption value="brecho">Brechó</IonSelectOption>
+                  <IonSelectOption value="cosmeticos">
+                    Cosméticos
+                  </IonSelectOption>
+                  <IonSelectOption value="cultura">Cultura</IonSelectOption>
+                  <IonSelectOption value="decoracao">Decoração</IonSelectOption>
+                  <IonSelectOption value="gastronomia">
+                    Gastronomia
+                  </IonSelectOption>
+                  <IonSelectOption value="moda">Moda</IonSelectOption>
+                  <IonSelectOption value="outros">Outros</IonSelectOption>
+                </CustomSelect>
+              </InputLabelContainer>
+
+              <InputLabelContainer>
+                <IonText color="light">Possui endereço físico?</IonText>
+                <IonRadioGroup
+                  color="light"
+                  value={hasPhysicalAddress ? "true" : "false"}
+                  onIonChange={(e) =>
+                    setHasPhysicalAddress(e.detail.value === "true")
+                  }
+                >
+                  <AffiliateRadioInputContainer>
+                    <IonRadio color="light" value="true" labelPlacement="end">
+                      Sim
+                    </IonRadio>
+                    <IonRadio color="light" value="false" labelPlacement="end">
+                      Não
+                    </IonRadio>
+                  </AffiliateRadioInputContainer>
+                </IonRadioGroup>
+              </InputLabelContainer>
+
+              {hasPhysicalAddress && (
+                <>
+                  <FormInputRow>
+                    {/* CEP */}
+                    <FloatingInput
+                      label="CEP"
+                      value={affiliate.cep}
+                      onChange={(value) =>
+                        setAffiliate({ ...affiliate, cep: value })
+                      }
+                      mask="99999-999"
+                      error={!!errors.cep}
+                    />
+                    <SearchCEPButton strong size="small" shape="round">
+                      BUSCAR
+                    </SearchCEPButton>
+                  </FormInputRow>
+                  {errors.cep && (
+                    <AffiliateErrorMessage>{errors.cep}</AffiliateErrorMessage>
+                  )}
+
+                  {/* Rua */}
+                  <FloatingInput
+                    label="Rua"
+                    value={affiliate.rua}
+                    onChange={(value) =>
+                      setAffiliate({ ...affiliate, rua: value })
+                    }
+                    error={!!errors.rua}
+                  />
+                  {errors.rua && (
+                    <AffiliateErrorMessage>{errors.rua}</AffiliateErrorMessage>
+                  )}
+
+                  <FormInputRow>
+                    <>
+                      {/* Numero */}
+                      <FloatingInput
+                        label="Número"
+                        value={affiliate.numeroEndereco}
+                        onChange={(value) =>
+                          setAffiliate({ ...affiliate, numeroEndereco: value })
+                        }
+                        error={!!errors.numeroEndereco}
+                        type="number"
+                      />
+                      {errors.numeroEndereco && (
+                        <AffiliateErrorMessage>
+                          {errors.numeroEndereco}
+                        </AffiliateErrorMessage>
+                      )}
+                    </>
+                    <>
+                      {/* Complemento */}
+                      <FloatingInput
+                        label="Complemento"
+                        value={affiliate.complemento}
+                        onChange={(value) =>
+                          setAffiliate({ ...affiliate, complemento: value })
+                        }
+                        error={!!errors.complemento}
+                      />
+                      {errors.complemento && (
+                        <AffiliateErrorMessage>
+                          {errors.complemento}
+                        </AffiliateErrorMessage>
+                      )}
+                    </>
+                  </FormInputRow>
+
+                  {/* Bairro */}
+                  <FloatingInput
+                    label="Bairro"
+                    value={affiliate.bairro}
+                    onChange={(value) =>
+                      setAffiliate({ ...affiliate, bairro: value })
+                    }
+                    error={!!errors.bairro}
+                  />
+                  {errors.bairro && (
+                    <AffiliateErrorMessage>
+                      {errors.bairro}
+                    </AffiliateErrorMessage>
+                  )}
+
+                  <FormInputRow>
+                    <>
+                      {/* Cidade */}
+                      <FloatingInput
+                        label="Cidade"
+                        value={affiliate.cidade}
+                        onChange={(value) =>
+                          setAffiliate({ ...affiliate, cidade: value })
+                        }
+                        error={!!errors.cidade}
+                      />
+                      {errors.cidade && (
+                        <AffiliateErrorMessage>
+                          {errors.cidade}
+                        </AffiliateErrorMessage>
+                      )}
+                    </>
+                    <>
+                      {/* UF */}
+                      <FloatingInput
+                        label="UF"
+                        value={affiliate.uf}
+                        onChange={(value) =>
+                          setAffiliate({ ...affiliate, uf: value })
+                        }
+                        error={!!errors.uf}
+                        mask="AA"
+                      />
+                      {errors.uf && (
+                        <AffiliateErrorMessage>
+                          {errors.uf}
+                        </AffiliateErrorMessage>
+                      )}
+                    </>
+                  </FormInputRow>
+                </>
+              )}
+
+              {/* Site */}
               <FloatingInput
-                label="Bairro"
-                value={affiliate.bairro}
+                label="Site"
+                value={affiliate.site}
                 onChange={(value) =>
-                  setAffiliate({ ...affiliate, bairro: value })
+                  setAffiliate({
+                    ...affiliate,
+                    site: value,
+                  })
                 }
-                error={!!errors.bairro}
+                error={!!errors.site}
               />
-              {errors.bairro && (
-                <AffiliateErrorMessage>{errors.bairro}</AffiliateErrorMessage>
+              {errors.site && (
+                <AffiliateErrorMessage>{errors.site}</AffiliateErrorMessage>
               )}
 
-              {/* Cidade */}
+              {/* Instagram */}
               <FloatingInput
-                label="Cidade"
-                value={affiliate.cidade}
+                label="Instagram"
+                value={`@${affiliate.instagram}`}
                 onChange={(value) =>
-                  setAffiliate({ ...affiliate, cidade: value })
+                  setAffiliate({
+                    ...affiliate,
+                    instagram: formatInstagramHandle(value),
+                  })
                 }
-                error={!!errors.cidade}
+                error={!!errors.instagram}
               />
-              {errors.cidade && (
-                <AffiliateErrorMessage>{errors.cidade}</AffiliateErrorMessage>
+              {errors.instagram && (
+                <AffiliateErrorMessage>
+                  {errors.instagram}
+                </AffiliateErrorMessage>
               )}
+            </AffiliateDataContainer>
 
-              {/* UF */}
+            <BaseDataContainer>
               <FloatingInput
-                label="UF"
-                value={affiliate.uf}
-                onChange={(value) => setAffiliate({ ...affiliate, uf: value })}
-                error={!!errors.uf}
-                mask="AA"
+                label="Senha"
+                value={affiliate.password}
+                onChange={(v) => setAffiliate({ ...affiliate, password: v })}
+                isPassword
+                error={!!errors.password}
               />
-              {errors.uf && (
-                <AffiliateErrorMessage>{errors.uf}</AffiliateErrorMessage>
+              {errors.password && (
+                <AffiliateErrorMessage>{errors.password}</AffiliateErrorMessage>
               )}
-            </>
-          )}
 
-          <AffiliateRadioInputWrapper>
-            <IonText>Você produz ou revende?</IonText>
-            <IonRadioGroup
-              value={affiliate.tipo_atividade}
-              onIonChange={(e) =>
-                setAffiliate({ ...affiliate, tipo_atividade: e.detail.value })
-              }
-            >
-              <AffiliateRadioInputContainer>
-                <IonRadio value="produz" labelPlacement="end" color="dark">
-                  Produzo
-                </IonRadio>
-                <IonRadio value="revende" labelPlacement="end" color="dark">
-                  Revendo
-                </IonRadio>
-              </AffiliateRadioInputContainer>
-            </IonRadioGroup>
-          </AffiliateRadioInputWrapper>
+              <FloatingInput
+                label="Confirmar Senha"
+                value={affiliate.password_confirmation}
+                onChange={(v) =>
+                  setAffiliate({ ...affiliate, password_confirmation: v })
+                }
+                isPassword
+                error={!!errors.password_confirmation}
+              />
+              {errors.password_confirmation && (
+                <AffiliateErrorMessage>
+                  {errors.password_confirmation}
+                </AffiliateErrorMessage>
+              )}
+            </BaseDataContainer>
+          </FormDataContainer>
 
-          <AffiliateRadioInputWrapper>
-            <IonText>
-              Você topa enviar alguns produtos para a gente te conhecer melhor?
-            </IonText>
-            <IonRadioGroup
-              value={affiliate.envio_produtos}
-              onIonChange={(e) =>
-                setAffiliate({ ...affiliate, envio_produtos: e.detail.value })
-              }
-            >
-              <AffiliateRadioInputContainer direction="column">
-                <IonRadio value="sim" color="dark">
-                  Sim, posso enviar
-                </IonRadio>
-                <IonRadio value="nao" color="dark">
-                  Prefiro não enviar
-                </IonRadio>
-                <IonRadio value="nao_trabalhamos_com_produtos" color="dark">
-                  Não trabalhamos com produtos
-                </IonRadio>
-              </AffiliateRadioInputContainer>
-            </IonRadioGroup>
-          </AffiliateRadioInputWrapper>
+          <p style={{ marginTop: "16px", textAlign: "justify" }}>
+            Ao enviar as informações, sua empresa será submetida a um processo
+            seletivo para avaliar sua conformidade com as normas e valores. Caso
+            possua um código de aprovação imediata fornecido pelo Administrador,
+            insira-o no campo abaixo.
+          </p>
 
+          {/* Código de Pré-aprovação */}
+          <FloatingInput
+            label="Código de aprovação"
+            value={affiliate.codigo_aprovacao}
+            onChange={(value) =>
+              setAffiliate({ ...affiliate, codigo_aprovacao: value })
+            }
+            error={!!errors.codigo_aprovacao}
+          />
+
+          <AffiliateButtonContainer>
+            <Button onClick={handleAffiliateRegister} variant="secondary">
+              {affiliate.codigo_aprovacao
+                ? "CADASTRAR-SE"
+                : "SOLICITAR APROVAÇÃO"}
+            </Button>
+          </AffiliateButtonContainer>
           {/* Mensagem de erro geral */}
           {Object.keys(errors).length > 0 && (
             <AffiliateErrorMessage style={{ marginBottom: "16px" }}>
@@ -466,29 +490,11 @@ const AffiliateRegister: React.FC = () => {
             </AffiliateErrorMessage>
           )}
 
-          <p style={{ marginTop: "16px", textAlign: "center" }}>
-            Ao enviar as informações, sua empresa será submetida a um processo
-            seletivo para avaliar sua conformidade com as normas e valores.
-          </p>
-
-          <AffiliateButtonContainer>
-            <Button onClick={handleAffiliateRegister} variant="secondary">
-              ENVIAR INFORMAÇÕES
-            </Button>
-          </AffiliateButtonContainer>
-
-          <p
-            style={{
-              marginTop: "16px",
-              fontSize: "12px",
-              textAlign: "center",
-            }}
-          >
-            Ao entrar, você concorda com nossos{" "}
-            <a href="#" style={{ color: "#fff", textDecoration: "underline" }}>
-              Termos e política de Privacidade
-            </a>
-          </p>
+          <TermsParagraph>
+            Ao entrar, você concorda com nossos
+            <br />
+            <TermsLink href="#oi">Termos e política de Privacidade</TermsLink>
+          </TermsParagraph>
         </AffiliateContainer>
       </IonContent>
     </IonPage>

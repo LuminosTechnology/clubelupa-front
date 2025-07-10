@@ -65,6 +65,7 @@ const Login: React.FC = () => {
   };
 
   const handleRegister = () => history.push("/register");
+  const handleRegisterAffiliate = () => history.push("/register/affiliate");
 
   /* ─────────── UI ─────────── */
   return (
@@ -128,6 +129,9 @@ const Login: React.FC = () => {
           <RegisterContainer>
             <Link onClick={handleRegister}>
               Ainda não tem conta? Cadastre-se
+            </Link>
+            <Link onClick={handleRegisterAffiliate}>
+              Quero cadastrar minha marca
             </Link>
           </RegisterContainer>
 

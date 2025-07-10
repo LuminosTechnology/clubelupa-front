@@ -9,6 +9,9 @@
   --app-background-color: #ffffff;
   --app-text-color: #000000;
 
+  --ion-color-light: #ffffff;
+  --ion-color-dark: #000000;
+
   /* Theme Colors */
   --ion-color-primary: #9fa369;
   --ion-color-secondary: #e6c178;
@@ -46,6 +49,11 @@ ion-toolbar {
 
 body {
   overflow: hidden;
+}
+
+body.dark {
+  --ion-color-light: #ffffff;
+  --ion-color-dark: #000000;
 }
 
 ion-content {

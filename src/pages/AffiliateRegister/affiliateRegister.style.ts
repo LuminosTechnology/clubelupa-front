@@ -1,4 +1,45 @@
+import {
+  IonButton,
+  IonCheckbox,
+  IonContent,
+  IonItem,
+  IonSelect,
+} from "@ionic/react";
 import styled from "styled-components";
+
+export const BaseDataContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+`;
+
+export const AffiliateDataContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+`;
+
+export const FormDataContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+`;
+
+export const TermsParagraph = styled.p`
+  text-align: center;
+  color: white;
+  font-size: 1rem;
+  width: 100%;
+`;
+
+export const TermsLink = styled.a`
+  color: #825c12;
+  text-decoration: underline;
+  font-size: 1rem;
+`;
 
 export const AffiliateContainer = styled.div`
   display: flex;
@@ -7,19 +48,13 @@ export const AffiliateContainer = styled.div`
   width: 100%;
   padding: 50px;
 
-  gap: 0.5rem;
+  gap: 1rem;
 
   height: 100%;
   overflow: auto;
 
   h2 {
     color: white;
-  }
-
-  p {
-    color: white;
-    margin: 0;
-    font-size: 14px;
   }
 `;
 
@@ -58,17 +93,71 @@ export const AffiliateErrorMessage = styled.div`
 
 export const AffiliateButtonContainer = styled.div`
   width: 100%;
-  margin-top: 32px;
   display: flex;
   justify-content: center;
 `;
 
-export const AffiliateRadioInputWrapper = styled.div`
+export const InputLabelContainer = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 1rem;
   margin-top: 1rem;
+`;
+
+export const WeekDayPickerContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgb(0 0 0 / 0.33);
+`;
+
+export const WeekDayContainer = styled(IonItem)`
+  --background: transparent;
+`;
+
+export const TimeInputButton = styled(IonButton)``;
+
+export const TimeInputButtonsRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  ion-button {
+    --background: white;
+    --color: black;
+  }
+`;
+
+export const DatePickerContent = styled(IonContent)``;
+
+export const CustomSelect = styled(IonSelect)`
+  --highlight-color: white;
+  --background: rgb(255 255 255 / 0.33);
+
+  &::part(icon) {
+    margin-left: 1rem;
+    color: white;
+  }
+`;
+
+export const CheckboxLabelContainer = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+`;
+
+export const CustomCheckbox = styled(IonCheckbox)`
+  --checkbox-background-checked: rgb(255 255 255 / 0.25);
+  --border-color: rgb(255 255 255 / 0.8);
+  --checkbox-background: transparent;
+  --checkmark-color: white;
+  --border-color-checked: rbg(255 255 255 / 0.8);
+
+  &::part(label) {
+    color: white;
+  }
 `;
 
 export const AffiliateRadioInputContainer = styled.div<{
@@ -77,6 +166,26 @@ export const AffiliateRadioInputContainer = styled.div<{
   display: flex;
   flex-direction: ${({ direction }) => (direction ? direction : "row")};
   gap: 1rem;
+
+  ion-radio {
+    --color: white;
+
+    &::part(label) {
+      color: white;
+    }
+  }
+`;
+
+export const FormInputRow = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: end;
+  gap: 0.5rem;
+`;
+
+export const SearchCEPButton = styled(IonButton)`
+  --background: white;
+  --color: var(--orange);
 `;
 
 export const RadioOption = styled.div`
