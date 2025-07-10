@@ -17,6 +17,7 @@ import {
   RegisterContainer,
   TermsWrapper,
   TermsLink,
+  RegisterAffiliateLink,
 } from "./login.style";
 
 import FloatingInput from "../../components/FloatingInput";
@@ -130,9 +131,10 @@ const Login: React.FC = () => {
             <Link onClick={handleRegister}>
               Ainda não tem conta? Cadastre-se
             </Link>
-            <Link onClick={handleRegisterAffiliate}>
+
+            <RegisterAffiliateLink onClick={handleRegisterAffiliate}>
               Quero cadastrar minha marca
-            </Link>
+            </RegisterAffiliateLink>
           </RegisterContainer>
 
           {errors.form && (

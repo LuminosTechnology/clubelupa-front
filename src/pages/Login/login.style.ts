@@ -11,7 +11,7 @@ export const Container = styled.div`
   align-items: center;
   min-height: 100vh;
   width: 100%;
-  padding: 0 20px 40px;   /* ← padding lateral de 20 px */
+  padding: 0 20px 40px; /* ← padding lateral de 20 px */
 `;
 
 /* logo — 90 px do topo */
@@ -78,15 +78,15 @@ export const TermsWrapper = styled.div`
 
 /* link consentimento */
 export const TermsLink = styled(Link)`
-  color: #D3E0A2;
+  color: #d3e0a2;
   font-size: 16px;
 `;
 
 /* ────────── divisor “ou” ──────────
  * ocupa toda a largura, ignorando o padding lateral de 20 px do Container */
 export const DividerOr = styled.div`
-  margin: 30px -20px 0;            /* -20 px compensa o padding do container */
-  width: calc(100% + 40px);        /* expande 20 px para cada lado */
+  margin: 30px -20px 0; /* -20 px compensa o padding do container */
+  width: calc(100% + 40px); /* expande 20 px para cada lado */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -118,6 +118,11 @@ export const RegisterContainer = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 16px;
+`;
+
+export const RegisterAffiliateLink = styled(Link)`
+  margin-top: 2rem;
+  color: #d3e0a2;
 `;
 
 /* mensagens de erro */
