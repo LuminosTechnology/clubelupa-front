@@ -64,6 +64,38 @@ const AffiliateStoresPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
 
+  const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
+
+  const handleSelectLetter = (clientY: number) => {
+    const container = document.getElementById("alphabet-scroll");
+    if (!container) return;
+
+    const rect = container.getBoundingClientRect();
+    const relativeY = clientY - rect.top;
+
+    const letterHeight = rect.height / alphabet.length;
+    let index = Math.floor(relativeY / letterHeight);
+
+    if (index < 0) index = 0;
+    if (index >= alphabet.length) index = alphabet.length - 1;
+
+    const letter = alphabet[index];
+    setSelectedLetter(letter);
+    scrollToLetter(letter);
+  };
+
+  const handleTouch = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    handleSelectLetter(touch.clientY);
+  };
+
+  const handleMouse = (e: React.MouseEvent) => {
+    if (e.buttons) {
+      // Only if mouse is pressed
+      handleSelectLetter(e.clientY);
+    }
+  };
+
   /* ─── carrega da API ───────────────────────────────────────────── */
   // useEffect(() => {
   //   (async () => {
@@ -105,7 +137,7 @@ const AffiliateStoresPage: React.FC = () => {
   };
 
   return (
-    <IonPage>
+    <IonPage style={{ "--background": "#ffffff" }}>
       <AppHeader
         title="Afiliados"
         backgroundColor="#E6C178"
@@ -114,7 +146,7 @@ const AffiliateStoresPage: React.FC = () => {
       <IonContent
         ref={containerRef}
         fullscreen
-        style={{ "--background": "#ffffff" as any }}
+        style={{ "--background": "#ffffff", "--offset-bottom": "400px" }}
       >
         <SearchBar value={query} onChange={setQuery} placeholder="Procurar" />
         <RowContainer>
@@ -147,12 +179,16 @@ const AffiliateStoresPage: React.FC = () => {
             })}
           </StoreListContainer>
 
-          <AlphabetContainer>
-            <AlphabetLetter key="#" onClick={() => scrollToTop()}>
-              #
-            </AlphabetLetter>
+          <AlphabetContainer
+            id="alphabet-scroll"
+            onTouchStart={handleTouch}
+            onTouchMove={handleTouch}
+            onMouseDown={handleMouse}
+            onMouseMove={handleMouse}
+          >
             {alphabet.split("").map((letter) => (
               <AlphabetLetter
+                disabled
                 key={letter}
                 onClick={() => scrollToLetter(letter)}
               >

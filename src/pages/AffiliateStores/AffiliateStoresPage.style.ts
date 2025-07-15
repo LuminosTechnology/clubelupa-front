@@ -17,19 +17,18 @@ export const AlphabetContainer = styled.div`
   position: fixed;
   top: 250px;
   right: 0;
-  bottom: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
   color: black;
-  padding: 0.25rem;
 `;
 
 export const AlphabetLetter = styled.button`
   text-align: center;
-  background: transparent;
   border: none;
   color: var(--ion-color-primary);
+  padding: 0.25rem;
+  background-color: transparent;
+  font-weight: bold;
 `;
 
 export const RowContainer = styled.div`
