@@ -1,31 +1,29 @@
-import React, { useEffect, useMemo, useState } from "react";
-import {
-  IonPage,
-  IonContent,
-  IonLoading,
-  IonToast,
-} from "@ionic/react";
+import { IonContent, IonPage } from "@ionic/react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 
-import AppHeader from "../../components/SimpleHeader";
 import SearchBar from "../../components/SearchButton/SearchBar";
 
 import {
-  ScrollArea,
+  AlphabetContainer,
+  AlphabetLetter,
   Container,
   ListWrapper,
+  RowContainer,
   StoreCard,
   StoreImage,
   StoreInfo,
   StoreLine,
+  StoreListContainer,
 } from "./AffiliateStoresPage.style";
 
-import { AffiliateData } from "../../services/interfaces/Affiliate";
 import { getAllAffiliates } from "../../services/affiliateService";
+import { AffiliateData } from "../../services/interfaces/Affiliate";
 
-import searchIcon from "../../assets/lupa-search.svg";
 import sampleImg from "../../assets/sample-store.png";
+import AppHeader from "../../components/SimpleHeader";
 
+const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 interface CardStore {
   id: number;
   name: string;
@@ -35,6 +33,18 @@ interface CardStore {
   color?: string;
   img?: string;
 }
+
+const MOCK_STORES: CardStore[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  .split("")
+  .map((letter, idx) => ({
+    id: idx,
+    name: `${letter} Loja Exemplo`,
+    category: "Categoria Teste",
+    schedule: "9:00 - 18:00",
+    benefits: "Desconto 10%",
+    color: "#E6C178",
+    img: sampleImg,
+  }));
 
 const mapToCard = (a: AffiliateData): CardStore => ({
   id: a.id,
@@ -49,28 +59,30 @@ const mapToCard = (a: AffiliateData): CardStore => ({
 const AffiliateStoresPage: React.FC = () => {
   const history = useHistory();
 
-  const [affiliates, setAffiliates] = useState<CardStore[]>([]);
+  const [affiliates, setAffiliates] = useState<CardStore[]>(MOCK_STORES);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
 
   /* ─── carrega da API ───────────────────────────────────────────── */
-  useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
-        const data = await getAllAffiliates();
-        setAffiliates(data.map(mapToCard));
-      } catch (err: any) {
-        setError(
-          err?.response?.data?.message ??
-            "Não foi possível carregar os afiliados."
-        );
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       setLoading(true);
+  //       const data = await getAllAffiliates();
+  //       setAffiliates(data.map(mapToCard));
+  //     } catch (err: any) {
+  //       setError(
+  //         err?.response?.data?.message ??
+  //           "Não foi possível carregar os afiliados."
+  //       );
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   })();
+  // }, []);
+
+  const firstLetters: Set<string> = new Set<string>();
 
   /* ─── filtro local ─────────────────────────────────────────────── */
   const filtered = useMemo(() => {
@@ -79,6 +91,19 @@ const AffiliateStoresPage: React.FC = () => {
     return affiliates.filter((s) => s.name.toLowerCase().includes(q));
   }, [affiliates, query]);
 
+  const scrollToLetter = (letter: string) => {
+    console.log({ letter });
+    const element = document.getElementById(letter);
+    if (element) element.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const containerRef = useRef<HTMLIonContentElement>(null);
+
+  const scrollToTop = () => {
+    if (!containerRef.current) return;
+    containerRef.current.scrollToTop(500);
+  };
+
   return (
     <IonPage>
       <AppHeader
@@ -86,30 +111,27 @@ const AffiliateStoresPage: React.FC = () => {
         backgroundColor="#E6C178"
         textColor="#FFFFFF"
       />
+      <IonContent
+        ref={containerRef}
+        fullscreen
+        style={{ "--background": "#ffffff" as any }}
+      >
+        <SearchBar value={query} onChange={setQuery} placeholder="Procurar" />
+        <RowContainer>
+          <StoreListContainer>
+            {filtered.map((s) => {
+              const firstLetter = s.name.charAt(0).toUpperCase();
+              let sectionId;
 
-      <IonContent fullscreen style={{ "--background": "#FFFFFF" } as React.CSSProperties}>
-        <IonLoading isOpen={loading} message="Carregando afiliados…" />
-        <IonToast
-          isOpen={!!error}
-          message={error}
-          color="danger"
-          duration={4000}
-          onDidDismiss={() => setError(undefined)}
-        />
+              if (!firstLetters.has(firstLetter)) {
+                firstLetters.add(firstLetter);
+                sectionId = firstLetter;
+              }
 
-        <ScrollArea>
-          <Container>
-            <SearchBar
-              value={query}
-              onChange={setQuery}
-              placeholder="O que você procura hoje?"
-              iconSrc={searchIcon}
-            />
-
-            <ListWrapper>
-              {filtered.map((s) => (
+              return (
                 <StoreCard
                   key={s.id}
+                  id={sectionId}
                   onClick={() => history.push(`/affiliate-view/${s.id}`)}
                 >
                   <StoreImage src={s.img} alt={s.name} />
@@ -121,10 +143,24 @@ const AffiliateStoresPage: React.FC = () => {
                     {!!s.benefits && <StoreLine>{s.benefits}</StoreLine>}
                   </StoreInfo>
                 </StoreCard>
-              ))}
-            </ListWrapper>
-          </Container>
-        </ScrollArea>
+              );
+            })}
+          </StoreListContainer>
+
+          <AlphabetContainer>
+            <AlphabetLetter key="#" onClick={() => scrollToTop()}>
+              #
+            </AlphabetLetter>
+            {alphabet.split("").map((letter) => (
+              <AlphabetLetter
+                key={letter}
+                onClick={() => scrollToLetter(letter)}
+              >
+                {letter}
+              </AlphabetLetter>
+            ))}
+          </AlphabetContainer>
+        </RowContainer>
       </IonContent>
     </IonPage>
   );
