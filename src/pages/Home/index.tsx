@@ -35,8 +35,9 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [selectedAffiliate, setSelectedAffiliate] =
-    useState<Restaurant | null>(null);
+  const [selectedAffiliate, setSelectedAffiliate] = useState<Restaurant | null>(
+    null
+  );
 
   const [showSuccess, setShowSuccess] = useState(false);
 

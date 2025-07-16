@@ -46,7 +46,7 @@ const AffiliateRegister: React.FC = () => {
 
     cep: "",
     rua: "",
-    numeroEndereco: "",
+    numero_endereco: "",
     complemento: "",
     bairro: "",
     cidade: "",
@@ -84,7 +84,7 @@ const AffiliateRegister: React.FC = () => {
     if (hasPhysicalAddress) {
       if (!affiliate.cep) newErrors.cep = "CEP é obrigatório";
       if (!affiliate.rua) newErrors.rua = "Rua é obrigatório";
-      if (!affiliate.numeroEndereco)
+      if (!affiliate.numero_endereco)
         newErrors.numeroEndereco = "Número é obrigatório";
       if (!affiliate.bairro) newErrors.bairro = "Bairro é obrigatório";
       if (!affiliate.cidade) newErrors.cidade = "Cidade é obrigatório";
@@ -106,7 +106,7 @@ const AffiliateRegister: React.FC = () => {
 
     try {
       await registerAffiliate({
-        email: affiliate.email,
+        ...affiliate,
       });
 
       // Se deu tudo certo, vamos para a tela de sucesso
@@ -311,9 +311,9 @@ const AffiliateRegister: React.FC = () => {
                       {/* Numero */}
                       <FloatingInput
                         label="Número"
-                        value={affiliate.numeroEndereco}
+                        value={affiliate.numero_endereco}
                         onChange={(value) =>
-                          setAffiliate({ ...affiliate, numeroEndereco: value })
+                          setAffiliate({ ...affiliate, numero_endereco: value })
                         }
                         error={!!errors.numeroEndereco}
                         type="number"
@@ -383,7 +383,6 @@ const AffiliateRegister: React.FC = () => {
                           setAffiliate({ ...affiliate, uf: value })
                         }
                         error={!!errors.uf}
-                        mask="AA"
                       />
                       {errors.uf && (
                         <AffiliateErrorMessage>

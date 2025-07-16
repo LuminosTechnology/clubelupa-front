@@ -1,10 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  IonPage,
-  IonContent,
-  IonLoading,
-  IonToast,
-} from "@ionic/react";
+import { IonPage, IonContent, IonLoading, IonToast } from "@ionic/react";
 import { useHistory } from "react-router-dom";
 
 import AppHeader from "../../components/SimpleHeader";
@@ -25,6 +20,7 @@ import { getAllAffiliates } from "../../services/affiliateService";
 
 import searchIcon from "../../assets/lupa-search.svg";
 import sampleImg from "../../assets/sample-store.png";
+import { Affiliate } from "../../types/api/affiliate";
 
 interface CardStore {
   id: number;
@@ -49,7 +45,7 @@ const mapToCard = (a: AffiliateData): CardStore => ({
 const AffiliateStoresPage: React.FC = () => {
   const history = useHistory();
 
-  const [affiliates, setAffiliates] = useState<CardStore[]>([]);
+  const [affiliates, setAffiliates] = useState<Affiliate[]>([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
@@ -58,9 +54,8 @@ const AffiliateStoresPage: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        setLoading(true);
         const data = await getAllAffiliates();
-        setAffiliates(data.map(mapToCard));
+        setAffiliates(data);
       } catch (err: any) {
         setError(
           err?.response?.data?.message ??
@@ -76,7 +71,7 @@ const AffiliateStoresPage: React.FC = () => {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return affiliates;
-    return affiliates.filter((s) => s.name.toLowerCase().includes(q));
+    return affiliates.filter((s) => s.nome_marca.toLowerCase().includes(q));
   }, [affiliates, query]);
 
   return (
@@ -87,7 +82,10 @@ const AffiliateStoresPage: React.FC = () => {
         textColor="#FFFFFF"
       />
 
-      <IonContent fullscreen style={{ "--background": "#FFFFFF" } as React.CSSProperties}>
+      <IonContent
+        fullscreen
+        style={{ "--background": "#FFFFFF" } as React.CSSProperties}
+      >
         <IonLoading isOpen={loading} message="Carregando afiliados…" />
         <IonToast
           isOpen={!!error}
@@ -112,13 +110,13 @@ const AffiliateStoresPage: React.FC = () => {
                   key={s.id}
                   onClick={() => history.push(`/affiliate-view/${s.id}`)}
                 >
-                  <StoreImage src={s.img} alt={s.name} />
+                  <StoreImage src={sampleImg} alt={s.nome_marca} />
 
-                  <StoreInfo style={{ background: s.color }}>
-                    <StoreLine>{s.name}</StoreLine>
-                    {!!s.category && <StoreLine>{s.category}</StoreLine>}
-                    {!!s.schedule && <StoreLine>{s.schedule}</StoreLine>}
-                    {!!s.benefits && <StoreLine>{s.benefits}</StoreLine>}
+                  <StoreInfo style={{ background: "#E6C178" }}>
+                    <StoreLine>{s.nome_completo}</StoreLine>
+                    {!!s.categoria && <StoreLine>{s.categoria}</StoreLine>}
+                    {/* {!!s.horario && <StoreLine>{s.schedule}</StoreLine>} */}
+                    {/* {!!s.benefits && <StoreLine>{s.benefits}</StoreLine>} */}
                   </StoreInfo>
                 </StoreCard>
               ))}

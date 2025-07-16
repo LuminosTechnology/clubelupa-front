@@ -1,62 +1,54 @@
-import React, { useState, useEffect } from "react";
-import { IonApp, IonRouterOutlet } from "@ionic/react";
-import { IonReactRouter } from "@ionic/react-router";
-import { Route, Redirect } from "react-router-dom";
-import { setupIonicReact } from "@ionic/react";
 import { StatusBar, Style } from "@capacitor/status-bar";
+import { IonApp, IonRouterOutlet, setupIonicReact } from "@ionic/react";
+import { IonReactRouter } from "@ionic/react-router";
+import React, { useEffect, useState } from "react";
+import { Redirect, Route } from "react-router-dom";
 
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import Home from "./pages/Home";
-import RegisterSuccess from "./pages/Register/RegisterSuccess";
-import ForgotPassword from "./pages/ForgotPassword";
-import ChangePassword from "./pages/ForgotPassword/ChangePassword";
-import AffiliateRegister from "./pages/AffiliateRegister/AffiliateRegister";
-import AffiliateRegisterSuccess from "./pages/AffiliateRegister/AffiliateRegisterSuccess";
 import AffiliateArea from "./pages/AffiliateArea/AffiliateArea";
 import AffiliateEdit from "./pages/AffiliateEdit/AffiliateEdit";
+import AffiliateRegister from "./pages/AffiliateRegister/AffiliateRegister";
+import AffiliateRegisterSuccess from "./pages/AffiliateRegister/AffiliateRegisterSuccess";
 import AffiliateStores from "./pages/AffiliateStores/AffiliateStoresPage";
 import AffiliateView from "./pages/AffiliateView/AffiliateView";
-import ProfilePage from "./pages/Profile/ProfilePage";
-import ProfilePageEdit from "./pages/ProfileEdit/ProfileEditPage";
-import Notification from "./pages/Notification/Notification";
-import TalkToUs from "./pages/TalkToUs/TalkToUs";
-import ReccomendAndWin from "./pages/RecommendAndWin/RecommendAndWin";
-import MyPlan from "./pages/MyPlan/MyPlan";
-import UpgradePlan from "./pages/UpgradePlan/UpgradePlan";
-import LupoCoins from "./pages/LupoCoins/LupoCoins";
 import Experience from "./pages/Experience/Experience";
 import Favorites from "./pages/Favorites/Favorites";
+import ForgotPassword from "./pages/ForgotPassword";
+import ChangePassword from "./pages/ForgotPassword/ChangePassword";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import LupoCoins from "./pages/LupoCoins/LupoCoins";
+import MyPlan from "./pages/MyPlan/MyPlan";
+import Notification from "./pages/Notification/Notification";
+import ProfilePage from "./pages/Profile/ProfilePage";
+import ProfilePageEdit from "./pages/ProfileEdit/ProfileEditPage";
+import ReccomendAndWin from "./pages/RecommendAndWin/RecommendAndWin";
+import Register from "./pages/Register";
+import RegisterSuccess from "./pages/Register/RegisterSuccess";
 import ScannerNote from "./pages/ScannerNote/ScannerNote";
+import TalkToUs from "./pages/TalkToUs/TalkToUs";
+import UpgradePlan from "./pages/UpgradePlan/UpgradePlan";
 
 import { getToken } from "./services/auth-service";
 
 import "@ionic/react/css/core.css";
-import "@ionic/react/css/normalize.css";
-import "@ionic/react/css/structure.css";
-import "@ionic/react/css/typography.css";
-import "@ionic/react/css/padding.css";
+import "@ionic/react/css/display.css";
+import "@ionic/react/css/flex-utils.css";
 import "@ionic/react/css/float-elements.css";
+import "@ionic/react/css/normalize.css";
+import "@ionic/react/css/padding.css";
+import "@ionic/react/css/palettes/dark.system.css";
+import "@ionic/react/css/structure.css";
 import "@ionic/react/css/text-alignment.css";
 import "@ionic/react/css/text-transformation.css";
-import "@ionic/react/css/flex-utils.css";
-import "@ionic/react/css/display.css";
-import "@ionic/react/css/palettes/dark.system.css";
+import "@ionic/react/css/typography.css";
+import { PrivateRoute, PublicRoute } from "./components/Routes";
+import { AuthContextProvider, useAuthContext } from "./contexts/AuthContext";
 import "./theme/variables.css";
 
 setupIonicReact();
 
 const App: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      const token = await getToken();
-      setIsAuthenticated(!!token);
-      setLoading(false);
-    })();
-  }, []);
+  const { isAuthenticated, loading } = useAuthContext();
 
   useEffect(() => {
     (async () => {
@@ -70,51 +62,100 @@ const App: React.FC = () => {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <IonApp>
-      <IonReactRouter>
-        <IonRouterOutlet>
-          <Route
-            exact
-            path="/login"
-            render={() =>
-              isAuthenticated ? <Redirect to="/home" /> : <Login />
-            }
-          />
-          <Route exact path="/register" component={Register} />
-          <Route exact path="/register/success" component={RegisterSuccess} />
-          <Route
-            exact
-            path="/register/affiliate"
-            component={AffiliateRegister}
-          />
-          <Route exact path="/lupacoins" component={LupoCoins} />
-          <Route exact path="/forgot/password" component={ForgotPassword} />
-          <Route exact path="/change/password" component={ChangePassword} />
-          <Route
-            exact
-            path="/affiliate/register/success"
-            component={AffiliateRegisterSuccess}
-          />
-          <Route exact path="/affiliate/area" component={AffiliateArea} />
-          <Route exact path="/affiliate/area/edit" component={AffiliateEdit} />
-          <Route exact path="/affiliates" component={AffiliateStores} />
-          <Route exact path="/affiliate-view/:id" component={AffiliateView} />
-          <Route exact path="/profile" component={ProfilePage} />
-          <Route exact path="/profile/edit" component={ProfilePageEdit} />
-          <Route exact path="/profile/notification" component={Notification} />
-          <Route exact path="/profile/talktous" component={TalkToUs} />
-          <Route exact path="/recommendandwin" component={ReccomendAndWin} />
-          <Route exact path="/myplan" component={MyPlan} />
-          <Route exact path="/myplan/upgrade" component={UpgradePlan} />
-          <Route exact path="/experience" component={Experience} />
-          <Route exact path="/favorites" component={Favorites} />
-          <Route exact path="/affiliate/scanner" component={ScannerNote} />
-          <Route exact path="/home" component={Home} />
+    <AuthContextProvider>
+      <IonApp>
+        <IonReactRouter>
+          <IonRouterOutlet>
+            <PublicRoute exact path="/login" component={Login} />
+            <PublicRoute exact path="/register" component={Register} />
+            <PublicRoute
+              exact
+              path="/register/success"
+              component={RegisterSuccess}
+            />
+            <PublicRoute
+              exact
+              path="/register/affiliate"
+              component={AffiliateRegister}
+            />
+            <PublicRoute
+              exact
+              path="/forgot/password"
+              component={ForgotPassword}
+            />
+            <PublicRoute
+              exact
+              path="/change/password"
+              component={ChangePassword}
+            />
+            <PublicRoute
+              exact
+              path="/affiliate/register/success"
+              component={AffiliateRegisterSuccess}
+            />
 
-          <Redirect exact from="/" to={isAuthenticated ? "/home" : "/login"} />
-        </IonRouterOutlet>
-      </IonReactRouter>
-    </IonApp>
+            <PrivateRoute exact path="/lupacoins" component={LupoCoins} />
+            <PrivateRoute
+              exact
+              path="/affiliate/area"
+              component={AffiliateArea}
+            />
+            <PrivateRoute
+              exact
+              path="/affiliate/area/edit"
+              component={AffiliateEdit}
+            />
+            <PrivateRoute
+              exact
+              path="/affiliates"
+              component={AffiliateStores}
+            />
+            <PrivateRoute
+              exact
+              path="/affiliate-view/:id"
+              component={AffiliateView}
+            />
+            <PrivateRoute exact path="/profile" component={ProfilePage} />
+            <PrivateRoute
+              exact
+              path="/profile/edit"
+              component={ProfilePageEdit}
+            />
+            <PrivateRoute
+              exact
+              path="/profile/notification"
+              component={Notification}
+            />
+            <PrivateRoute exact path="/profile/talktous" component={TalkToUs} />
+            <PrivateRoute
+              exact
+              path="/recommendandwin"
+              component={ReccomendAndWin}
+            />
+            <PrivateRoute exact path="/myplan" component={MyPlan} />
+            <PrivateRoute
+              exact
+              path="/myplan/upgrade"
+              component={UpgradePlan}
+            />
+            <PrivateRoute exact path="/experience" component={Experience} />
+            <PrivateRoute exact path="/favorites" component={Favorites} />
+            <PrivateRoute
+              exact
+              path="/affiliate/scanner"
+              component={ScannerNote}
+            />
+            <PrivateRoute exact path="/home" component={Home} />
+
+            <Redirect
+              exact
+              from="/"
+              to={isAuthenticated ? "/home" : "/login"}
+            />
+          </IonRouterOutlet>
+        </IonReactRouter>
+      </IonApp>
+    </AuthContextProvider>
   );
 };
 

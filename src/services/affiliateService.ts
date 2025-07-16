@@ -1,6 +1,7 @@
 import api from "./api";
 import { AffiliateData } from "./interfaces/Affiliate";
 import { getToken } from "./auth-service";
+import { Affiliate } from "../types/api/affiliate";
 
 const withAuth = async () => ({
   headers: { Authorization: `Bearer ${await getToken()}` },
@@ -24,10 +25,8 @@ export const getMyFirstAffiliate = async (): Promise<AffiliateData | null> => {
   return list.length ? list[0] : null;
 };
 
-export const getAllAffiliates = async (): Promise<AffiliateData[]> => {
-  const { data } = await api.get<{ affiliates: AffiliateData[] }>(
-    "/affiliates"
-  );
+export const getAllAffiliates = async () => {
+  const { data } = await api.get<{ affiliates: Affiliate[] }>("/affiliates");
   return data.affiliates;
 };
 

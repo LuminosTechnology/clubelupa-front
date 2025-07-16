@@ -17,6 +17,7 @@ import { logout, getUserByToken } from "../../services/auth-service";
 import { getMyFirstAffiliate } from "../../services/affiliateService";
 import { Preferences } from "@capacitor/preferences";
 import type { User } from "../../services/interfaces/Auth";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 interface SlideMenuProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ interface SlideMenuProps {
 const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
   const history = useHistory();
   const location = useLocation();
+  const { setIsAuthenticated } = useAuthContext();
 
   const [user, setUser] = useState<User | null>(null);
   // undefined = carregando | false = sem afiliado | true = tem afiliado
@@ -66,6 +68,7 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
   const handleLogout = async () => {
     try {
       await logout();
+      setIsAuthenticated(false);
     } catch (e) {
       console.error("Logout error:", e);
     } finally {

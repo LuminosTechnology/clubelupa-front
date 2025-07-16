@@ -7,12 +7,11 @@ import {
   ResetPasswordRequest,
   User,
 } from "./interfaces/Auth";
+import { CreateAffiliateRequest } from "../types/api/affiliate";
 
 const AUTH_TOKEN_KEY = "auth_token";
 
-export const login = async (
-  data: LoginUserRequest
-): Promise<LoginUserResponse> => {
+export const login = async (data: LoginUserRequest) => {
   console.log("[Auth Service] Attempting login with data:", data);
   const response = await api.post<LoginUserResponse>("/login", data);
   console.log("[Auth Service] Received login response:", response.data);
@@ -30,7 +29,7 @@ export const register = async (data: any) => {
   return response;
 };
 
-export const registerAffiliate = async (data: any) => {
+export const registerAffiliate = async (data: CreateAffiliateRequest) => {
   console.log(
     "[Auth Service] Attempting affiliate registration with data:",
     data

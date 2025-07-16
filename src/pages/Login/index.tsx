@@ -26,12 +26,15 @@ import Button from "../../components/Button";
 import { login } from "../../services/auth-service";
 
 import Logo from "../../assets/Logo.svg";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const history = useHistory();
+
+  const { setIsAuthenticated } = useAuthContext();
 
   /* ─────────── helpers ─────────── */
   const validateEmail = (value: string) =>
@@ -55,6 +58,7 @@ const Login: React.FC = () => {
 
     try {
       await login({ email, password });
+      setIsAuthenticated(true);
       history.push("/home");
     } catch (error: any) {
       const message = error.response?.data?.message || "Erro ao fazer login!";
