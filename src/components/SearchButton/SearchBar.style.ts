@@ -1,15 +1,14 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const SearchBarWrapper = styled.div`
-  margin-left: 20px;
-  height: 43px;
   border-radius: 100px;
   background: #f0f0ef;
   border: 1px solid #868950;
   display: flex;
   align-items: center;
-  padding: 0 15px;
   gap: 12px;
+  padding: 0.5rem 1rem;
+  margin: 2rem 1.25rem;
 `;
 
 export const SearchIcon = styled.img`
@@ -22,7 +21,7 @@ export const SearchInput = styled.input`
   border: none;
   background: transparent;
   font-family: "Karla", sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   color: #cbccce;
   outline: none;
 
