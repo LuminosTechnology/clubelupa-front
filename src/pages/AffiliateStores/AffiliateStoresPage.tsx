@@ -47,6 +47,7 @@ const mapToCard = (a: AffiliateData): CardStore => ({
 
 const AffiliateStoresPage: React.FC = () => {
   const history = useHistory();
+  const firstLetters = new Set<string>();
 
   const [affiliates, setAffiliates] = useState<Affiliate[]>([]);
   const [query, setQuery] = useState("");
@@ -150,6 +151,11 @@ const AffiliateStoresPage: React.FC = () => {
               const firstLetter = s.nome_marca.charAt(0).toUpperCase();
               let sectionId;
 
+              if (!firstLetters.has(firstLetter)) {
+                firstLetters.add(firstLetter);
+                sectionId = firstLetter;
+              }
+
               return (
                 <StoreCard
                   key={s.id}
@@ -159,7 +165,7 @@ const AffiliateStoresPage: React.FC = () => {
                   <StoreImage src={sampleImg} alt={s.nome_marca} />
 
                   <StoreInfo style={{ background: "#E6C178" }}>
-                    <StoreLine>{s.nome_completo}</StoreLine>
+                    <StoreLine>{s.nome_marca}</StoreLine>
                     {!!s.categoria && <StoreLine>{s.categoria}</StoreLine>}
                     {/* {!!s.horario && <StoreLine>{s.schedule}</StoreLine>} */}
                     {/* {!!s.benefits && <StoreLine>{s.benefits}</StoreLine>} */}
