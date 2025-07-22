@@ -8,9 +8,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCWNg1ASza0HDHNKDzGpSl6MMmKb3zVqWs"/>
+            <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyDoIWw3SXNki0nyFrJGoTjzHO5CkTqU1ms"/>
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation"
             android:name=".MainActivity"

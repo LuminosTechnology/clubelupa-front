@@ -5,8 +5,8 @@ const config: CapacitorConfig = {
   appName: "LupaApp",
   webDir: "dist",
   plugins: {
-    GoogleMaps: {
-      apiKey: "AIzaSyCWNg1ASza0HDHNKDzGpSl6MMmKb3zVqWs",
+    CapacitorGoogleMaps: {
+      apiKey: "AIzaSyDoIWw3SXNki0nyFrJGoTjzHO5CkTqU1ms",
     },
     SplashScreen: {
       androidScaleType: "CENTER_CROP",

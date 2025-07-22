@@ -36,6 +36,7 @@
 
 ion-content {
   --padding-top: var(--ion-safe-area-top);
+  --background: transparent;
 }
 
 ion-header {
@@ -47,8 +48,13 @@ ion-toolbar {
   --padding-top: var(--ion-safe-area-top);
 }
 
+html {
+  background-color: transparent;
+}
+
 body {
   overflow: hidden;
+  background-color: transparent;
 }
 
 body.dark {

@@ -109,10 +109,17 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
       const el = mapRef.current;
       if (!el) return;
 
+      console.log("mapRef.current", mapRef.current);
+      console.log("typeof mapRef.current", typeof mapRef.current);
+      console.log(
+        "instanceof HTMLElement?",
+        mapRef.current instanceof HTMLElement
+      );
+
       const gMap = await GoogleMap.create({
+        apiKey: "AIzaSyCADmNNz3iLtqV7UX-mY83WJnL6m3gpdkU",
         id: "affiliates-map",
         element: el,
-        apiKey: "AIzaSyCWNg1ASza0HDHNKDzGpSl6MMmKb3zVqWs",
         config: {
           androidLiteMode: false,
           center: userLoc,
@@ -121,20 +128,24 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
           clickableIcons: false,
           styles: [
             {
-              featureType: "all",
-              elementType: "poi",
-              stylers: [{ visibility: "off" }],
+              featureType: "poi",
+              elementType: "all",
+              stylers: [
+                {
+                  visibility: "off",
+                },
+              ],
             },
           ],
         },
       });
 
       // marker do usuário
-      // await gMap.addMarker({
-      //   coordinate: userLoc,
-      //   iconUrl: accessibilityOutline,
-      //   iconSize: { width: 32, height: 32 },
-      // });
+      await gMap.addMarker({
+        coordinate: userLoc,
+        iconUrl: accessibilityOutline,
+        iconSize: { width: 32, height: 32 },
+      });
 
       // markers dos afiliados
       // for (const r of restaurants) {
@@ -207,7 +218,16 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
   /* ─── UI ─────────────────────────────────────────────────────────────── */
   return (
     <MapWrapper>
-      <MapContainer ref={mapRef} />
+      <capacitor-google-map
+        ref={mapRef}
+        id="map"
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100vw",
+          height: "100vh",
+        }}
+      ></capacitor-google-map>
 
       {selected && (
         <RestaurantCard>

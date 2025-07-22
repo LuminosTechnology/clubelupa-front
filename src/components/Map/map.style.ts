@@ -2,14 +2,14 @@ import styled from "styled-components";
 
 /* --------- área do mapa --------- */
 export const MapWrapper = styled.div`
-  position: absolute;
-  inset: 0;
-  z-index: 0;
+  width: 100vw;
+  height: 100vh;
+  background: transparent;
 `;
 
 export const MapContainer = styled.div`
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
 `;
 
 /* --------- popup / card ---------- */
@@ -18,7 +18,7 @@ export const RestaurantCard = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  max-width: 320px;     /* ↓ menor */
+  max-width: 320px; /* ↓ menor */
   width: 85%;
   background: #fff;
   border-radius: 12px;
@@ -35,7 +35,7 @@ export const CloseButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 22px;   /* ↓ um pouco menor */
+  font-size: 22px; /* ↓ um pouco menor */
   color: #666;
   z-index: 2;
 `;
@@ -48,7 +48,7 @@ export const RestaurantInfo = styled.div`
 
 export const RestaurantImage = styled.img`
   width: 100%;
-  height: 140px;      /* ↓ altura */
+  height: 140px; /* ↓ altura */
   object-fit: cover;
 `;
 
@@ -59,7 +59,7 @@ export const RestaurantDetails = styled.div`
   padding: 10px;
 
   h3 {
-    font-size: 14px;  /* ↓ */
+    font-size: 14px; /* ↓ */
     color: #333;
     margin: 0;
     white-space: nowrap;
@@ -68,7 +68,7 @@ export const RestaurantDetails = styled.div`
   }
 
   p {
-    font-size: 11px;  /* ↓ */
+    font-size: 11px; /* ↓ */
     color: #666;
     margin: 0;
     white-space: nowrap;
@@ -79,12 +79,12 @@ export const RestaurantDetails = styled.div`
 
 export const ViewMoreButton = styled.button`
   margin: 0 10px 10px;
-  height: 32px;          /* ↓ */
+  height: 32px; /* ↓ */
   background: var(--ion-color-primary);
   border: none;
   border-radius: 100px;
   color: #fff;
-  font-size: 13px;       /* ↓ */
+  font-size: 13px; /* ↓ */
   font-weight: 500;
   cursor: pointer;
   transition: opacity 0.2s;
@@ -100,9 +100,9 @@ export const CheckInButton = styled.button`
   color: #fff;
   border: none;
   border-radius: 5px;
-  padding: 8px 16px;     /* ↓ */
+  padding: 8px 16px; /* ↓ */
   cursor: pointer;
-  font-size: 14px;       /* ↓ */
+  font-size: 14px; /* ↓ */
   font-weight: bold;
   transition: background-color 0.3s;
 
@@ -118,7 +118,7 @@ export const CheckInButton = styled.button`
 
 export const CheckInMessage = styled.p`
   color: #ff4646;
-  font-size: 13px;       /* ↓ */
+  font-size: 13px; /* ↓ */
   text-align: center;
   margin: 0 0 10px;
 `;
