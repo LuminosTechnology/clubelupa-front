@@ -3,14 +3,13 @@ import styled from "styled-components";
 
 export const Container = styled.div`
   display: flex;
-  background-color: blue;
+  flex-direction: column;
 `;
 
 export const ListWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 28px;
-  background-color: red;
 `;
 
 export const AlphabetContainer = styled.div`

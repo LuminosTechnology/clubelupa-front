@@ -6,7 +6,7 @@ import {
   IonSelectOption,
   IonText,
 } from "@ionic/react";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import {
   AffiliateButtonContainer,
@@ -30,11 +30,13 @@ import FloatingInput from "../../components/FloatingInput";
 
 // Importa a função que criamos no auth-service
 import { registerAffiliate } from "../../services/auth-service";
+import { fetchCep } from "../../services/viacepService";
 
 const AffiliateRegister: React.FC = () => {
   const history = useHistory();
   const [hasPhysicalAddress, setHasPhysicalAddress] = useState(false);
   const [hasCodeApproval, setHasCodeApproval] = useState(false);
+  const streetNumberRef = useRef<HTMLInputElement>(null);
   const [affiliate, setAffiliate] = useState({
     nome_completo: "",
     data_nascimento: "",
@@ -101,6 +103,23 @@ const AffiliateRegister: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleFetchCep = async () => {
+    if (affiliate.cep.replace(/\D/g, "").length !== 8) return;
+
+    const response = await fetchCep(affiliate.cep);
+    if (response.cep) {
+      setAffiliate({
+        ...affiliate,
+        cep: response.cep,
+        rua: response.logradouro,
+        complemento: response.complemento,
+        bairro: response.bairro,
+        cidade: response.localidade,
+        uf: response.uf,
+      });
+    }
+  };
+
   const handleAffiliateRegister = async () => {
     if (!validateForm()) return;
 
@@ -111,6 +130,7 @@ const AffiliateRegister: React.FC = () => {
 
       // Se deu tudo certo, vamos para a tela de sucesso
       history.push("/affiliate/register/success");
+      resetForm();
     } catch (error: any) {
       // Se o backend retornou algum erro, tratamos aqui
       const backendErrors = error.response?.data?.errors || {};
@@ -145,6 +165,34 @@ const AffiliateRegister: React.FC = () => {
     handle = handle.slice(0, 30);
 
     return handle;
+  };
+
+  const resetForm = () => {
+    setAffiliate({
+      nome_completo: "",
+      data_nascimento: "",
+      telefone: "",
+      email: "",
+
+      nome_marca: "",
+      categoria: "",
+
+      cep: "",
+      rua: "",
+      numero_endereco: "",
+      complemento: "",
+      bairro: "",
+      cidade: "",
+      uf: "",
+
+      instagram: "",
+      site: "",
+
+      password: "",
+      password_confirmation: "",
+
+      codigo_aprovacao: "",
+    });
   };
 
   return (
@@ -247,8 +295,8 @@ const AffiliateRegister: React.FC = () => {
                   <IonSelectOption value="gastronomia">
                     Gastronomia
                   </IonSelectOption>
-                  <IonSelectOption value="moda">Moda</IonSelectOption>
-                  <IonSelectOption value="outros">Outros</IonSelectOption>
+                  <IonSelectOption value="moda">Moda Autoral</IonSelectOption>
+                  <IonSelectOption value="outros">Serviços</IonSelectOption>
                 </CustomSelect>
               </InputLabelContainer>
 
@@ -285,7 +333,12 @@ const AffiliateRegister: React.FC = () => {
                       mask="99999-999"
                       error={!!errors.cep}
                     />
-                    <SearchCEPButton strong size="small" shape="round">
+                    <SearchCEPButton
+                      strong
+                      size="small"
+                      shape="round"
+                      onClick={handleFetchCep}
+                    >
                       BUSCAR
                     </SearchCEPButton>
                   </FormInputRow>

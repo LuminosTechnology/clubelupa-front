@@ -1,10 +1,10 @@
 // src/pages/ProfilePage/ProfilePage.tsx
-import React, { useEffect, useState } from 'react';
-import { IonPage, IonContent } from '@ionic/react';
-import { useHistory } from 'react-router-dom';
-import AppHeader from '../../components/SimpleHeader';
-import Button from '../../components/Button';
-import styled from 'styled-components';
+import React, { useEffect, useState } from "react";
+import { IonPage, IonContent } from "@ionic/react";
+import { useHistory } from "react-router-dom";
+import AppHeader from "../../components/SimpleHeader";
+import Button from "../../components/Button";
+import styled from "styled-components";
 
 import {
   ProfileContainer,
@@ -16,24 +16,23 @@ import {
   MenuIcon,
   Divider,
   LogoutWrapper,
-} from './ProfilePage.style';
+} from "./ProfilePage.style";
 
-import { logout, getUserByToken } from '../../services/auth-service';
-import { User } from '../../services/interfaces/Auth';
+import { logout, getUserByToken } from "../../services/auth-service";
+import { User } from "../../services/interfaces/Auth";
 
-import avatarPic from '../../assets/profile-pic.svg';
-import editIcon from '../../assets/edit.svg';
-import lockIcon from '../../assets/lock.svg';
-import notificationIcon from '../../assets/notification.svg';
-import chatIcon from '../../assets/chat.svg';
-import emailIcon from '../../assets/email.svg';
-import instagramIcon from '../../assets/insta.svg';
+import editIcon from "../../assets/edit.svg";
+import lockIcon from "../../assets/lock.svg";
+import notificationIcon from "../../assets/notification.svg";
+import chatIcon from "../../assets/chat.svg";
+import emailIcon from "../../assets/email.svg";
+import instagramIcon from "../../assets/insta.svg";
 
 /** Botão “SAIR” centralizado */
 const LogoutButton = styled(Button)`
   display: block;
   margin: 0 auto;
-  background-color: #8E9455 !important;
+  background-color: #8e9455 !important;
   color: #ffffff !important;
 `;
 
@@ -47,7 +46,7 @@ const ProfilePage: React.FC = () => {
         const fetched = await getUserByToken();
         setUser(fetched);
       } catch (err) {
-        console.error('Erro ao buscar dados do usuário', err);
+        console.error("Erro ao buscar dados do usuário", err);
       }
     })();
   }, []);
@@ -58,20 +57,18 @@ const ProfilePage: React.FC = () => {
   };
 
   const goToEditProfile = () => {
-    history.push('/profile/edit');
+    history.push("/profile/edit");
   };
 
   const goToNotification = () => {
-    history.push('/profile/notification');
+    history.push("/profile/notification");
   };
 
   const goToTalkToUs = () => {
-    history.push('/profile/talktous');
+    history.push("/profile/talktous");
   };
 
   // Escolhe a foto do usuário se existir, senão o placeholder
-  const photoSrc = user?.profile_photo ?? user?.avatar_url ?? avatarPic;
-
   return (
     <IonPage>
       <AppHeader
@@ -81,14 +78,20 @@ const ProfilePage: React.FC = () => {
       />
 
       <AvatarWrapper>
-        <Avatar src={photoSrc} alt="Foto de perfil" />
+        <Avatar
+          src={
+            user?.avatar_url ||
+            user?.profile_photo ||
+            "/assets/default-profile-photo.png"
+          }
+        />
       </AvatarWrapper>
 
-      <IonContent fullscreen style={{ '--background': '#FFFFFF' } as any}>
+      <IonContent fullscreen style={{ "--background": "#FFFFFF" } as any}>
         <ProfileContainer>
-          <UserName>{user?.nome_completo ?? ''}</UserName>
-          <UserSubInfo>{user?.cpf ?? ''}</UserSubInfo>
-          <UserSubInfo>{user?.email ?? ''}</UserSubInfo>
+          <UserName>{user?.nome_completo ?? ""}</UserName>
+          <UserSubInfo>{user?.cpf ?? ""}</UserSubInfo>
+          <UserSubInfo>{user?.email ?? ""}</UserSubInfo>
 
           <MenuOption primary onClick={goToEditProfile}>
             <MenuIcon src={editIcon} alt="Ícone Editar Perfil" />
@@ -112,7 +115,7 @@ const ProfilePage: React.FC = () => {
             <MenuIcon src={chatIcon} alt="Ícone Fale Conosco" />
             Fale Conosco
           </MenuOption>
-          <Divider style={{ marginBottom: '80px' }} />
+          <Divider style={{ marginBottom: "80px" }} />
 
           <MenuOption>
             <MenuIcon src={emailIcon} alt="Ícone Email" />
@@ -124,9 +127,7 @@ const ProfilePage: React.FC = () => {
           </MenuOption>
 
           <LogoutWrapper>
-            <LogoutButton onClick={handleLogout}>
-              SAIR
-            </LogoutButton>
+            <LogoutButton onClick={handleLogout}>SAIR</LogoutButton>
           </LogoutWrapper>
         </ProfileContainer>
       </IonContent>

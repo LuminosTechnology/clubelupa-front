@@ -44,6 +44,7 @@ import "@ionic/react/css/typography.css";
 import { PrivateRoute, PublicRoute } from "./components/Routes";
 import { AuthContextProvider, useAuthContext } from "./contexts/AuthContext";
 import "./theme/variables.css";
+import VerifyEmail from "./pages/VerifyEmail/VerifyEmail";
 
 setupIonicReact();
 
@@ -72,6 +73,11 @@ const App: React.FC = () => {
               exact
               path="/register/success"
               component={RegisterSuccess}
+            />
+            <PublicRoute
+              exact
+              path="/register/verify-email"
+              component={VerifyEmail}
             />
             <PublicRoute
               exact

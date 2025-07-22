@@ -7,22 +7,7 @@ import Footer from "../../components/Footer";
 import AffiliateFooter from "../../components/AffiliateFooter";
 import CheckinSuccessFooter from "../../components/CheckinSuccessFooter";
 import type { Restaurant } from "../../components/Map";
-
-interface User {
-  id: number;
-  nome_completo: string;
-  data_nascimento: string;
-  telefone: string;
-  celular: string;
-  cpf: string;
-  cep: string;
-  rua: string;
-  bairro: string;
-  cidade: string;
-  uf: string;
-  email: string;
-  created_at: string;
-}
+import { User } from "../../services/interfaces/Auth";
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
 
@@ -104,8 +89,7 @@ const Home: React.FC = () => {
   return (
     <IonPage>
       <IonContent>
-        <Header backgroundColor="var(--ion-color-primary)" />
-
+        <Header />
         <Map
           apiKey={GOOGLE_MAPS_API_KEY}
           onViewMore={(affiliate) => {
@@ -118,11 +102,9 @@ const Home: React.FC = () => {
         {userData && !affiliateForFooter && !showSuccess && (
           <Footer
             userData={{
-              nome_completo: userData.nome_completo,
-              nivel: 1,
-              experiencia: 750,
+              experiencia: 1,
               proximo_nivel: 1000,
-              created_at: userData.created_at,
+              profile_photo: userData.profile_photo,
             }}
           />
         )}

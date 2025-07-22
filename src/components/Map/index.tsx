@@ -41,7 +41,6 @@ const extraById: Record<number, ExtraFields> = {
     location: { lat: -25.4415, lng: -49.291 },
     value: 150,
   },
-
 };
 
 /* ---------------- tipagens finais ----------------------------------------*/
@@ -69,23 +68,23 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
   const CHECKIN_RADIUS = 500; // m
 
   /* ─── carrega afiliados ───────────────────────────────────────────────── */
-  useEffect(() => {
-    (async () => {
-      try {
-        const data = await getAllAffiliates();
-        const full = data
-          .filter((a) => extraById[a.id])
-          .map<Restaurant>((a) => ({
-            ...a,
-            ...extraById[a.id],
-            image: extraById[a.id].image ?? a.foto_perfil ?? sampleImg,
-          }));
-        setRestaurants(full);
-      } catch (err) {
-        console.error("[MAP] Falha ao carregar afiliados:", err);
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       const data = await getAllAffiliates();
+  //       const full = data
+  //         .filter((a) => extraById[a.id])
+  //         .map<Restaurant>((a) => ({
+  //           ...a,
+  //           ...extraById[a.id],
+  //           image: extraById[a.id].image ?? a.foto_perfil ?? sampleImg,
+  //         }));
+  //       setRestaurants(full);
+  //     } catch (err) {
+  //       console.error("[MAP] Falha ao carregar afiliados:", err);
+  //     }
+  //   })();
+  // }, []);
 
   /* ─── localização do usuário ─────────────────────────────────────────── */
   useEffect(() => {
@@ -104,7 +103,7 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
   /* ─── inicia o mapa e marcadores ─────────────────────────────────────── */
   useEffect(() => {
     (async () => {
-      if (!userLoc || !restaurants.length) return;
+      if (!userLoc) return;
 
       const el = document.getElementById("map");
       if (!el) return;
@@ -118,39 +117,45 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
           zoom: 15,
           disableDefaultUI: true,
           clickableIcons: false,
+          styles: [
+            {
+              elementType: "all",
+              stylers: [{ visibility: "off" }, { color: "#ff0000" }],
+            },
+          ],
         },
       });
 
       // marker do usuário
-      await gMap.addMarker({
-        coordinate: userLoc,
-        iconUrl: accessibilityOutline,
-        iconSize: { width: 32, height: 32 },
-      });
+      // await gMap.addMarker({
+      //   coordinate: userLoc,
+      //   iconUrl: accessibilityOutline,
+      //   iconSize: { width: 32, height: 32 },
+      // });
 
       // markers dos afiliados
-      for (const r of restaurants) {
-        await gMap.addMarker({
-          coordinate: r.location,
-          iconUrl: lupaMarker,
-          iconSize: { width: 40, height: 40 },
-        });
-      }
+      // for (const r of restaurants) {
+      //   await gMap.addMarker({
+      //     coordinate: r.location,
+      //     iconUrl: lupaMarker,
+      //     iconSize: { width: 40, height: 40 },
+      //   });
+      // }
 
-      await gMap.setOnMarkerClickListener(async (m) => {
-        const hit = restaurants.find(
-          (r) => r.location.lat === m.latitude && r.location.lng === m.longitude
-        );
-        if (hit) {
-          await gMap.setCamera({ coordinate: hit.location, animate: true });
-          setSelected(hit);
-          setCheckInMessage(null);
-        }
-      });
+      // await gMap.setOnMarkerClickListener(async (m) => {
+      //   const hit = restaurants.find(
+      //     (r) => r.location.lat === m.latitude && r.location.lng === m.longitude
+      //   );
+      //   if (hit) {
+      //     await gMap.setCamera({ coordinate: hit.location, animate: true });
+      //     setSelected(hit);
+      //     setCheckInMessage(null);
+      //   }
+      // });
 
       setMap(gMap);
     })();
-  }, [userLoc, restaurants, apiKey]);
+  }, [userLoc, apiKey]);
 
   /* ─── check-in ───────────────────────────────────────────────────────── */
   const haversine = (

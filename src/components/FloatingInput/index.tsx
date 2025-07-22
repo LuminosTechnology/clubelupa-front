@@ -1,8 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Container, Label, Input, InputContainer, EyeButton } from './floating.style';
-import { IonIcon } from '@ionic/react';
-import { eye, eyeOff } from 'ionicons/icons';
-import InputMask from 'react-input-mask';
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Container,
+  Label,
+  Input,
+  InputContainer,
+  EyeButton,
+} from "./floating.style";
+import { IonIcon } from "@ionic/react";
+import { eye, eyeOff } from "ionicons/icons";
+import InputMask from "react-input-mask";
 
 interface FloatingInputProps {
   label: string;
@@ -18,10 +24,10 @@ const FloatingInput: React.FC<FloatingInputProps> = ({
   label,
   value,
   onChange,
-  type = 'text',
+  type = "text",
   isPassword = false,
   error = false,
-  mask
+  mask,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -43,7 +49,7 @@ const FloatingInput: React.FC<FloatingInputProps> = ({
     return () => clearTimeout(timer);
   }, []);
 
-  const isActive = type === 'date' || isFocused || (value && value.length > 0);
+  const isActive = type === "date" || isFocused || (value && value.length > 0);
 
   useEffect(() => {
     if (value && value.length > 0) {
@@ -53,7 +59,7 @@ const FloatingInput: React.FC<FloatingInputProps> = ({
 
   return (
     <Container>
-      <Label className={`${isActive ? 'active' : ''} ${error ? 'error' : ''}`}>
+      <Label className={`${isActive ? "active" : ""} ${error ? "error" : ""}`}>
         {label}
       </Label>
       <InputContainer>
@@ -63,20 +69,22 @@ const FloatingInput: React.FC<FloatingInputProps> = ({
             mask={mask}
             maskChar={null}
             value={value}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onChange(e.target.value)
+            }
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(value.length > 0)}
-            className={error ? 'error' : ''}
+            className={error ? "error" : ""}
           />
         ) : (
           <Input
             ref={inputRef}
-            type={isPassword ? (showPassword ? 'text' : 'password') : type}
+            type={isPassword ? (showPassword ? "text" : "password") : type}
             value={value}
             onChange={(e) => onChange(e.target.value)}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(value.length > 0)}
-            className={error ? 'error' : ''}
+            className={error ? "error" : ""}
           />
         )}
         {isPassword && (
@@ -89,7 +97,7 @@ const FloatingInput: React.FC<FloatingInputProps> = ({
           >
             <IonIcon
               icon={showPassword ? eyeOff : eye}
-              style={{ color: 'white', fontSize: '26px' }}
+              style={{ color: "white", fontSize: "26px" }}
             />
           </EyeButton>
         )}

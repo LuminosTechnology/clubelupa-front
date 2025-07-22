@@ -37,7 +37,7 @@ import type { User } from "../../services/interfaces/Auth";
 
 interface FooterProps {
   userData?: {
-    nivel?: number;
+    profile_photo?: string;
     experiencia?: number;
     proximo_nivel?: number;
   };
@@ -192,7 +192,7 @@ const Footer: React.FC<FooterProps> = ({
             src={
               currentUser?.avatar_url ||
               currentUser?.profile_photo ||
-              "/src/assets/profile-pic.svg"
+              "/assets/default-profile-photo.png"
             }
           />
           <LevelBadge>

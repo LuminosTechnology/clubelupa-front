@@ -22,6 +22,22 @@ export const login = async (data: LoginUserRequest) => {
   return response.data;
 };
 
+export const verifyEmail = async ({
+  email,
+  code,
+}: {
+  email: string;
+  code: string;
+}) => {
+  console.log("[Auth Service] Attempting email verification with data:", {
+    email,
+    code,
+  });
+  const response = await api.post("/verify", { email, code });
+  console.log("[Auth Service] Email verification response:", response.data);
+  return response.data;
+};
+
 export const register = async (data: any) => {
   console.log("[Auth Service] Attempting registration with data:", data);
   const response = await api.post("/register", data);

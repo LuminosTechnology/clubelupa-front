@@ -27,6 +27,7 @@ import { login } from "../../services/auth-service";
 
 import Logo from "../../assets/Logo.svg";
 import { useAuthContext } from "../../contexts/AuthContext";
+import { AxiosError } from "axios";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -40,6 +41,10 @@ const Login: React.FC = () => {
   const validateEmail = (value: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
+  const resetForm = () => {
+    setEmail("");
+    setPassword("");
+  };
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
@@ -59,8 +64,17 @@ const Login: React.FC = () => {
     try {
       await login({ email, password });
       setIsAuthenticated(true);
+      resetForm();
       history.push("/home");
     } catch (error: any) {
+      if (error instanceof AxiosError) {
+        if (error.status === 403) {
+          // se e-mail da conta não está verificado
+          history.push("/register/verify-email", { email });
+          return;
+        }
+      }
+
       const message = error.response?.data?.message || "Erro ao fazer login!";
       setErrors({
         form: message,

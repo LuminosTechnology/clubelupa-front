@@ -40,30 +40,61 @@ const Register: React.FC = () => {
     const newErrors: { [key: string]: string } = {};
 
     if (!user.nome_completo) newErrors.nome_completo = "Nome é obrigatório";
-    if (!user.data_nascimento) newErrors.data_nascimento = "Data de nascimento é obrigatória";
+    if (!user.data_nascimento)
+      newErrors.data_nascimento = "Data de nascimento é obrigatória";
     if (!user.telefone) newErrors.telefone = "Telefone é obrigatório";
     if (!user.email) newErrors.email = "Email é obrigatório";
     if (!user.password) newErrors.password = "Senha é obrigatória";
-    if (!user.password_confirmation) newErrors.password_confirmation = "Confirmação de senha é obrigatória";
+    if (!user.password_confirmation)
+      newErrors.password_confirmation = "Confirmação de senha é obrigatória";
     if (user.password !== user.password_confirmation)
       newErrors.password_confirmation = "As senhas não coincidem";
+
+    const birthDate = new Date(user.data_nascimento);
+    const now = new Date();
+
+    const age = now.getFullYear() - birthDate.getFullYear();
+    const hadBirthdayThisYear =
+      now.getMonth() < birthDate.getMonth() ||
+      (now.getMonth() === birthDate.getMonth() &&
+        now.getDate() >= birthDate.getDate());
+
+    const finalAge = hadBirthdayThisYear ? age - 1 : age;
+
+    if (finalAge < 18)
+      newErrors.data_nascimento = "Você precisa ter 18 anos para se cadastrar";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  
+
+  const resetForm = () => {
+    setUser({
+      nome_completo: "",
+      data_nascimento: "",
+      telefone: "",
+      email: "",
+      password: "",
+      password_confirmation: "",
+    });
+  };
+
   /* ─────────── ação de cadastro ─────────── */
   const handleRegister = async () => {
     if (!validateForm()) return;
 
     try {
+      console.log({ user });
       await register(user);
-      history.push("/register/success");
+      history.push("/register/verify-email", { email: user.email });
+      resetForm();
     } catch (error: any) {
       const backendErrors = error.response?.data?.errors || {};
 
       const transformed = Object.keys(backendErrors).reduce((acc, key) => {
-        const msg = Array.isArray(backendErrors[key]) ? backendErrors[key][0] : backendErrors[key];
+        const msg = Array.isArray(backendErrors[key])
+          ? backendErrors[key][0]
+          : backendErrors[key];
         acc[key] =
           key === "email" && msg === "The email has already been taken."
             ? "Este email já está cadastrado"
@@ -92,7 +123,9 @@ const Register: React.FC = () => {
             onChange={(v) => setUser({ ...user, nome_completo: v })}
             error={!!errors.nome_completo}
           />
-          {errors.nome_completo && <ErrorMessage>{errors.nome_completo}</ErrorMessage>}
+          {errors.nome_completo && (
+            <ErrorMessage>{errors.nome_completo}</ErrorMessage>
+          )}
 
           <FloatingInput
             label="Data de Nascimento"
@@ -101,7 +134,9 @@ const Register: React.FC = () => {
             type="date"
             error={!!errors.data_nascimento}
           />
-          {errors.data_nascimento && <ErrorMessage>{errors.data_nascimento}</ErrorMessage>}
+          {errors.data_nascimento && (
+            <ErrorMessage>{errors.data_nascimento}</ErrorMessage>
+          )}
 
           <FloatingInput
             label="Telefone"
@@ -137,7 +172,9 @@ const Register: React.FC = () => {
             isPassword
             error={!!errors.password_confirmation}
           />
-          {errors.password_confirmation && <ErrorMessage>{errors.password_confirmation}</ErrorMessage>}
+          {errors.password_confirmation && (
+            <ErrorMessage>{errors.password_confirmation}</ErrorMessage>
+          )}
 
           {Object.keys(errors).length > 0 && (
             <ErrorMessage style={{ marginBottom: "16px" }}>

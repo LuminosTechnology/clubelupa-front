@@ -4,19 +4,19 @@ export interface User {
   nome_completo: string;
   data_nascimento: string;
   telefone: string;
-  celular: string | null;
+  celular: string;
   cpf: string;
   cep: string;
   rua: string;
-  bairro: string | null;
-  cidade: string | null;
-  uf: string | null;
+  bairro: string;
+  cidade: string;
+  uf: string;
   email: string;
-  email_verified_at: string | null;
+  email_verified_at: string;
   created_at: string;
   updated_at: string;
-  profile_photo?: string;   // URL da foto vinda da API
-  avatar_url?: string;      // opcional, manter para compatibilidade
+  profile_photo?: string; // URL da foto vinda da API
+  avatar_url?: string; // opcional, manter para compatibilidade
 }
 
 export interface LoginUserRequest {

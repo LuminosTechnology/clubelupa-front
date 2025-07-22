@@ -3,9 +3,11 @@ import React, { useState, useEffect, useRef } from "react";
 import { IonPage, IonContent } from "@ionic/react";
 import { useHistory } from "react-router-dom";
 
+import InputMask from "react-input-mask";
+
 import AppHeader from "../../components/SimpleHeader";
 import ScrollArea from "../../components/ScrollArea/ScrollArea";
-import profilePlaceholder from "../../assets/profile-pic.svg";
+import profilePlaceholder from "../../assets/default-profile-photo.png";
 
 import {
   Content,
@@ -30,13 +32,16 @@ import {
   updateProfilePhoto,
 } from "../../services/auth-service";
 import { User } from "../../services/interfaces/Auth";
+import { Input } from "../../components/FloatingInput/floating.style";
 
 const ProfileEditPage: React.FC = () => {
   const history = useHistory();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [scrolled, setScrolled] = useState(false);
-  const [photoUrl, setPhotoUrl] = useState<string>(profilePlaceholder);
+  const [photoUrl, setPhotoUrl] = useState<string>(
+    "/assets/default-profile-photo.png"
+  );
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
   const [form, setForm] = useState<Partial<User>>({
@@ -121,10 +126,12 @@ const ProfileEditPage: React.FC = () => {
           textColor="#FFFFFF"
         />
 
-        <ScrollArea onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 0)}>
+        <ScrollArea
+          onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 0)}
+        >
           <ProfileWrapper scrolled={scrolled}>
             <PhotoContainer>
-              <ProfilePhoto src={photoUrl} alt="Foto de perfil" />
+              <ProfilePhoto src={photoUrl} />
               <EditOverlay onClick={onEditPhotoClick}>Editar</EditOverlay>
               <input
                 type="file"
@@ -177,19 +184,11 @@ const ProfileEditPage: React.FC = () => {
                   </FieldWrapper>
 
                   <FieldWrapper>
-                    <label>Celular</label>
-                    <input
-                      placeholder="(11) 99876-5432"
-                      value={form.celular}
-                      onChange={(e) =>
-                        setForm({ ...form, celular: e.target.value })
-                      }
-                    />
-                  </FieldWrapper>
-
-                  <FieldWrapper>
                     <label>CPF</label>
-                    <input
+                    <Input
+                      as={InputMask}
+                      mask="999.999.999-99"
+                      maskChar={null}
                       placeholder="123.456.789-10"
                       value={form.cpf}
                       onChange={(e) =>
