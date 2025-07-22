@@ -1,4 +1,4 @@
-package io.ionic.starter;
+package com.clubelupa.app;
 
 import com.getcapacitor.BridgeActivity;
 

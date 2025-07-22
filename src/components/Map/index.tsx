@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   MapContainer,
   MapWrapper,
@@ -59,6 +59,7 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
   const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(
     null
   );
+  const mapRef = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState<Restaurant | null>(null);
   const [map, setMap] = useState<GoogleMap | null>(null);
   const [loading, setLoading] = useState(false);
@@ -102,25 +103,27 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
 
   /* ─── inicia o mapa e marcadores ─────────────────────────────────────── */
   useEffect(() => {
-    (async () => {
+    const initMap = async () => {
       if (!userLoc) return;
 
-      const el = document.getElementById("map");
+      const el = mapRef.current;
       if (!el) return;
 
       const gMap = await GoogleMap.create({
         id: "affiliates-map",
         element: el,
-        apiKey,
+        apiKey: "AIzaSyCWNg1ASza0HDHNKDzGpSl6MMmKb3zVqWs",
         config: {
+          androidLiteMode: false,
           center: userLoc,
           zoom: 15,
           disableDefaultUI: true,
           clickableIcons: false,
           styles: [
             {
-              elementType: "all",
-              stylers: [{ visibility: "off" }, { color: "#ff0000" }],
+              featureType: "all",
+              elementType: "poi",
+              stylers: [{ visibility: "off" }],
             },
           ],
         },
@@ -154,8 +157,12 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
       // });
 
       setMap(gMap);
-    })();
-  }, [userLoc, apiKey]);
+    };
+
+    const timeout = setTimeout(initMap, 1000);
+
+    return () => clearTimeout(timeout);
+  }, [userLoc, apiKey, mapRef]);
 
   /* ─── check-in ───────────────────────────────────────────────────────── */
   const haversine = (
@@ -200,7 +207,7 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
   /* ─── UI ─────────────────────────────────────────────────────────────── */
   return (
     <MapWrapper>
-      <MapContainer id="map" />
+      <MapContainer ref={mapRef} />
 
       {selected && (
         <RestaurantCard>

@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">LupaApp</string>
     <string name="title_activity_main">LupaApp</string>
-    <string name="package_name">io.ionic.starter</string>
-    <string name="custom_url_scheme">io.ionic.starter</string>
-    <string name="google_maps_key">AIzaSyCWNg1ASza0HDHNKDzGpSl6MMmKb3zVqWs</string>
+    <string name="package_name">com.clubelupa.app</string>
+    <string name="custom_url_scheme">com.clubelupa.app</string>
 </resources>
