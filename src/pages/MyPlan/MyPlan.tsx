@@ -1,8 +1,8 @@
 // src/pages/MyPlan/MyPlan.tsx
-import React, { useEffect, useState } from 'react';
-import { IonPage, IonContent } from '@ionic/react';
-import { useHistory } from 'react-router-dom';
-import AppHeader from '../../components/SimpleHeader';
+import React, { useEffect, useState } from "react";
+import { IonPage, IonContent } from "@ionic/react";
+import { useHistory } from "react-router-dom";
+import AppHeader from "../../components/SimpleHeader";
 
 import {
   ProfileContainer,
@@ -14,28 +14,20 @@ import {
   PlanValue,
   ButtonWrapper,
   PremiumButton,
-} from './MyPlan.style';
+} from "./MyPlan.style";
 
-import { getUserByToken } from '../../services/auth-service';
-import { User } from '../../services/interfaces/Auth';
+import { getUserByToken } from "../../services/auth-service";
+import { User } from "../../services/interfaces/Auth";
 
-import avatarPic from '../../assets/profile-pic.svg';
+import avatarPic from "../../assets/profile-pic.svg";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 const MyPlan: React.FC = () => {
   const history = useHistory();
-  const [user, setUser] = useState<User | null>(null);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        setUser(await getUserByToken());
-      } catch (err) {
-        console.error(err);
-      }
-    })();
-  }, []);
+  const { user } = useAuthContext();
 
-  const handleUpgrade = () => history.push('/myplan/upgrade');
+  const handleUpgrade = () => history.push("/myplan/upgrade");
 
   return (
     <IonPage>
@@ -46,10 +38,13 @@ const MyPlan: React.FC = () => {
       />
 
       <AvatarWrapper>
-        <Avatar src={avatarPic} alt="Foto de perfil" />
+        <Avatar
+          src={user?.profile_photo || "/assets/default-profile-photo.png"}
+          alt="Foto de perfil"
+        />
       </AvatarWrapper>
 
-      <IonContent fullscreen style={{ '--background': '#FFFFFF' } as any}>
+      <IonContent fullscreen style={{ "--background": "#FFFFFF" } as any}>
         <ProfileContainer>
           <UserName>{user?.nome_completo}</UserName>
           <UserSubInfo>{user?.cpf}</UserSubInfo>

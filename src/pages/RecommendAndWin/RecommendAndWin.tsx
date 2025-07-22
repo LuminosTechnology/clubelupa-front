@@ -1,42 +1,30 @@
 // src/pages/RecommendAndWin/RecommendAndWin.tsx
-import React, { useEffect, useState } from 'react';
-import { IonPage, IonContent } from '@ionic/react';
-import { useHistory } from 'react-router-dom';
-import AppHeader from '../../components/SimpleHeader';
+import { IonContent, IonPage } from "@ionic/react";
+import React from "react";
+import { useHistory } from "react-router-dom";
+import AppHeader from "../../components/SimpleHeader";
 
 import {
-  ProfileContainer,
-  AvatarWrapper,
-  Avatar,
-  UserName,
-  UserSubInfo,
-  InviteText,
-  LogoutWrapper,
   ActionButton,
   ActionIcon,
-} from './RecommendAndWin.style';
+  Avatar,
+  AvatarWrapper,
+  InviteText,
+  LogoutWrapper,
+  ProfileContainer,
+  UserName,
+  UserSubInfo,
+} from "./RecommendAndWin.style";
 
-import { logout, getUserByToken } from '../../services/auth-service';
-import { User } from '../../services/interfaces/Auth';
+import { logout } from "../../services/auth-service";
 
-import avatarPic from '../../assets/profile-pic.svg';
-import emailIcon from '../../assets/emailwhite.svg';
-import whatsIcon from '../../assets/whatswhite.svg';
+import emailIcon from "../../assets/emailwhite.svg";
+import whatsIcon from "../../assets/whatswhite.svg";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 const RecommendAndWin: React.FC = () => {
   const history = useHistory();
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const fetched = await getUserByToken();
-        setUser(fetched);
-      } catch (err) {
-        console.error('Erro ao buscar dados do usuário', err);
-      }
-    })();
-  }, []);
+  const { user } = useAuthContext();
 
   const handleLogout = async () => {
     await logout();
@@ -44,11 +32,11 @@ const RecommendAndWin: React.FC = () => {
   };
 
   const handleWhats = () => {
-    window.open('https://wa.me/seunumerodetelefone', '_blank');
+    window.open("https://wa.me/seunumerodetelefone", "_blank");
   };
 
   const handleEmail = () => {
-    window.location.href = 'mailto:contato@clubelupa.com.br';
+    window.location.href = "mailto:contato@clubelupa.com.br";
   };
 
   return (
@@ -60,14 +48,17 @@ const RecommendAndWin: React.FC = () => {
       />
 
       <AvatarWrapper>
-        <Avatar src={avatarPic} alt="Foto de perfil" />
+        <Avatar
+          src={user?.profile_photo || "/assets/default-profile-photo.png"}
+          alt="Foto de perfil"
+        />
       </AvatarWrapper>
 
-      <IonContent fullscreen style={{ '--background': '#FFFFFF' } as any}>
+      <IonContent fullscreen style={{ "--background": "#FFFFFF" } as any}>
         <ProfileContainer>
-          <UserName>{user?.nome_completo ?? ''}</UserName>
-          <UserSubInfo>{user?.cpf ?? ''}</UserSubInfo>
-          <UserSubInfo>{user?.email ?? ''}</UserSubInfo>
+          <UserName>{user?.nome_completo ?? ""}</UserName>
+          <UserSubInfo>{user?.cpf ?? ""}</UserSubInfo>
+          <UserSubInfo>{user?.email ?? ""}</UserSubInfo>
 
           {/* Texto abaixo do email */}
           <InviteText>Enviar convite pelo</InviteText>
