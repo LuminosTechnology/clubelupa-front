@@ -18,13 +18,13 @@ import { AxiosError } from "axios";
 
 type VerifyEmailState = {
   email: string;
+  nextPage?: string;
 };
 
 const VerifyEmail: React.FC = () => {
   const location = useLocation<VerifyEmailState>();
   const history = useHistory();
-  const email = location?.state?.email;
-  console.log({ email });
+  const { email, nextPage } = location?.state || {};
   const [error, setError] = React.useState<string | null>(null);
 
   const [code, setCode] = React.useState(["", "", "", ""]);
@@ -64,7 +64,7 @@ const VerifyEmail: React.FC = () => {
     try {
       await verifyEmail({ email, code: code.join("") });
       resetForm();
-      history.push("/login");
+      history.push(nextPage || "/login");
     } catch (err) {
       if (err instanceof AxiosError) {
         if (err.status === 404) {

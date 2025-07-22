@@ -9,7 +9,7 @@ import {
 } from "./affiliateRegister.style";
 import Button from "../../components/Button";
 
-const AffiliateRegisterSuccess: React.FC = () => {
+const AffiliatePendingApprovalRegisterSuccess: React.FC = () => {
   const history = useHistory();
 
   return (
@@ -18,8 +18,9 @@ const AffiliateRegisterSuccess: React.FC = () => {
         <AffiliateSuccessContainer>
           <AffiliateTitle>Cadastro enviado com sucesso!</AffiliateTitle>
           <AffiliateSubtitle>
-            O processo seletivo pode levar até 72 horas para se concluido. Até
-            Lá, aproveite nosso aplicativo para ter as melhores experiencias.
+            O processo seletivo pode levar até 72 horas para ser concluido. Até
+            lá, navegue como sócio e aproveite nosso aplicativo para ter as
+            melhores experiencias.
           </AffiliateSubtitle>
           <AffiliateButtonContainer>
             <Button
@@ -35,4 +36,4 @@ const AffiliateRegisterSuccess: React.FC = () => {
   );
 };
 
-export default AffiliateRegisterSuccess;
+export default AffiliatePendingApprovalRegisterSuccess;

@@ -129,7 +129,13 @@ const AffiliateRegister: React.FC = () => {
       });
 
       // Se deu tudo certo, vamos para a tela de sucesso
-      history.push("/affiliate/register/success");
+      history.push("/register/verify-email", {
+        email: affiliate.email,
+        nextPage: affiliate.codigo_aprovacao //TODO: Implementar verificação de código de aprovação, se correto redirecionar para a tela de approved, senão para pending
+          ? "/register/affiliate/approved/success"
+          : "/register/affiliate/pending/success",
+      });
+
       resetForm();
     } catch (error: any) {
       // Se o backend retornou algum erro, tratamos aqui

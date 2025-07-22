@@ -7,7 +7,8 @@ import { Redirect, Route } from "react-router-dom";
 import AffiliateArea from "./pages/AffiliateArea/AffiliateArea";
 import AffiliateEdit from "./pages/AffiliateEdit/AffiliateEdit";
 import AffiliateRegister from "./pages/AffiliateRegister/AffiliateRegister";
-import AffiliateRegisterSuccess from "./pages/AffiliateRegister/AffiliateRegisterSuccess";
+import AffiliateApprovedRegisterSuccess from "./pages/AffiliateRegister/AffiliateApprovedRegisterSuccess";
+import AffiliatePendingApprovalRegisterSuccess from "./pages/AffiliateRegister/AffiliatePendingApprovalRegisterSuccess";
 import AffiliateStores from "./pages/AffiliateStores/AffiliateStoresPage";
 import AffiliateView from "./pages/AffiliateView/AffiliateView";
 import Experience from "./pages/Experience/Experience";
@@ -86,6 +87,16 @@ const App: React.FC = () => {
             />
             <PublicRoute
               exact
+              path="/register/affiliate/approved/success"
+              component={AffiliateApprovedRegisterSuccess}
+            />
+            <PublicRoute
+              exact
+              path="/register/affiliate/pending/success"
+              component={AffiliatePendingApprovalRegisterSuccess}
+            />
+            <PublicRoute
+              exact
               path="/forgot/password"
               component={ForgotPassword}
             />
@@ -93,11 +104,6 @@ const App: React.FC = () => {
               exact
               path="/change/password"
               component={ChangePassword}
-            />
-            <PublicRoute
-              exact
-              path="/affiliate/register/success"
-              component={AffiliateRegisterSuccess}
             />
 
             <PrivateRoute exact path="/lupacoins" component={LupoCoins} />
