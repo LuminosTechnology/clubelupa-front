@@ -2,43 +2,52 @@
  * src/components/AffiliateFooter/index.tsx
  * — Versão que chama `onAction` ao clicar em IR AO ESTABELECIMENTO
  * ──────────────────────────────────────────── */
-import React, { useRef, useState } from "react";
 import { IonIcon } from "@ionic/react";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  FooterContainer,
-  WhiteLine,
-  UserImageContainer,
-  UserImage,
-  UserName,
-  ExpandedContent,
-  LupaIcons,
-  Tagline,
-  Description,
   ActionButton,
+  Description,
+  ExpandedContent,
+  FooterContainer,
   SocialLink,
+  Tagline,
+  UserImage,
+  UserImageContainer,
+  UserName,
 } from "./footerAffiliate.style";
 
-import lupaIcon from "../../assets/icon-lupa.svg";
-import lupaIcon2 from "../../assets/icon-lupa2.svg";
-import { Restaurant } from "../../components/Map";
 import { logoInstagram } from "ionicons/icons";
+import { Restaurant } from "../../components/Map";
 
 interface AffiliateFooterProps {
-  affiliate: Restaurant;
+  affiliate?: Restaurant;
   onClose: () => void;
   onAction: () => void; // ← callback para “ir ao estabelecimento”
+  visible: boolean;
 }
 
 const AffiliateFooter: React.FC<AffiliateFooterProps> = ({
   affiliate,
   onClose,
   onAction,
+  visible,
 }) => {
   const minHeight = 177;
   const maxHeight = window.innerHeight * 0.8;
-  const [height, setHeight] = useState(maxHeight);
+
+  const [height, setHeight] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const dragRef = useRef({ startY: 0, startHeight: maxHeight });
+
+  useEffect(() => {
+    if (visible) {
+      setHeight(maxHeight);
+      dragRef.current.startHeight = maxHeight;
+    } else {
+      setHeight(minHeight);
+      dragRef.current.startHeight = minHeight;
+    }
+  }, [visible]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setIsDragging(true);
@@ -60,7 +69,9 @@ const AffiliateFooter: React.FC<AffiliateFooterProps> = ({
     else setHeight(maxHeight);
   };
 
-  const lupaIcons = [lupaIcon2, lupaIcon2, lupaIcon2, lupaIcon, lupaIcon];
+  if (!visible && height <= minHeight) {
+    return null;
+  }
 
   return (
     <FooterContainer
@@ -69,30 +80,21 @@ const AffiliateFooter: React.FC<AffiliateFooterProps> = ({
       onTouchEnd={handleTouchEnd}
       style={{ height, transition: isDragging ? "none" : "height 0.3s ease" }}
     >
-      <WhiteLine />
-
       {/* imagem + nome */}
       <UserImageContainer>
-        <UserImage src={affiliate.image} />
+        <UserImage src={affiliate?.image} />
       </UserImageContainer>
-      <UserName>{affiliate.name}</UserName>
-
-      {/* ícones de lupa */}
-      <LupaIcons>
-        {lupaIcons.map((icon, i) => (
-          <img key={i} src={icon} alt={`Lupa ${i}`} width={24} height={34} />
-        ))}
-      </LupaIcons>
+      <UserName>{affiliate?.name}</UserName>
 
       {/* conteúdo principal */}
       <ExpandedContent>
         <Tagline>
-          Conheça o {affiliate.name} e ganhe {affiliate.value} Moedas Lupa!
+          Conheça o {affiliate?.name} e ganhe {affiliate?.value} Moedas Lupa!
         </Tagline>
 
         <Description>
-          {affiliate.benefits ||
-            `O ${affiliate.name} é o lugar ideal para você… Faça seu Check-in no estabelecimento para ganhar suas Moedas Lupa!
+          {affiliate?.benefits ||
+            `O ${affiliate?.name} é o lugar ideal para você… Faça seu Check-in no estabelecimento para ganhar suas Moedas Lupa!
             e receba o benefício EXCLUSIVO que só o Lupa proporciona.`}
         </Description>
 

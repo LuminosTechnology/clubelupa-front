@@ -63,7 +63,7 @@ const Footer: React.FC<FooterProps> = ({
   }, []);
 
   /* ─────────── drawer principal ───────── */
-  const minHeight = 120;
+  const minHeight = 80;
   const maxHeight = window.innerHeight * 0.8;
 
   const [height, setHeight] = useState(minHeight);

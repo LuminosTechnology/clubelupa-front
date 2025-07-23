@@ -8,6 +8,7 @@ import AffiliateFooter from "../../components/AffiliateFooter";
 import CheckinSuccessFooter from "../../components/CheckinSuccessFooter";
 import type { Restaurant } from "../../components/Map";
 import { User } from "../../services/interfaces/Auth";
+import { useHistory } from "react-router";
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
 
@@ -16,6 +17,7 @@ if (!GOOGLE_MAPS_API_KEY) {
 }
 
 const Home: React.FC = () => {
+  const history = useHistory();
   const [userData, setUserData] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -93,7 +95,7 @@ const Home: React.FC = () => {
         <Map
           apiKey={GOOGLE_MAPS_API_KEY}
           onViewMore={(affiliate) => {
-            setSelectedAffiliate(affiliate);
+            history.push(`/affiliate-view/${affiliate.id}`);
             setShowSuccess(false);
           }}
         />
@@ -109,14 +111,14 @@ const Home: React.FC = () => {
           />
         )}
 
-        {/* Footer do afiliado */}
-        {affiliateForFooter && !showSuccess && (
-          <AffiliateFooter
-            affiliate={affiliateForFooter}
-            onClose={() => setSelectedAffiliate(null)}
-            onAction={() => setShowSuccess(true)}
-          />
-        )}
+        <AffiliateFooter
+          visible={!!affiliateForFooter && !showSuccess}
+          affiliate={affiliateForFooter}
+          onClose={() => setSelectedAffiliate(null)}
+          onAction={() =>
+            history.push(`/affiliate-view/${affiliateForFooter.id}`)
+          }
+        />
 
         {/* Footer de sucesso de check-in */}
         {affiliateForFooter && showSuccess && (
@@ -124,7 +126,6 @@ const Home: React.FC = () => {
             affiliateName={affiliateDisplayName}
             coinsEarned={affiliateForFooter.value}
             onRedeem={() => {
-              // lógica de resgate, ex.: chamar API...
               setShowSuccess(false);
               setSelectedAffiliate(null);
             }}

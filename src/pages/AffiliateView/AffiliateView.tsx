@@ -41,7 +41,8 @@ import {
   removeFavorite,
   getFavorites,
 } from "../../services/favoritesService";
-import { AffiliateData } from "../../services/interfaces/Affiliate";  
+import { AffiliateData } from "../../services/interfaces/Affiliate";
+import { affiliates } from "../../contexts/mock";
 
 interface Params {
   id: string;
@@ -51,37 +52,38 @@ const AffiliateView: React.FC = () => {
   const history = useHistory();
   const { id } = useParams<Params>();
 
+  const mockData = affiliates.find((a) => a.id === Number(id));
   const [store, setStore] = useState<AffiliateData | null>(null);
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(false);
   const [animating, setAnimating] = useState(false);
 
   /* ─── carrega o afiliado ───────────────────────────────────────── */
-  useEffect(() => {
-    (async () => {
-      try {
-        const data = await getAffiliateById(id);
-        setStore(data);
-      } catch (err) {
-        console.error("[AffiliateView] Falha ao buscar afiliado:", err);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [id]);
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       const data = await getAffiliateById(id);
+  //       setStore(data);
+  //     } catch (err) {
+  //       console.error("[AffiliateView] Falha ao buscar afiliado:", err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   })();
+  // }, [id]);
 
   /* ─── favoritos ────────────────────────────────────────────────── */
-  useEffect(() => {
-    if (!store) return;
-    (async () => {
-      try {
-        const favs = await getFavorites();
-        setLiked(favs.some((f) => f.id === store.id));
-      } catch (err) {
-        console.error("[AffiliateView] Erro ao verificar favoritos:", err);
-      }
-    })();
-  }, [store]);
+  // useEffect(() => {
+  //   if (!store) return;
+  //   (async () => {
+  //     try {
+  //       const favs = await getFavorites();
+  //       setLiked(favs.some((f) => f.id === store.id));
+  //     } catch (err) {
+  //       console.error("[AffiliateView] Erro ao verificar favoritos:", err);
+  //     }
+  //   })();
+  // }, [store]);
 
   const handleLike = useCallback(async () => {
     if (!store) return;
@@ -102,28 +104,33 @@ const AffiliateView: React.FC = () => {
   }, [liked, store]);
 
   /* ─── loading / erro ───────────────────────────────────────────── */
-  if (loading) {
-    return (
-      <IonPage>
-        <IonLoading isOpen message="Carregando…" />
-      </IonPage>
-    );
-  }
-
-  if (!store) return null;
+  // if (loading) {
+  //   return (
+  //     <IonPage>
+  //       <IonLoading isOpen message="Carregando…" />
+  //     </IonPage>
+  //   );
+  // }
 
   /* ─── helpers p/ nomenclatura antiga ───────────────────────────── */
-  const color = store.color ?? "#E6C178";
-  const img = store.foto_perfil ?? sampleImg;
-  const name = store.nome_local || store.nome_fantasia;
-  const category = store.categoria;
-  const schedule = store.horario_funcionamento;
+  // const color = store.color ?? "#E6C178";
+  // const img = store.foto_perfil ?? sampleImg;
+  // const name = store.nome_local || store.nome_fantasia;
+  // const category = store.categoria;
+  // const schedule = store.horario_funcionamento;
+
+  /* ─── helpers p/ nomenclatura antiga ───────────────────────────── */
+  const color = "#E6C178";
+  const img = mockData?.image;
+  const name = mockData?.nome_fantasia;
+  const category = mockData?.category?.join(", ") || "N/|";
+  const schedule = mockData?.hours;
 
   return (
     <IonPage>
       <IonContent fullscreen style={{ "--background": "#ffffff" } as any}>
         <ScrollArea>
-          <PhotoHeader image={img}>
+          <PhotoHeader image={img || ""}>
             <BackButtonWrapper color={color} onClick={() => history.goBack()}>
               <BackButton src={backButtonVerde} alt="Voltar" />
             </BackButtonWrapper>
@@ -142,15 +149,6 @@ const AffiliateView: React.FC = () => {
               </LikeButton>
             </TitleWrapper>
 
-            <Description>
-              Sócio Lupa, escaneie ou insira aqui sua nota para acumular moedas
-              e trocar por experiências incríveis!
-            </Description>
-
-            <CTAButton bg={color} onClick={() => history.push("/affiliate/scanner")}>
-              ESCANEAR NOTA
-            </CTAButton>
-
             {/* seções dinâmicas */}
             {!!category && (
               <Section>
@@ -167,57 +165,61 @@ const AffiliateView: React.FC = () => {
             <Section>
               <SectionTitle color={color}>Endereço</SectionTitle>
               <SectionText>
-                {store.rua ?? "Rua"} {store.bairro && `– ${store.bairro}`}
+                {mockData?.address}
                 <br />
-                {store.cidade ?? ""} {store.uf ?? ""}
               </SectionText>
             </Section>
 
             {!!schedule && (
               <Section>
-                <SectionTitle color={color}>Horário de atendimento</SectionTitle>
+                <SectionTitle color={color}>
+                  Horário de atendimento
+                </SectionTitle>
                 <SectionText>{schedule}</SectionText>
               </Section>
             )}
 
-            {!!store.instagram && (
-              <LinkRow>
-                <LinkIcon color={color}>
-                  <InstaIcon size={18} />
-                </LinkIcon>
-                <LinkText
-                  href={`https://instagram.com/${store.instagram.replace("@", "")}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  color={color}
-                >
-                  Acesse o instagram
-                </LinkText>
-              </LinkRow>
-            )}
+            <Section>
+              <SectionTitle color={color}>Sobre nós</SectionTitle>
+              <Description>{mockData?.description}</Description>
+            </Section>
 
-            {!!store.site && (
-              <PlainLinkRow>
-                <PlainLink href={store.site} target="_blank" color={color}>
-                  Acesse o site
-                </PlainLink>
-              </PlainLinkRow>
-            )}
+            {/* {!!store.instagram && ( */}
+            <LinkRow>
+              <LinkIcon color={color}>
+                <InstaIcon size={18} />
+              </LinkIcon>
+              <LinkText
+                // href={`https://instagram.com/${store.instagram.replace(
+                //   "@",
+                //   ""
+                // )}`}
+                href={`https://instagram.com/@`}
+                target="_blank"
+                rel="noopener noreferrer"
+                color={color}
+              >
+                Acesse o instagram
+              </LinkText>
+            </LinkRow>
 
-            <BoldLink href="#" color={color}>
-              SOBRE A MARCA AUTORAL / ESTABELECIMENTO
-            </BoldLink>
+            {/* {!!store.site && ( */}
+            <PlainLinkRow>
+              <PlainLink href="#" target="_blank" color={color}>
+                Acesse o site
+              </PlainLink>
+            </PlainLinkRow>
+            {/* )} */}
 
-            {/* descrição estática de exemplo */}
-            <HistoryRow>
-              <HistoryIcon color={color}>
-                <LupaIcon size={18} />
-              </HistoryIcon>
-              <HistTitle color={color}>História:</HistTitle>
-            </HistoryRow>
-            <HistText>
-              Fundada em 2016 pela publicitária Patricia Lima…
-            </HistText>
+            <CTAButton bg={color} onClick={() => {}}>
+              FAZER CHECK-IN
+            </CTAButton>
+            <CTAButton
+              bg={color}
+              onClick={() => history.push("/affiliate/scanner")}
+            >
+              ESCANEAR NOTA
+            </CTAButton>
           </InfoContainer>
         </ScrollArea>
       </IonContent>

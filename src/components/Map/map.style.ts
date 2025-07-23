@@ -5,11 +5,8 @@ export const MapWrapper = styled.div`
   width: 100vw;
   height: 100vh;
   background: transparent;
-`;
-
-export const MapContainer = styled.div`
-  width: 100vw;
-  height: 100vh;
+  position: fixed;
+  inset: 0;
 `;
 
 /* --------- popup / card ---------- */
@@ -17,7 +14,6 @@ export const RestaurantCard = styled.div`
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
   max-width: 320px; /* ↓ menor */
   width: 85%;
   background: #fff;
@@ -26,6 +22,15 @@ export const RestaurantCard = styled.div`
   display: flex;
   flex-direction: column;
   overflow: hidden;
+
+  transform: translate(-50%, 150%);
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+
+  &.show {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
 `;
 
 export const CloseButton = styled.button`

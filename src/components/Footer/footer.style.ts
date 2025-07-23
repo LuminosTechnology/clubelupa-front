@@ -28,8 +28,8 @@ export const BlurOverlay = styled.div`
   align-items: center;
   justify-content: center;
   animation: ${fadeIn} 0.3s ease-out forwards,
-             ${fadeOut} 0.3s ease-in  forwards 2.7s;
-  pointer-events: none;           /* não captura cliques */
+    ${fadeOut} 0.3s ease-in forwards 2.7s;
+  pointer-events: none; /* não captura cliques */
 `;
 
 const pop = keyframes`
@@ -43,7 +43,7 @@ export const CongratsText = styled.h1`
   color: #ffffff;
   text-shadow: 0 0 10px #00000080;
   animation: ${pop} 0.3s ease-out forwards,
-             ${fadeOut} 0.3s ease-in forwards 2.7s;
+    ${fadeOut} 0.3s ease-in forwards 2.7s;
 `;
 
 /* cada “pedaço” de confete */
@@ -130,7 +130,7 @@ export const UserName = styled.h3`
 /* ---------- nav colapsada ---------- */
 export const CollapsedNav = styled.div`
   position: absolute;
-  top: 50%;
+  top: 40%;
   left: 0;
   width: 100%;
   transform: translateY(-50%);
@@ -141,11 +141,11 @@ export const NavButton = styled.button<{ $pos: "left" | "right" }>`
   ${({ $pos }) =>
     $pos === "left"
       ? css`
-          left: 25%;
+          left: 20%;
           transform: translate(-50%, -50%);
         `
       : css`
-          right: 25%;
+          right: 20%;
           transform: translate(50%, -50%);
         `}
   background: none;

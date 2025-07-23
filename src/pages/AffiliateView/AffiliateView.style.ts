@@ -1,5 +1,5 @@
 // src/pages/AffiliateView/AffiliateView.style.ts
-import styled, { keyframes, css } from 'styled-components';
+import styled, { keyframes, css } from "styled-components";
 
 /* área de scroll */
 export const ScrollArea = styled.div`
@@ -13,7 +13,7 @@ export const PhotoHeader = styled.div<{ image: string }>`
   position: relative;
   height: 280px;
   width: 100%;
-  background: url(${p => p.image}) center/cover no-repeat;
+  background: url(${(p) => p.image}) center/cover no-repeat;
   border-bottom-left-radius: 35px;
   border-bottom-right-radius: 35px;
 `;
@@ -53,7 +53,7 @@ const bump = keyframes`
 `;
 
 /* botão de like cinza que vira colorido ao clicar */
-export const LikeButton = styled.button.attrs({ type: 'button' })<{
+export const LikeButton = styled.button.attrs({ type: "button" })<{
   liked: boolean;
   animate: boolean;
 }>`
@@ -70,8 +70,7 @@ export const LikeButton = styled.button.attrs({ type: 'button' })<{
     height: 38px;
 
     /* cinza quando não curtido, sem filtro quando curtido */
-    filter: ${({ liked }) =>
-      liked ? 'none' : 'grayscale(100%)'};
+    filter: ${({ liked }) => (liked ? "none" : "grayscale(100%)")};
     transition: filter 200ms ease-in-out;
 
     ${({ animate }) =>
@@ -108,9 +107,10 @@ export const Description = styled.p`
 /* botão CTA */
 export const CTAButton = styled.button<{ bg: string }>`
   display: block;
-  width: 100%;
+  width: 217px;
+  margin: 0 auto;
   padding: 14px 0;
-  margin-bottom: 32px;
+  margin-bottom: 0.5rem;
   background: ${({ bg }) => bg};
   color: #fff;
   border: none;

@@ -61,3 +61,25 @@ body.dark {
   --ion-color-light: #ffffff;
   --ion-color-dark: #000000;
 }
+
+@keyframes color-change {
+  0% {
+    fill: #ffd700;
+  }
+  25% {
+    fill: #ff6347;
+  }
+  50% {
+    fill: #4682b4;
+  }
+  75% {
+    fill: #32cd32;
+  }
+  100% {
+    fill: #ffd700;
+  }
+}
+
+#splash-logo {
+  animation: color-change 1s infinite alternate;
+}

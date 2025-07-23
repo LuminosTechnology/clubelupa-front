@@ -23,16 +23,16 @@ export const BalanceContainer = styled.div`
 export const BalanceLabel = styled.p`
   font-size: 16px;
   font-weight: 400;
-  color: #8E9455;
+  color: #8e9455;
   margin: 0;
   text-align: center;
-  `;
+`;
 
 export const BalanceAmount = styled.p`
   font-size: 25px;
   font-weight: 800;
-  color: #8E9455;
-  margin: 0px 0 0; 
+  color: #8e9455;
+  margin: 0px 0 0;
   text-align: center;
 `;
 
@@ -40,20 +40,20 @@ export const VouncherWrapper = styled.div`
   display: flex;
   width: 100%;
   height: 120px;
-  background: #E0A075;
+  background: #e0a075;
   border-radius: 0 20px 20px 0;
   overflow: hidden;
 `;
 
 export const IconContainer = styled.div`
-  width: 110px;
   display: flex;
   align-items: center;
   justify-content: center;
 
   & > img {
-    width: 100px;
-    height: 100px;
+    width: 130px;
+    height: 100%;
+    object-fit: cover;
   }
 `;
 
@@ -95,7 +95,7 @@ export const ViewMore = styled.button`
   padding: 0;
   font-size: 14px;
   font-weight: 600;
-  color: #FFFFFF;
+  color: #ffffff;
   cursor: pointer;
   text-align: left;
 

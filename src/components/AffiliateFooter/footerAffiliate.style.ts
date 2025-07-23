@@ -1,9 +1,9 @@
-import styled from 'styled-components';
-import Button from '../Button';          /* Button reutilizado */
+import styled from "styled-components";
+import Button from "../Button"; /* Button reutilizado */
 
 /* paleta da print */
-const olive = '#8e9455';      // fundo
-const borderBlue = '#0f63ff'; // borda
+const olive = "#8e9455"; // fundo
+const borderBlue = "#0f63ff"; // borda
 
 /* ---------- estrutura base ---------- */
 export const FooterContainer = styled.div`
@@ -117,7 +117,7 @@ export const ActionButton = styled(Button)`
   color: ${olive};
   font-size: 18px;
   font-weight: 700;
-  margin: 32px auto 0;   /* distância extra para cima */
+  margin: 32px auto 0; /* distância extra para cima */
   display: block;
   cursor: pointer;
 `;

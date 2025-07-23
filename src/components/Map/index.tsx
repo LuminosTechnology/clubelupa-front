@@ -1,24 +1,21 @@
+import { Geolocation } from "@capacitor/geolocation";
+import { GoogleMap } from "@capacitor/google-maps";
+import { IonIcon } from "@ionic/react";
+import { close } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  MapContainer,
+  CheckInButton,
+  CheckInMessage,
+  CloseButton,
   MapWrapper,
   RestaurantCard,
   RestaurantDetails,
   RestaurantImage,
   RestaurantInfo,
   ViewMoreButton,
-  CheckInButton,
-  CheckInMessage,
-  CloseButton,
 } from "./map.style";
-import { Geolocation } from "@capacitor/geolocation";
-import { GoogleMap } from "@capacitor/google-maps";
-import lupaMarker from "../../assets/comercio.svg";
-import sampleImg from "../../assets/sample-store.png";
-import { close, accessibilityOutline } from "ionicons/icons";
-import { IonIcon } from "@ionic/react";
 
-import { getAllAffiliates } from "../../services/affiliateService";
+import { affiliates } from "../../contexts/mock";
 import { AffiliateData } from "../../services/interfaces/Affiliate";
 
 /* ---------------- extras específicos do mapa ------------------- */
@@ -46,6 +43,10 @@ const extraById: Record<number, ExtraFields> = {
 /* ---------------- tipagens finais ----------------------------------------*/
 export interface Restaurant extends AffiliateData, ExtraFields {
   checkedIn?: boolean;
+  iconType: "green" | "terracotta" | "yellow";
+  category?: string[];
+  description?: string;
+  structure?: "Física" | "Online";
 }
 
 /* -------------------------------------------------------------------------*/
@@ -55,7 +56,7 @@ interface MapProps {
 }
 
 const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  // const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(
     null
   );
@@ -123,6 +124,7 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
         config: {
           androidLiteMode: false,
           center: userLoc,
+
           zoom: 15,
           disableDefaultUI: true,
           clickableIcons: false,
@@ -140,37 +142,45 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
         },
       });
 
+      await gMap.enableCurrentLocation(true);
+
       // marker do usuário
-      await gMap.addMarker({
-        coordinate: userLoc,
-        iconUrl: accessibilityOutline,
-        iconSize: { width: 32, height: 32 },
-      });
+      // await gMap.addMarker({
+      //   coordinate: userLoc,
+      //   iconUrl: accessibilityOutline,
+      //   iconSize: { width: 32, height: 32 },
+      // });
 
       // markers dos afiliados
-      // for (const r of restaurants) {
-      //   await gMap.addMarker({
-      //     coordinate: r.location,
-      //     iconUrl: lupaMarker,
-      //     iconSize: { width: 40, height: 40 },
-      //   });
-      // }
+      for (const a of affiliates) {
+        await gMap.addMarker({
+          coordinate: a.location,
+          iconUrl:
+            a.iconType === "green"
+              ? "assets/affiliate_pin.png"
+              : a.iconType === "yellow"
+              ? "assets/affiliate_shack.png"
+              : "assets/affiliate_star.png",
+          iconSize: { width: 40, height: 55 },
+          iconAnchor: { x: 20, y: 55 },
+        });
+      }
 
-      // await gMap.setOnMarkerClickListener(async (m) => {
-      //   const hit = restaurants.find(
-      //     (r) => r.location.lat === m.latitude && r.location.lng === m.longitude
-      //   );
-      //   if (hit) {
-      //     await gMap.setCamera({ coordinate: hit.location, animate: true });
-      //     setSelected(hit);
-      //     setCheckInMessage(null);
-      //   }
-      // });
+      await gMap.setOnMarkerClickListener(async (m) => {
+        const hit = affiliates.find(
+          (r) => r.location.lat === m.latitude && r.location.lng === m.longitude
+        );
+        if (hit) {
+          await gMap.setCamera({ coordinate: hit.location, animate: true });
+          setSelected(hit);
+          setCheckInMessage(null);
+        }
+      });
 
       setMap(gMap);
     };
 
-    const timeout = setTimeout(initMap, 1000);
+    const timeout = setTimeout(initMap, 300);
 
     return () => clearTimeout(timeout);
   }, [userLoc, apiKey, mapRef]);
@@ -224,59 +234,75 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
         style={{
           position: "absolute",
           inset: 0,
-          width: "100vw",
-          height: "100vh",
+          width: "100%",
+          height: "100%",
         }}
       ></capacitor-google-map>
 
-      {selected && (
-        <RestaurantCard>
-          <CloseButton
-            onClick={() => {
-              setSelected(null);
-              setCheckInMessage(null);
-            }}
-          >
-            <IonIcon icon={close} />
-          </CloseButton>
+      <RestaurantCard className={!!selected ? "show" : ""}>
+        <CloseButton
+          onClick={() => {
+            setSelected(null);
+            setCheckInMessage(null);
+          }}
+        >
+          <IonIcon icon={close} />
+        </CloseButton>
 
-          {/* imagem de ponta a ponta */}
-          <RestaurantInfo>
-            <RestaurantImage
-              src={selected.image}
-              alt={selected.nome_fantasia}
-            />
-            <RestaurantDetails>
-              <h3>{selected.nome_local || selected.nome_fantasia}</h3>
-              <p>{selected.address}</p>
-              <p>{selected.distance}</p>
-              <p>{selected.hours}</p>
-              <p>
-                <strong>Vale {selected.value} pontos</strong>
-              </p>
-            </RestaurantDetails>
-          </RestaurantInfo>
+        {/* imagem de ponta a ponta */}
+        <RestaurantInfo>
+          <RestaurantImage
+            src={selected?.image}
+            alt={selected?.nome_fantasia}
+          />
+          <RestaurantDetails>
+            {selected && (
+              <>
+                <h3>{selected?.nome_local || selected?.nome_fantasia}</h3>
+                <p>{selected?.address}</p>
+                {userLoc && (
+                  <p>
+                    {Math.round(
+                      haversine(
+                        userLoc?.lat,
+                        userLoc?.lng,
+                        selected!.location.lat,
+                        selected!.location.lng
+                      ) / 1000
+                    )}
+                    Km
+                  </p>
+                )}
+                <p>{selected?.hours}</p>
+              </>
+            )}
+            <p>
+              <strong>Vale {selected?.value} pontos</strong>
+            </p>
+          </RestaurantDetails>
+        </RestaurantInfo>
 
+        {selected && (
           <ViewMoreButton onClick={() => onViewMore(selected)}>
             Ver mais sobre
           </ViewMoreButton>
+        )}
 
-          {!selected.checkedIn && (
-            <>
-              <CheckInButton onClick={handleCheckIn} disabled={loading}>
-                {loading ? "Carregando…" : "Check-in"}
-              </CheckInButton>
-              {checkInMessage && (
-                <CheckInMessage>{checkInMessage}</CheckInMessage>
-              )}
-            </>
-          )}
+        {!selected?.checkedIn && (
+          <>
+            <CheckInButton onClick={handleCheckIn} disabled={loading}>
+              {loading ? "Carregando…" : "Check-in"}
+            </CheckInButton>
+            {checkInMessage && (
+              <CheckInMessage>{checkInMessage}</CheckInMessage>
+            )}
+          </>
+        )}
 
-          {selected.checkedIn && (
-            <CheckInMessage>✅ Check-in já realizado</CheckInMessage>
-          )}
-        </RestaurantCard>
-      )}
+        {selected?.checkedIn && (
+          <CheckInMessage>✅ Check-in já realizado</CheckInMessage>
+        )}
+      </RestaurantCard>
     </MapWrapper>
   );
 };
