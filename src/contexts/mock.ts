@@ -21,7 +21,7 @@ export const affiliates: Restaurant[] = [
     address: "Rua Desembargador Costa Carvalho, 471",
     distance: "0",
     hours: "17:00 às 02:00",
-    image: "https://i.imgur.com/TjZWucq.png",
+    image: "https://imgur.com/oKY6h8W.png",
     location: {
       lat: -25.4404079247463,
       lng: -49.29390293493574,
