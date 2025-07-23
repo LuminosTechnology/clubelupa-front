@@ -64,19 +64,24 @@ body.dark {
 
 @keyframes color-change {
   0% {
-    fill: #ffd700;
+    fill: #e09d73;
+    stroke: #e09d73;
   }
   25% {
-    fill: #ff6347;
+    fill: #d5dfa1;
+    stroke: #d5dfa1;
   }
   50% {
-    fill: #4682b4;
+    fill: #ffffff;
+    stroke: #ffffff;
   }
   75% {
-    fill: #32cd32;
+    fill: transparent;
+    stroke: white;
   }
   100% {
-    fill: #ffd700;
+    fill: #ffffff;
+    stroke: #fff;
   }
 }
 
