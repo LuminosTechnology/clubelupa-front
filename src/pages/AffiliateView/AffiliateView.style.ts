@@ -1,24 +1,20 @@
-// src/pages/AffiliateView/AffiliateView.style.ts
 import styled, { keyframes, css } from "styled-components";
 
-/* área de scroll */
 export const ScrollArea = styled.div`
   height: 100%;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 `;
 
-/* header com imagem */
 export const PhotoHeader = styled.div<{ image: string }>`
   position: relative;
   height: 280px;
   width: 100%;
-  background: url(${(p) => p.image}) center/cover no-repeat;
+  background: url(${p => p.image}) center/cover no-repeat;
   border-bottom-left-radius: 35px;
   border-bottom-right-radius: 35px;
 `;
 
-/* botão voltar */
 export const BackButtonWrapper = styled.button<{ color: string }>`
   position: absolute;
   top: 45px;
@@ -40,19 +36,16 @@ export const BackButton = styled.img`
   height: 20px;
 `;
 
-/* container */
 export const InfoContainer = styled.div`
   padding: 24px;
 `;
 
-/* keyframes de bump */
 const bump = keyframes`
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.3); }
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
   100% { transform: scale(1); }
 `;
 
-/* botão de like cinza que vira colorido ao clicar */
 export const LikeButton = styled.button.attrs({ type: "button" })<{
   liked: boolean;
   animate: boolean;
@@ -68,8 +61,6 @@ export const LikeButton = styled.button.attrs({ type: "button" })<{
   img {
     width: 38px;
     height: 38px;
-
-    /* cinza quando não curtido, sem filtro quando curtido */
     filter: ${({ liked }) => (liked ? "none" : "grayscale(100%)")};
     transition: filter 200ms ease-in-out;
 
@@ -96,7 +87,6 @@ export const Title = styled.h1<{ color: string }>`
   max-width: 80%;
 `;
 
-/* descrição */
 export const Description = styled.p`
   font-size: 16px;
   color: #666;
@@ -104,7 +94,6 @@ export const Description = styled.p`
   margin: 0 0 24px;
 `;
 
-/* botão CTA */
 export const CTAButton = styled.button<{ bg: string }>`
   display: block;
   width: 217px;
@@ -121,7 +110,6 @@ export const CTAButton = styled.button<{ bg: string }>`
   cursor: pointer;
 `;
 
-/* seções comuns */
 export const Section = styled.div`
   margin-bottom: 20px;
 `;
@@ -138,7 +126,6 @@ export const SectionText = styled.p`
   line-height: 1.5;
 `;
 
-/* link com ícone (instagram) */
 export const LinkRow = styled.div`
   display: flex;
   align-items: center;
@@ -169,7 +156,6 @@ export const LinkText = styled.a<{ color: string }>`
   }
 `;
 
-/* link simples (site) */
 export const PlainLinkRow = styled.div`
   margin-bottom: 12px;
 `;
@@ -183,7 +169,6 @@ export const PlainLink = styled.a<{ color: string }>`
   }
 `;
 
-/* link em negrito sempre sublinhado */
 export const BoldLink = styled.a<{ color: string }>`
   display: inline-block;
   font-size: 14px;
@@ -194,7 +179,6 @@ export const BoldLink = styled.a<{ color: string }>`
   cursor: pointer;
 `;
 
-/* história */
 export const HistoryRow = styled.div`
   display: flex;
   align-items: center;
@@ -213,4 +197,29 @@ export const HistText = styled.p`
   color: #666;
   line-height: 1.5;
   margin: 0;
+`;
+
+const fall = keyframes`
+  0% { transform: translateY(-120vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 1; }
+`;
+
+export const ConfettiPiece = styled.div<{
+  left: number;
+  delay: number;
+  duration: number;
+  size: number;
+  color: string;
+}>`
+  position: fixed;
+  top: -10vh;
+  left: ${({ left }) => left}%;
+  width: ${({ size }) => size}px;
+  height: ${({ size }) => size * 0.4}px;
+  background: ${({ color }) => color};
+  opacity: 1;
+  z-index: 9999;
+  animation: ${fall} ${({ duration }) => duration}ms linear ${({ delay }) => delay}ms forwards;
+  border-radius: 2px;
+  pointer-events: none;
 `;

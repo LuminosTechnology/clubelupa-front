@@ -63,8 +63,8 @@ export const FooterContainer = styled.div`
   bottom: 0;
   width: 100%;
   background: #8e9455;
-  border-top-left-radius: 70px;
-  border-top-right-radius: 70px;
+  border-top-left-radius: 35px;
+  border-top-right-radius: 35px;
   box-shadow: 0 -3px 20px #00000040;
   z-index: 2;
   touch-action: none;
@@ -130,7 +130,7 @@ export const UserName = styled.h3`
 /* ---------- nav colapsada ---------- */
 export const CollapsedNav = styled.div`
   position: absolute;
-  top: 40%;
+  top: 50%;
   left: 0;
   width: 100%;
   transform: translateY(-50%);

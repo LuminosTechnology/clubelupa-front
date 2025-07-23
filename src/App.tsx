@@ -47,6 +47,8 @@ import { AuthContextProvider, useAuthContext } from "./contexts/AuthContext";
 import "./theme/variables.css";
 import VerifyEmail from "./pages/VerifyEmail/VerifyEmail";
 
+import { GlobalFonts } from "./styles/GlobalFonts";
+
 setupIonicReact();
 
 const App: React.FC = () => {
@@ -66,6 +68,7 @@ const App: React.FC = () => {
   return (
     <AuthContextProvider>
       <IonApp>
+        <GlobalFonts />
         <IonReactRouter>
           <IonRouterOutlet>
             <PublicRoute exact path="/login" component={Login} />

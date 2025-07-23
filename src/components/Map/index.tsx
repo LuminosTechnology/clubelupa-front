@@ -67,7 +67,7 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
   const [checkInMessage, setCheckInMessage] = useState<string | null>(null);
 
   const DEFAULT_LOCATION = { lat: -25.4415, lng: -49.291 };
-  const CHECKIN_RADIUS = 500; // m
+  const CHECKIN_RADIUS = 5000000; // m
 
   /* ─── carrega afiliados ───────────────────────────────────────────────── */
   // useEffect(() => {
