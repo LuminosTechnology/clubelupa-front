@@ -81,25 +81,38 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
   /* ---------- itens do menu ---------------------------------- */
   const menuItems = useMemo(() => {
     const base = [
-      { label: "Home", path: "/home" },
-      { label: "Perfil", path: "/profile" },
-      { label: "Afiliados", path: "/affiliates" },
-      { label: "Troca de Moedas Lupa", path: "/lupacoins" },
-      { label: "Meu Plano", path: "/myplan" },
-      { label: "Meus Favoritos", path: "/favorites" },
-      { label: "Histórico", path: "/experience" },
-      { label: "Indique e Ganhe", path: "/recommendandwin" },
+      { label: "Home", path: "/home", enabled: true },
+      { label: "Perfil", path: "/profile", enabled: true },
+      { label: "Afiliados", path: "/affiliates", enabled: true },
+      { label: "Troca de Moedas Lupa", path: "/lupacoins", enabled: false },
+      { label: "Meu Plano", path: "/myplan", enabled: false },
+      { label: "Meus Favoritos", path: "/favorites", enabled: false },
+      { label: "Histórico", path: "/experience", enabled: false },
+      { label: "Indique e Ganhe", path: "/recommendandwin", enabled: false },
     ];
 
     // Enquanto carrega, mostramos um placeholder
     if (hasAffiliate === undefined) {
-      return base.concat({ label: "Carregando…", path: location.pathname });
+      return [
+        ...base,
+        { label: "Carregando…", path: location.pathname, enabled: false },
+      ];
     }
 
     // Após carregado, acrescenta o item correto
     return hasAffiliate
-      ? base.concat({ label: "Área do Afiliado", path: "/affiliate/area" })
-      : base.concat({ label: "Seja um Afiliado", path: "/affiliate/register" });
+      ? [
+          ...base,
+          { label: "Área do Afiliado", path: "/affiliate/area", enabled: true },
+        ]
+      : [
+          ...base,
+          {
+            label: "Seja um Afiliado",
+            path: "/affiliate/register",
+            enabled: true,
+          },
+        ];
   }, [hasAffiliate, location.pathname]);
 
   /* ---------- render ----------------------------------------- */
@@ -117,13 +130,22 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
         <MenuItems>
           {menuItems.map((item) => (
             <MenuItem
+              enabled={item.enabled}
               key={item.path}
               onClick={() => {
-                history.push(item.path);
-                onClose();
+                if (item.enabled) {
+                  history.push(item.path);
+                  onClose();
+                }
               }}
             >
               {item.label}
+              {!item.enabled && (
+                <IonIcon
+                  name="lock-closed"
+                  style={{ width: 16, height: 16, marginLeft: 10 }}
+                />
+              )}
             </MenuItem>
           ))}
         </MenuItems>

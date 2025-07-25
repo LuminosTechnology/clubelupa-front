@@ -33,14 +33,16 @@ import {
 } from "../../services/auth-service";
 import { User } from "../../services/interfaces/Auth";
 import { Input } from "../../components/FloatingInput/floating.style";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 const ProfileEditPage: React.FC = () => {
   const history = useHistory();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const { setUser, user } = useAuthContext();
   const [scrolled, setScrolled] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string>(
-    "/assets/default-profile-photo.png"
+    user?.profile_photo || profilePlaceholder
   );
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
@@ -61,28 +63,26 @@ const ProfileEditPage: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const user = await getUserByToken();
-
         setForm({
-          nome_completo: user.nome_completo,
-          data_nascimento: user.data_nascimento,
-          telefone: user.telefone,
-          celular: user.celular,
-          cpf: user.cpf,
-          email: user.email,
-          cep: user.cep,
-          rua: user.rua,
-          bairro: user.bairro,
-          cidade: user.cidade,
-          uf: user.uf,
+          nome_completo: user?.nome_completo,
+          data_nascimento: user?.data_nascimento,
+          telefone: user?.telefone,
+          celular: user?.celular,
+          cpf: user?.cpf,
+          email: user?.email,
+          cep: user?.cep,
+          rua: user?.rua,
+          bairro: user?.bairro,
+          cidade: user?.cidade,
+          uf: user?.uf,
         });
 
-        setPhotoUrl(user.avatar_url ?? profilePlaceholder);
+        setPhotoUrl(user?.profile_photo ?? profilePlaceholder);
       } catch (err) {
         console.error("Erro ao carregar usuário:", err);
       }
     })();
-  }, []);
+  }, [user]);
 
   const onEditPhotoClick = () => fileInputRef.current?.click();
 
@@ -94,17 +94,24 @@ const ProfileEditPage: React.FC = () => {
   };
 
   const handleSave = async () => {
-    console.log("handleSave iniciado", { form, photoFile });
     try {
       const updatedUser = await updateUserProfile(form);
-      console.log("Perfil atualizado:", updatedUser);
 
+      let newProfilePhotoUrl = updatedUser.profile_photo;
       if (photoFile) {
         const newUrl = await updateProfilePhoto(photoFile);
-        console.log("Foto atualizada, nova URL:", newUrl);
+        newProfilePhotoUrl = `${newUrl}?cb=${Date.now()}`;
         // atualiza localmente para preview imediato
         setPhotoUrl(`${newUrl}?cb=${Date.now()}`);
       }
+      console.log(newProfilePhotoUrl);
+
+      setUser({
+        ...user,
+        ...updatedUser,
+        profile_photo: newProfilePhotoUrl,
+        avatar_url: newProfilePhotoUrl,
+      });
     } catch (err) {
       console.error("Erro ao salvar perfil/foto:", err);
       return;
@@ -131,7 +138,9 @@ const ProfileEditPage: React.FC = () => {
         >
           <ProfileWrapper scrolled={scrolled}>
             <PhotoContainer>
-              <ProfilePhoto src={photoUrl} />
+              <ProfilePhoto
+                src={photoUrl || "/assets/default-profile-photo.png"}
+              />
               <EditOverlay onClick={onEditPhotoClick}>Editar</EditOverlay>
               <input
                 type="file"

@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const MenuOverlay = styled.div<{ $isOpen: boolean }>`
   position: fixed;
@@ -9,14 +9,14 @@ export const MenuOverlay = styled.div<{ $isOpen: boolean }>`
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
   opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
-  visibility: ${({ $isOpen }) => ($isOpen ? 'visible' : 'hidden')};
+  visibility: ${({ $isOpen }) => ($isOpen ? "visible" : "hidden")};
   transition: opacity 0.3s ease, visibility 0.3s ease;
 `;
 
 export const MenuContainer = styled.div<{ $isOpen: boolean }>`
   position: fixed;
   top: 0;
-  right: ${({ $isOpen }) => ($isOpen ? '0' : '-90%')};
+  right: ${({ $isOpen }) => ($isOpen ? "0" : "-90%")};
   width: 90%;
   height: 100%;
   background-color: var(--ion-color-tertiary);
@@ -45,7 +45,7 @@ export const MenuItems = styled.div`
   margin-top: 150px;
 `;
 
-export const MenuItem = styled.button`
+export const MenuItem = styled.button<{ enabled?: boolean }>`
   background: transparent;
   border: none;
   border-bottom: 1px solid white;
@@ -54,15 +54,20 @@ export const MenuItem = styled.button`
   padding-left: 12px;
   font-size: 16px;
   font-weight: 700;
-  font-family: 'Karla', sans-serif;
+  font-family: "Karla", sans-serif;
   cursor: pointer;
   text-align: center;
   transition: opacity 0.2s ease;
   width: 100%;
   text-align: left;
 
+  display: flex;
+  align-items: center;
+
+  opacity: ${({ enabled }) => (enabled ? 1 : 0.4)};
+
   &:hover {
-    opacity: 0.8;
+    opacity: ${({ enabled }) => (enabled ? 0.8 : 0.4)};
   }
 
   &:last-child {

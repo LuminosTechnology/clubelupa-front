@@ -1,32 +1,32 @@
 // src/pages/ProfilePage/ProfilePage.tsx
-import React, { useEffect, useState } from "react";
-import { IonPage, IonContent } from "@ionic/react";
+import { IonContent, IonPage } from "@ionic/react";
+import React from "react";
 import { useHistory } from "react-router-dom";
-import AppHeader from "../../components/SimpleHeader";
-import Button from "../../components/Button";
 import styled from "styled-components";
+import Button from "../../components/Button";
+import AppHeader from "../../components/SimpleHeader";
 
 import {
-  ProfileContainer,
-  AvatarWrapper,
   Avatar,
-  UserName,
-  UserSubInfo,
-  MenuOption,
-  MenuIcon,
+  AvatarWrapper,
   Divider,
   LogoutWrapper,
+  MenuIcon,
+  MenuOption,
+  ProfileContainer,
+  UserName,
+  UserSubInfo,
 } from "./ProfilePage.style";
 
-import { logout, getUserByToken } from "../../services/auth-service";
-import { User } from "../../services/interfaces/Auth";
+import { logout } from "../../services/auth-service";
 
-import editIcon from "../../assets/edit.svg";
-import lockIcon from "../../assets/lock.svg";
-import notificationIcon from "../../assets/notification.svg";
 import chatIcon from "../../assets/chat.svg";
+import editIcon from "../../assets/edit.svg";
 import emailIcon from "../../assets/email.svg";
 import instagramIcon from "../../assets/insta.svg";
+import lockIcon from "../../assets/lock.svg";
+import notificationIcon from "../../assets/notification.svg";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 /** Botão “SAIR” centralizado */
 const LogoutButton = styled(Button)`
@@ -38,18 +38,7 @@ const LogoutButton = styled(Button)`
 
 const ProfilePage: React.FC = () => {
   const history = useHistory();
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const fetched = await getUserByToken();
-        setUser(fetched);
-      } catch (err) {
-        console.error("Erro ao buscar dados do usuário", err);
-      }
-    })();
-  }, []);
+  const { user, setUser } = useAuthContext();
 
   const handleLogout = async () => {
     await logout();

@@ -51,3 +51,5 @@ yarn-error.log*
 /platforms
 /plugins
 /www
+
+app-lupa-upload-key.keystore

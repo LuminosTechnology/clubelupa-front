@@ -122,15 +122,17 @@ export const updateUserProfile = async (
 };
 
 export const updateProfilePhoto = async (file: File): Promise<string> => {
-  const token = await getToken();
-  if (!token) throw new Error("Token não encontrado");
   const formData = new FormData();
   formData.append("profile_photo", file);
-  const response = await api.post<{ url: string }>("/profile/photo", formData, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "multipart/form-data",
-    },
-  });
-  return response.data.url;
+
+  const response = await api.post<{ profile_photo: string }>(
+    "/profile/photo",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return response.data.profile_photo;
 };

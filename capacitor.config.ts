@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.clubelupa.app",
+  appId: "br.com.clubelupa.app",
   appName: "LupaApp",
   webDir: "dist",
   plugins: {
