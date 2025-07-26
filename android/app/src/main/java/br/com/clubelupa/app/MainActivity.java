@@ -1,4 +1,4 @@
-package com.clubelupa.app;
+package br.com.clubelupa.app;
 
 import com.getcapacitor.BridgeActivity;
 

@@ -7,8 +7,8 @@ android {
         applicationId "br.com.clubelupa.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 3
-        versionName "1.0.2"
+        versionCode 8
+        versionName "1.0.7"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,22 +16,21 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
-    signingConfigs {
-        release {
-            if (project.hasProperty('keystore')) {
-                storeFile file(project.property('keystore.storeFile'))
-                storePassword project.property('keystore.storePassword')
-                keyAlias project.property('keystore.keyAlias')
-                keyPassword project.property('keystore.keyPassword')
-            }
+
+    configurations.all {
+        resolutionStrategy {
+            // Força a resolução de conflitos de versões do Kotlin Stdlib
+            force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22'
+            force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22'
+            force 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22'
         }
     }
 
     buildTypes {
         release {
-            signingConfig signingConfigs.release
             minifyEnabled false
-            // proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
