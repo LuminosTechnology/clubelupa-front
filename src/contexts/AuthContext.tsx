@@ -40,6 +40,12 @@ export const AuthContextProvider: React.FC<Props> = ({ children }) => {
     fetchToken();
   }, []);
 
+  useEffect(() => {
+    if (!!user) {
+      setIsAuthenticated(true);
+    }
+  }, [user]);
+
   return (
     <AuthContext.Provider
       value={{

@@ -1,33 +1,114 @@
 // src/pages/MyPlan/MyPlan.tsx
+import { IonContent, IonPage, IonText } from "@ionic/react";
 import React, { useEffect, useState } from "react";
-import { IonPage, IonContent } from "@ionic/react";
 import { useHistory } from "react-router-dom";
 import AppHeader from "../../components/SimpleHeader";
 
 import {
-  ProfileContainer,
-  AvatarWrapper,
   Avatar,
-  UserName,
-  UserSubInfo,
+  AvatarWrapper,
+  ButtonWrapper,
   InfoText,
   PlanValue,
-  ButtonWrapper,
   PremiumButton,
+  ProfileContainer,
+  UserName,
+  UserSubInfo,
 } from "./MyPlan.style";
 
-import { getUserByToken } from "../../services/auth-service";
-import { User } from "../../services/interfaces/Auth";
-
-import avatarPic from "../../assets/profile-pic.svg";
 import { useAuthContext } from "../../contexts/AuthContext";
+import { Capacitor } from "@capacitor/core";
+import { Purchases } from "@revenuecat/purchases-capacitor";
 
 const MyPlan: React.FC = () => {
-  const history = useHistory();
+  const navigate = useHistory();
+  const [premiumPackage, setPremiumPackage] = useState<any>();
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasPremium, setHasPremium] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const { user } = useAuthContext();
 
-  const handleUpgrade = () => history.push("/myplan/upgrade");
+  const handlePurchase = async () => {
+    if (!premiumPackage) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      if (!window.Purchases) return;
+      const { customerInfo } = await window.Purchases.purchasePackage({
+        aPackage: premiumPackage,
+      });
+      alert("Parabéns! Você possui um plano premium!");
+    } catch (error: any) {
+      if (error.code === "PURCHASE_CANCELLED") {
+      } else {
+        if (error.code === "BILLING_UNAVAILABLE") {
+          setError(
+            "O serviço de compra não está disponível no seu dispositivo. Verifique a conexão com a Play Store."
+          );
+        } else if (error.code === "PRODUCT_NOT_AVAILABLE_FOR_PURCHASE") {
+          setError("O produto não está disponível para compra.");
+        } else {
+          setError(
+            `Erro ao fazer o checkout: ${
+              error.message || error || "Desconhecido"
+            }`
+          );
+        }
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchProductsAndCheckAccess = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    if (!Capacitor.isNativePlatform() || !window.Purchases) {
+      setError("Funcionalidade de assinatura não disponível no dispositivo");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const { customerInfo } = await window.Purchases.getCustomerInfo();
+      const currentPremiumAccess =
+        customerInfo.entitlements.active["socio_premium"];
+      setHasPremium(!!currentPremiumAccess);
+
+      const offerings = await window.Purchases.getOfferings();
+      if (offerings.current && offerings.current.availablePackages.length > 0) {
+        console.log(offerings.current.availablePackages);
+        const foundPremium = offerings.current.availablePackages.find(
+          (p) => p.identifier === "$rc_socio_premium_monthly"
+        );
+
+        if (foundPremium) setPremiumPackage(foundPremium);
+
+        if (!foundPremium) {
+          setError("Nenhum plano Premium encontrado.");
+        }
+      } else {
+        setError("Nenhuma oferta de assinatura encontrada no RevenueCat.");
+      }
+    } catch (err: any) {
+      console.error("Erro ao buscar planos ou status:", err);
+      setError(
+        `Erro ao carregar o plano: ${
+          err instanceof Error ? err.message : String(err) || "Desconhecido"
+        }`
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProductsAndCheckAccess();
+  }, []);
 
   return (
     <IonPage>
@@ -47,7 +128,6 @@ const MyPlan: React.FC = () => {
       <IonContent fullscreen style={{ "--background": "#FFFFFF" } as any}>
         <ProfileContainer>
           <UserName>{user?.nome_completo}</UserName>
-          <UserSubInfo>{user?.cpf}</UserSubInfo>
           <UserSubInfo>{user?.email}</UserSubInfo>
 
           <InfoText>
@@ -55,15 +135,25 @@ const MyPlan: React.FC = () => {
             <br />
             Clube Lupa
           </InfoText>
-          <PlanValue>VALOR DO PLANO: FREE</PlanValue>
+          <PlanValue>
+            MEU PLANO: {hasPremium ? "PREMIUM" : "GRATUITO"}
+          </PlanValue>
 
-          <ButtonWrapper>
-            <PremiumButton onClick={handleUpgrade}>
-              ME TORNAR PREMIUM
-              <br />
-              POR 19,90/ MÊS
-            </PremiumButton>
-          </ButtonWrapper>
+          {error && <IonText color="danger">{error}</IonText>}
+
+          {!hasPremium && (
+            <ButtonWrapper>
+              <PremiumButton onClick={handlePurchase} disabled={isLoading}>
+                {isLoading ? "PROCESSANDO" : "ME TORNAR PREMIUM"}
+                ME TORNAR PREMIUM
+                <br />
+                POR{" "}
+                {premiumPackage
+                  ? `${premiumPackage.product.priceString}/MÊS`
+                  : "..."}
+              </PremiumButton>
+            </ButtonWrapper>
+          )}
         </ProfileContainer>
       </IonContent>
     </IonPage>

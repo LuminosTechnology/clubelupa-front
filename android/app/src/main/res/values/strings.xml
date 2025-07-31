@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">LupaApp</string>
+    <string name="app_name">Clube Lupa</string>
     <string name="title_activity_main">LupaApp</string>
     <string name="package_name">br.com.clubelupa.app</string>
     <string name="custom_url_scheme">br.com.clubelupa.app</string>
