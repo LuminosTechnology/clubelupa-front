@@ -9,8 +9,6 @@ interface AuthContextType {
   loading: boolean;
   user?: User;
   setUser: (value: User) => void;
-  userType: UserRole;
-  setUserType: (value: UserRole) => void;
 }
 
 export const AuthContext = createContext<AuthContextType>(

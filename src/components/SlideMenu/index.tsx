@@ -31,7 +31,7 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
 
   const [user, setUser] = useState<User | null>(null);
   // undefined = carregando | false = sem afiliado | true = tem afiliado
-  const [hasAffiliate, setHasAffiliate] = useState<boolean | undefined>();
+  const [hasAffiliate, setHasAffiliate] = useState<boolean | undefined>(false);
 
   /* ---------- fecha menu quando a rota mudar ----------------- */
   const prevPath = useRef(location.pathname);
@@ -43,26 +43,26 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
   }, [location.pathname, isOpen, onClose]);
 
   /* ---------- carrega usuário + status de afiliado ------------ */
-  useEffect(() => {
-    let mounted = true;
+  // useEffect(() => {
+  //   let mounted = true;
 
-    (async () => {
-      try {
-        const fetchedUser = await getUserByToken();
-        if (mounted) setUser(fetchedUser);
+  //   (async () => {
+  //     try {
+  //       const fetchedUser = await getUserByToken();
+  //       if (mounted) setUser(fetchedUser);
 
-        const affiliate = await getMyFirstAffiliate();
-        if (mounted) setHasAffiliate(!!affiliate); // true | false
-      } catch (err) {
-        console.error("[SlideMenu] Erro ao carregar dados:", err);
-        if (mounted) setHasAffiliate(false);
-      }
-    })();
+  //       const affiliate = await getMyFirstAffiliate();
+  //       if (mounted) setHasAffiliate(!!affiliate); // true | false
+  //     } catch (err) {
+  //       console.error("[SlideMenu] Erro ao carregar dados:", err);
+  //       if (mounted) setHasAffiliate(false);
+  //     }
+  //   })();
 
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  //   return () => {
+  //     mounted = false;
+  //   };
+  // }, []);
 
   /* ---------- logout ----------------------------------------- */
   const handleLogout = async () => {
@@ -109,7 +109,7 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
           ...base,
           {
             label: "Seja um Afiliado",
-            path: "/affiliate/register",
+            path: "/affiliate/paywall",
             enabled: true,
           },
         ];

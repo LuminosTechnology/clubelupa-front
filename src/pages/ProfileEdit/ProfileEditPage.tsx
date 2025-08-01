@@ -34,6 +34,7 @@ import {
 import { User } from "../../services/interfaces/Auth";
 import { Input } from "../../components/FloatingInput/floating.style";
 import { useAuthContext } from "../../contexts/AuthContext";
+import { fetchCep } from "../../services/viacepService";
 
 const ProfileEditPage: React.FC = () => {
   const history = useHistory();
@@ -45,6 +46,8 @@ const ProfileEditPage: React.FC = () => {
     user?.profile_photo || profilePlaceholder
   );
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+
+  const FullProfileInformation = false;
 
   const [form, setForm] = useState<Partial<User>>({
     nome_completo: "",
@@ -123,6 +126,23 @@ const ProfileEditPage: React.FC = () => {
     history.goBack();
   };
 
+  const handleFetchCep = async () => {
+    const value = form.cep;
+    if (!value) return;
+    if (value.replace(/\D/g, "").length !== 8) return;
+    const response = await fetchCep(value);
+    if (response.cep) {
+      setForm({
+        ...form,
+        cep: response.cep,
+        cidade: response.localidade,
+        uf: response.uf,
+        bairro: response.bairro,
+        rua: response.logradouro,
+      });
+    }
+  };
+
   return (
     <IonPage>
       <IonContent
@@ -195,20 +215,6 @@ const ProfileEditPage: React.FC = () => {
                   </FieldWrapper>
 
                   <FieldWrapper>
-                    <label>CPF</label>
-                    <Input
-                      as={InputMask}
-                      mask="999.999.999-99"
-                      maskChar={null}
-                      placeholder="123.456.789-10"
-                      value={form.cpf}
-                      onChange={(e) =>
-                        setForm({ ...form, cpf: e.target.value })
-                      }
-                    />
-                  </FieldWrapper>
-
-                  <FieldWrapper>
                     <label>E-mail</label>
                     <input
                       type="email"
@@ -220,59 +226,87 @@ const ProfileEditPage: React.FC = () => {
                     />
                   </FieldWrapper>
 
+                  <FieldWrapper disabled={!FullProfileInformation}>
+                    <label>CPF</label>
+                    <Input
+                      as={InputMask}
+                      mask="999.999.999-99"
+                      maskChar={null}
+                      placeholder="123.456.789-10"
+                      value={form.cpf}
+                      disabled={!FullProfileInformation}
+                      onChange={(e) =>
+                        setForm({ ...form, cpf: e.target.value })
+                      }
+                    />
+                  </FieldWrapper>
+
                   <CepRow>
-                    <FieldWrapper style={{ flex: 1 }}>
+                    <FieldWrapper
+                      style={{ flex: 1 }}
+                      disabled={!FullProfileInformation}
+                    >
                       <label>CEP</label>
                       <input
                         placeholder="12345-678"
                         value={form.cep}
+                        disabled={!FullProfileInformation}
                         onChange={(e) =>
                           setForm({ ...form, cep: e.target.value })
                         }
                       />
                     </FieldWrapper>
-                    <BuscarButton>BUSCAR</BuscarButton>
+                    <BuscarButton
+                      disabled={!FullProfileInformation}
+                      onClick={handleFetchCep}
+                    >
+                      BUSCAR
+                    </BuscarButton>
                   </CepRow>
 
-                  <FieldWrapper>
+                  <FieldWrapper disabled={!FullProfileInformation}>
                     <label>Rua</label>
                     <input
                       placeholder="Rua Exemplo"
                       value={form.rua}
+                      disabled={!FullProfileInformation}
                       onChange={(e) =>
                         setForm({ ...form, rua: e.target.value })
                       }
                     />
                   </FieldWrapper>
 
-                  <FieldWrapper>
+                  <FieldWrapper disabled={!FullProfileInformation}>
                     <label>Bairro</label>
                     <input
                       placeholder="Bairro Exemplo"
                       value={form.bairro}
+                      disabled={!FullProfileInformation}
                       onChange={(e) =>
                         setForm({ ...form, bairro: e.target.value })
                       }
                     />
                   </FieldWrapper>
 
-                  <FieldWrapper>
+                  <FieldWrapper disabled={!FullProfileInformation}>
                     <label>Cidade</label>
                     <input
                       placeholder="Cidade Exemplo"
                       value={form.cidade}
+                      disabled={!FullProfileInformation}
                       onChange={(e) =>
                         setForm({ ...form, cidade: e.target.value })
                       }
                     />
                   </FieldWrapper>
 
-                  <FieldWrapper>
+                  <FieldWrapper disabled={!FullProfileInformation}>
                     <label>UF</label>
                     <input
                       placeholder="SP"
                       maxLength={2}
                       value={form.uf}
+                      disabled={!FullProfileInformation}
                       onChange={(e) =>
                         setForm({
                           ...form,

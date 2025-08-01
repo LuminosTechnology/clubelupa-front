@@ -1,7 +1,5 @@
 import styled from "styled-components";
 
-
-
 export const ProfileWrapper = styled.div<{ scrolled: boolean }>`
   position: fixed;
   top: 120px;
@@ -63,7 +61,8 @@ export const TitleSection = styled.h2`
   color: #868950;
 `;
 
-export const FieldWrapper = styled.div`
+export const FieldWrapper = styled.div<{ disabled?: boolean }>`
+  opacity: ${({ disabled = false }) => (disabled ? 0.4 : 1)};
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -115,6 +114,9 @@ export const BuscarButton = styled.button`
   cursor: pointer;
   &:active {
     opacity: 0.85;
+  }
+  &:disabled {
+    opacity: 0.4;
   }
 `;
 

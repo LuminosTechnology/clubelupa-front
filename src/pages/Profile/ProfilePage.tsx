@@ -1,7 +1,7 @@
 // src/pages/ProfilePage/ProfilePage.tsx
 import { IonContent, IonPage } from "@ionic/react";
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory } from "react-router";
 import styled from "styled-components";
 import Button from "../../components/Button";
 import AppHeader from "../../components/SimpleHeader";
@@ -38,7 +38,7 @@ const LogoutButton = styled(Button)`
 
 const ProfilePage: React.FC = () => {
   const history = useHistory();
-  const { user, setUser } = useAuthContext();
+  const { user } = useAuthContext();
 
   const handleLogout = async () => {
     await logout();
@@ -55,6 +55,9 @@ const ProfilePage: React.FC = () => {
 
   const goToTalkToUs = () => {
     history.push("/profile/talktous");
+  };
+  const goToChangePassword = () => {
+    history.push("/profile/change-password");
   };
 
   // Escolhe a foto do usuário se existir, senão o placeholder
@@ -88,7 +91,7 @@ const ProfilePage: React.FC = () => {
           </MenuOption>
           <Divider />
 
-          <MenuOption>
+          <MenuOption onClick={goToChangePassword}>
             <MenuIcon src={lockIcon} alt="Ícone Alterar Senha" />
             Alterar Senha
           </MenuOption>

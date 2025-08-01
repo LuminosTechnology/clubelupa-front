@@ -52,6 +52,7 @@ import {
 import { Redirect } from "react-router";
 import { GlobalFonts } from "./styles/GlobalFonts";
 import BecomeAnAffiliatePage from "./pages/BecomeAnAffiliate/BecomeAnAffiliate";
+import ProfileChangePasswordPage from "./pages/ChangePassword/ChangePassword";
 
 declare global {
   interface Window {
@@ -162,6 +163,11 @@ const App: React.FC = () => {
             exact
             path="/profile/edit"
             component={ProfilePageEdit}
+          />
+          <PrivateRoute
+            exact
+            path="/profile/change-password"
+            component={ProfileChangePasswordPage}
           />
           <PrivateRoute
             exact

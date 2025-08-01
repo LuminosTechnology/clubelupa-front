@@ -34,6 +34,7 @@ import footerClose from "../../assets/footer-close.svg";
 import FooterAchievements from "../Footer-Achievements/FooterAchievements";
 import { getUserByToken } from "../../services/auth-service";
 import type { User } from "../../services/interfaces/Auth";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 interface FooterProps {
   userData?: {
@@ -50,17 +51,7 @@ const Footer: React.FC<FooterProps> = ({
   const history = useHistory();
 
   /* ─────────── usuário logado ─────────── */
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  useEffect(() => {
-    (async () => {
-      try {
-        const user = await getUserByToken();
-        setCurrentUser(user);
-      } catch (err) {
-        console.error("[Footer] Falha ao buscar usuário:", err);
-      }
-    })();
-  }, []);
+  const { user } = useAuthContext();
 
   /* ─────────── drawer principal ───────── */
   const minHeight = 80;
@@ -124,9 +115,9 @@ const Footer: React.FC<FooterProps> = ({
   );
 
   const daysUsing = () => {
-    if (!currentUser?.created_at) return 0;
+    if (!user?.created_at) return 0;
     return Math.ceil(
-      Math.abs(Date.now() - new Date(currentUser.created_at).getTime()) /
+      Math.abs(Date.now() - new Date(user.created_at).getTime()) /
         (1000 * 60 * 60 * 24)
     );
   };
@@ -190,8 +181,8 @@ const Footer: React.FC<FooterProps> = ({
         <UserImageContainer $progress={progressPct}>
           <UserImage
             src={
-              currentUser?.avatar_url ||
-              currentUser?.profile_photo ||
+              user?.avatar_url ||
+              user?.profile_photo ||
               "/assets/default-profile-photo.png"
             }
           />
@@ -201,9 +192,7 @@ const Footer: React.FC<FooterProps> = ({
         </UserImageContainer>
 
         {/* nome somente quando expandido */}
-        {isExpanded && (
-          <UserName>{currentUser?.nome_completo ?? "Usuário"}</UserName>
-        )}
+        {isExpanded && <UserName>{user?.nome_completo ?? "Usuário"}</UserName>}
 
         {/* navegação colapsada */}
         {isCollapsed && (
