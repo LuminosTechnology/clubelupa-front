@@ -2,12 +2,15 @@ import { useState, createContext, useContext, useEffect } from "react";
 import { getToken, getUserByToken } from "../services/auth-service";
 import { User } from "../services/interfaces/Auth";
 
+type UserRole = "NORMAL" | "PREMIUM" | "AFFILIATE";
 interface AuthContextType {
   isAuthenticated: boolean;
   setIsAuthenticated: (value: boolean) => void;
   loading: boolean;
   user?: User;
   setUser: (value: User) => void;
+  userType: UserRole;
+  setUserType: (value: UserRole) => void;
 }
 
 export const AuthContext = createContext<AuthContextType>(
@@ -22,6 +25,7 @@ export const AuthContextProvider: React.FC<Props> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User>();
+  const [userType, setUserType] = useState<UserRole>("NORMAL");
 
   const fetchToken = async () => {
     const token = await getToken();

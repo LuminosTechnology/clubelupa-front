@@ -2,8 +2,8 @@
  * Login.tsx
  * ──────────────────────────────────────────── */
 import React, { useState } from "react";
-import { IonPage, IonContent } from "@ionic/react";
-import { useHistory } from "react-router-dom";
+import { IonPage, IonContent, useIonRouter } from "@ionic/react";
+import { useHistory } from "react-router";
 
 import {
   Container,

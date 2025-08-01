@@ -1,33 +1,36 @@
 // src/pages/MyPlan/MyPlan.tsx
 import { IonContent, IonPage, IonText } from "@ionic/react";
 import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import AppHeader from "../../components/SimpleHeader";
 
 import {
   Avatar,
   AvatarWrapper,
+  Benefit,
+  BenefitsContainer,
   ButtonWrapper,
   InfoText,
-  PlanValue,
+  Paragraph,
   PremiumButton,
+  Price,
   ProfileContainer,
+  Title,
   UserName,
   UserSubInfo,
-} from "./MyPlan.style";
+} from "./BecomeAnAffiliate.style";
 
 import { Capacitor } from "@capacitor/core";
 import { useAuthContext } from "../../contexts/AuthContext";
 
-const MyPlan: React.FC = () => {
-  const [premiumPackage, setPremiumPackage] = useState<any>();
+const BecomeAnAffiliatePage: React.FC = () => {
+  const [affiliatePackage, setAffiliatePackage] = useState<any>();
   const [isLoading, setIsLoading] = useState(false);
-  const [hasPremium, setHasPremium] = useState(false);
+  const [hasAffiliate, setHasAffiliate] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { user } = useAuthContext();
-
   const handlePurchase = async () => {
-    if (!premiumPackage) return;
+    if (!affiliatePackage) return;
 
     setIsLoading(true);
     setError(null);
@@ -35,15 +38,15 @@ const MyPlan: React.FC = () => {
     try {
       if (!window.Purchases) return;
       const { customerInfo } = await window.Purchases.purchasePackage({
-        aPackage: premiumPackage,
+        aPackage: affiliatePackage,
       });
-      alert("Parabéns! Você possui um plano premium!");
+      alert("Parabéns! Você tem o Afiliado do Clube Lupa ativo!");
     } catch (error: any) {
       if (error.code === "PURCHASE_CANCELLED") {
       } else {
         if (error.code === "BILLING_UNAVAILABLE") {
           setError(
-            "O serviço de compra não está disponível no seu dispositivo. Verifique a conexão com a Play Store."
+            "O serviço de compra não está disponível no seu dispositivo."
           );
         } else if (error.code === "PRODUCT_NOT_AVAILABLE_FOR_PURCHASE") {
           setError("O produto não está disponível para compra.");
@@ -72,21 +75,21 @@ const MyPlan: React.FC = () => {
 
     try {
       const { customerInfo } = await window.Purchases.getCustomerInfo();
-      const currentPremiumAccess =
-        customerInfo.entitlements.active["socio_premium"];
-      setHasPremium(!!currentPremiumAccess);
+      const currentAffiliateAccess =
+        customerInfo.entitlements.active["afiliado_lupa"];
+      setHasAffiliate(!!currentAffiliateAccess);
 
       const offerings = await window.Purchases.getOfferings();
       if (offerings.current && offerings.current.availablePackages.length > 0) {
         console.log(offerings.current.availablePackages);
-        const foundPremium = offerings.current.availablePackages.find(
-          (p) => p.identifier === "$rc_socio_premium_monthly"
+        const foundAffiliateOffering = offerings.current.availablePackages.find(
+          (p) => p.identifier === "$rc_afiliado_monthly"
         );
 
-        if (foundPremium) setPremiumPackage(foundPremium);
+        if (foundAffiliateOffering) setAffiliatePackage(foundAffiliateOffering);
 
-        if (!foundPremium) {
-          setError("Nenhum plano Premium encontrado.");
+        if (!foundAffiliateOffering) {
+          setError("Nenhum plano encontrado.");
         }
       } else {
         setError("Nenhuma oferta de assinatura encontrada no RevenueCat.");
@@ -110,43 +113,49 @@ const MyPlan: React.FC = () => {
   return (
     <IonPage>
       <AppHeader
-        title="Meu Plano"
+        title="Torne-se um Afiliado"
         backgroundColor="#868950"
         textColor="#FFFFFF"
       />
 
-      <AvatarWrapper>
-        <Avatar
-          src={user?.profile_photo || "/assets/default-profile-photo.png"}
-          alt="Foto de perfil"
-        />
-      </AvatarWrapper>
-
       <IonContent fullscreen style={{ "--background": "#FFFFFF" } as any}>
         <ProfileContainer>
-          <UserName>{user?.nome_completo}</UserName>
-          <UserSubInfo>{user?.email}</UserSubInfo>
-
-          <InfoText>
-            Você faz parte do programa
+          <Title>Torne-se um Afiliado do Clube Lupa</Title>
+          <Paragraph>
+            Com a assinatura Afiliado do Clube Lupa, você impulsiona sua marca e
+            se conecta diretamente com nossos membros.
             <br />
-            Clube Lupa
-          </InfoText>
-          <PlanValue>
-            MEU PLANO: {hasPremium ? "PREMIUM" : "GRATUITO"}
-          </PlanValue>
+            <br />
+            Ao assinar, você terá acesso a:
+          </Paragraph>
+          <BenefitsContainer>
+            <Benefit>
+              Exibição da sua marca dentro do app, visível para todos os
+              usuários;
+            </Benefit>
+            <Benefit>
+              Check-in de clientes no seu estabelecimento, com registro
+              automático;
+            </Benefit>
+            <Benefit>
+              Escaneamento de notas fiscais de produtos comprados pelos seus
+              clientes;
+            </Benefit>
+            <Benefit>
+              Destaque da sua marca no mapa e no Instagram oficial do Clube.
+            </Benefit>
+          </BenefitsContainer>
+          <Paragraph>
+            Tudo isso por <Price>R$ 10,00</Price> por mês. Cancele quando
+            quiser.
+          </Paragraph>
 
           {error && <IonText color="danger">{error}</IonText>}
 
-          {!hasPremium && (
+          {!hasAffiliate && (
             <ButtonWrapper>
               <PremiumButton onClick={handlePurchase} disabled={isLoading}>
-                {isLoading ? "PROCESSANDO" : "ME TORNAR PREMIUM"}
-                <br />
-                POR{" "}
-                {premiumPackage
-                  ? `${premiumPackage.product.priceString}/MÊS`
-                  : "..."}
+                {isLoading ? "PROCESSANDO" : "ATIVAR ASSINATURA"}
               </PremiumButton>
             </ButtonWrapper>
           )}
@@ -156,4 +165,4 @@ const MyPlan: React.FC = () => {
   );
 };
 
-export default MyPlan;
+export default BecomeAnAffiliatePage;

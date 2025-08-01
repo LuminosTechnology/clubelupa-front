@@ -1,0 +1,105 @@
+// src/pages/MyPlan/MyPlan.style.ts
+import styled from "styled-components";
+import Button from "../../components/Button"; // ← import direto do seu components/Button
+
+export const AvatarWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  height: 48px;
+  z-index: 3;
+`;
+
+export const Avatar = styled.img`
+  position: absolute;
+  top: -20px;
+  left: 20px;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+`;
+
+export const ProfileContainer = styled.div`
+  padding: 0 30px;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+`;
+
+export const Paragraph = styled.p`
+  color: black;
+  line-height: 1.2;
+`;
+
+export const Price = styled.span`
+  color: var(--ion-color-primary);
+  font-weight: bold;
+  font-size: 1.2rem;
+`;
+
+export const BenefitsContainer = styled.ul`
+  color: black;
+  padding-left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+export const Benefit = styled.li`
+  line-height: 1.2;
+`;
+
+export const UserName = styled.h2`
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #868950;
+`;
+
+export const UserSubInfo = styled.p`
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  color: #868950;
+`;
+
+export const Title = styled.h1`
+  font-size: 1.5rem;
+  color: #868950;
+  line-height: 1.4;
+`;
+
+export const InfoText = styled.p`
+  margin: 50px 0 0;
+  font-size: 16px;
+  color: #868950;
+  line-height: 1.4;
+`;
+
+export const ButtonWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+`;
+
+/* estendendo seu Button para criar o PremiumButton */
+export const PremiumButton = styled(Button)`
+  /* anula altura fixa */
+  height: auto !important;
+  max-height: none !important;
+
+  /* padding extra para o texto caber */
+  padding: 12px 65px !important;
+
+  /* permite quebra de linha e centraliza */
+  white-space: normal !important;
+  line-height: 1.2;
+  text-align: center !important;
+
+  margin-top: 20px;
+  background-color: #8e9455 !important;
+  color: #ffffff !important;
+  font-weight: 700;
+`;

@@ -65,7 +65,9 @@ const ProfileEditPage: React.FC = () => {
       try {
         setForm({
           nome_completo: user?.nome_completo,
-          data_nascimento: user?.data_nascimento,
+          data_nascimento: user?.data_nascimento
+            ? user.data_nascimento.slice(0, 10)
+            : "",
           telefone: user?.telefone,
           celular: user?.celular,
           cpf: user?.cpf,

@@ -51,6 +51,7 @@ import {
 } from "@revenuecat/purchases-capacitor";
 import { Redirect } from "react-router";
 import { GlobalFonts } from "./styles/GlobalFonts";
+import BecomeAnAffiliatePage from "./pages/BecomeAnAffiliate/BecomeAnAffiliate";
 
 declare global {
   interface Window {
@@ -139,6 +140,11 @@ const App: React.FC = () => {
             exact
             path="/affiliate/area"
             component={AffiliateArea}
+          />
+          <PrivateRoute
+            exact
+            path="/affiliate/paywall"
+            component={BecomeAnAffiliatePage}
           />
           <PrivateRoute
             exact
