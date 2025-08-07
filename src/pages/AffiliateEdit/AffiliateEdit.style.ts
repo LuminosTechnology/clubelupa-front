@@ -1,4 +1,5 @@
 // src/pages/AffiliateEdit/AffiliateEdit.style.ts
+import { IonSelect } from "@ionic/react";
 import styled from "styled-components";
 
 export const ProfileWrapper = styled.div<{ scrolled: boolean }>`
@@ -45,7 +46,6 @@ export const EditOverlay = styled.button`
 
 export const Content = styled.div`
   background: #ffffff;
-  margin-top: 100px; /* espaço para foto fixa + header */
   padding: 20px;
 `;
 
@@ -68,6 +68,58 @@ export const FieldWrapper = styled.div`
   gap: 4px;
 `;
 
+export const UploadPhotoColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+export const UploadLogoColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+
+  p {
+    color: #666;
+    font-size: 1rem;
+  }
+`;
+
+export const UploadImageButton = styled.button`
+  border: none;
+  aspect-ratio: 16/7;
+  width: 100%;
+  background-color: #c8c8c8;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  img {
+    object-fit: fill;
+  }
+`;
+
+export const UploadPersonPhotoButton = styled.button`
+  border: none;
+  aspect-ratio: 1;
+  width: 80%;
+  background-color: #c8c8c8;
+  border-radius: 999px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+  }
+`;
+
 export const TextAreaWrapper = styled(FieldWrapper)`
   textarea {
     background: transparent;
@@ -85,6 +137,29 @@ export const TextAreaWrapper = styled(FieldWrapper)`
   textarea:focus {
     outline: none;
     border-color: #868950;
+  }
+`;
+
+export const AffiliateUpdateRadioContainer = styled.div`
+  display: flex;
+  gap: 1rem;
+
+  ion-radio {
+    --color: var(--ion-color-primary);
+
+    &::part(label) {
+      color: black;
+    }
+  }
+`;
+
+export const CustomSelect = styled(IonSelect)`
+  --highlight-color: white;
+  --background: rgb(0 0 0 / 0.33);
+
+  &::part(icon) {
+    margin-left: 1rem;
+    color: white;
   }
 `;
 

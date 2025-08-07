@@ -35,7 +35,7 @@ const Login: React.FC = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const history = useHistory();
 
-  const { setIsAuthenticated } = useAuthContext();
+  const { setIsAuthenticated, setUser } = useAuthContext();
 
   /* ─────────── helpers ─────────── */
   const validateEmail = (value: string) =>
@@ -62,7 +62,8 @@ const Login: React.FC = () => {
     if (!validateForm()) return;
 
     try {
-      await login({ email, password });
+      const response = await login({ email, password });
+      setUser(response.data.user);
       setIsAuthenticated(true);
       resetForm();
       history.push("/home");

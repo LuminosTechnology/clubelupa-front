@@ -21,15 +21,16 @@ import BackButton from "../../components/BackButton";
 import Link from "../../components/Link";
 
 import { register } from "../../services/auth-service";
+import { RegisterUserRequest } from "../../types/api/user";
 
 const Register: React.FC = () => {
-  const [user, setUser] = useState({
-    nome_completo: "",
-    data_nascimento: "",
-    telefone: "",
+  const [form, setForm] = useState<RegisterUserRequest>({
+    name: "",
     email: "",
+    birth_date: "",
     password: "",
     password_confirmation: "",
+    phone_number: "",
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -39,18 +40,18 @@ const Register: React.FC = () => {
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
-    if (!user.nome_completo) newErrors.nome_completo = "Nome é obrigatório";
-    if (!user.data_nascimento)
-      newErrors.data_nascimento = "Data de nascimento é obrigatória";
-    if (!user.telefone) newErrors.telefone = "Telefone é obrigatório";
-    if (!user.email) newErrors.email = "Email é obrigatório";
-    if (!user.password) newErrors.password = "Senha é obrigatória";
-    if (!user.password_confirmation)
+    if (!form.name) newErrors.name = "Nome é obrigatório";
+    if (!form.birth_date)
+      newErrors.birth_date = "Data de nascimento é obrigatória";
+    if (!form.phone_number) newErrors.phone_number = "Telefone é obrigatório";
+    if (!form.email) newErrors.email = "Email é obrigatório";
+    if (!form.password) newErrors.password = "Senha é obrigatória";
+    if (!form.password_confirmation)
       newErrors.password_confirmation = "Confirmação de senha é obrigatória";
-    if (user.password !== user.password_confirmation)
+    if (form.password !== form.password_confirmation)
       newErrors.password_confirmation = "As senhas não coincidem";
 
-    const birthDate = new Date(user.data_nascimento);
+    const birthDate = new Date(form.birth_date);
     const now = new Date();
 
     const age = now.getFullYear() - birthDate.getFullYear();
@@ -62,17 +63,17 @@ const Register: React.FC = () => {
     const finalAge = hadBirthdayThisYear ? age - 1 : age;
 
     if (finalAge < 18)
-      newErrors.data_nascimento = "Você precisa ter 18 anos para se cadastrar";
+      newErrors.birth_date = "Você precisa ter 18 anos para se cadastrar";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const resetForm = () => {
-    setUser({
-      nome_completo: "",
-      data_nascimento: "",
-      telefone: "",
+    setForm({
+      name: "",
+      birth_date: "",
+      phone_number: "",
       email: "",
       password: "",
       password_confirmation: "",
@@ -84,9 +85,9 @@ const Register: React.FC = () => {
     if (!validateForm()) return;
 
     try {
-      console.log({ user });
-      await register(user);
-      history.push("/register/verify-email", { email: user.email });
+      console.log({ user: form });
+      await register(form);
+      history.push("/register/verify-email", { email: form.email });
       resetForm();
     } catch (error: any) {
       const backendErrors = error.response?.data?.errors || {};
@@ -119,8 +120,8 @@ const Register: React.FC = () => {
           {/* campos */}
           <FloatingInput
             label="Nome Completo"
-            value={user.nome_completo}
-            onChange={(v) => setUser({ ...user, nome_completo: v })}
+            value={form.name}
+            onChange={(v) => setForm({ ...form, name: v })}
             error={!!errors.nome_completo}
           />
           {errors.nome_completo && (
@@ -129,8 +130,8 @@ const Register: React.FC = () => {
 
           <FloatingInput
             label="Data de Nascimento"
-            value={user.data_nascimento}
-            onChange={(v) => setUser({ ...user, data_nascimento: v })}
+            value={form.birth_date}
+            onChange={(v) => setForm({ ...form, birth_date: v })}
             type="date"
             error={!!errors.data_nascimento}
           />
@@ -140,8 +141,8 @@ const Register: React.FC = () => {
 
           <FloatingInput
             label="Telefone"
-            value={user.telefone}
-            onChange={(v) => setUser({ ...user, telefone: v })}
+            value={form.phone_number}
+            onChange={(v) => setForm({ ...form, phone_number: v })}
             error={!!errors.telefone}
             mask="(99)99999-9999"
           />
@@ -149,8 +150,8 @@ const Register: React.FC = () => {
 
           <FloatingInput
             label="Email"
-            value={user.email}
-            onChange={(v) => setUser({ ...user, email: v })}
+            value={form.email}
+            onChange={(v) => setForm({ ...form, email: v })}
             type="email"
             error={!!errors.email}
           />
@@ -158,8 +159,8 @@ const Register: React.FC = () => {
 
           <FloatingInput
             label="Senha"
-            value={user.password}
-            onChange={(v) => setUser({ ...user, password: v })}
+            value={form.password}
+            onChange={(v) => setForm({ ...form, password: v })}
             isPassword
             error={!!errors.password}
           />
@@ -167,8 +168,8 @@ const Register: React.FC = () => {
 
           <FloatingInput
             label="Confirmar Senha"
-            value={user.password_confirmation}
-            onChange={(v) => setUser({ ...user, password_confirmation: v })}
+            value={form.password_confirmation}
+            onChange={(v) => setForm({ ...form, password_confirmation: v })}
             isPassword
             error={!!errors.password_confirmation}
           />

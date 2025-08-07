@@ -6,7 +6,7 @@ import {
   IonSelectOption,
   IonText,
 } from "@ionic/react";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import {
   AffiliateButtonContainer,
@@ -17,6 +17,7 @@ import {
   BaseDataContainer,
   CustomSelect,
   FormDataContainer,
+  FormInputColumns,
   FormInputRow,
   InputLabelContainer,
   SearchCEPButton,
@@ -31,36 +32,26 @@ import FloatingInput from "../../components/FloatingInput";
 // Importa a função que criamos no auth-service
 import { registerAffiliate } from "../../services/auth-service";
 import { fetchCep } from "../../services/viacepService";
+import { RegisterAffiliateRequest } from "../../types/api/affiliate";
+import { Category } from "../../types/api/category";
+import { CategoryService } from "../../services/category-service";
+import { GeocodeService } from "../../services/geocode-service";
 
 const AffiliateRegister: React.FC = () => {
   const history = useHistory();
   const [hasPhysicalAddress, setHasPhysicalAddress] = useState(false);
-  const [hasCodeApproval, setHasCodeApproval] = useState(false);
-  const streetNumberRef = useRef<HTMLInputElement>(null);
-  const [affiliate, setAffiliate] = useState({
-    nome_completo: "",
-    data_nascimento: "",
-    telefone: "",
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [affiliate, setAffiliate] = useState<RegisterAffiliateRequest>({
+    name: "",
     email: "",
-
-    nome_marca: "",
-    categoria: "",
-
-    cep: "",
-    rua: "",
-    numero_endereco: "",
-    complemento: "",
-    bairro: "",
-    cidade: "",
-    uf: "",
-
-    instagram: "",
-    site: "",
-
+    birth_date: "",
     password: "",
     password_confirmation: "",
-
-    codigo_aprovacao: "",
+    phone_number: "",
+    establishment_name: "",
+    category_id: 0,
+    instagram: "",
+    site: "",
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -68,54 +59,129 @@ const AffiliateRegister: React.FC = () => {
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
-    // if (!affiliate.nome_fantasia) {
-    //   newErrors.nome_fantasia = "Nome Fantasia é obrigatório";
-    // }
-
-    if (!affiliate.nome_marca) {
-      newErrors.nome_marca = "Nome da Marca é obrigatório";
+    if (!affiliate.name) {
+      newErrors.name = "Nome é obrigatório";
     }
 
     if (!affiliate.email) {
       newErrors.email = "Email é obrigatório";
     }
-    // if (!affiliate.telefone) {
-    //   newErrors.telefone = "Telefone é obrigatório";
-    // }
 
-    if (hasPhysicalAddress) {
-      if (!affiliate.cep) newErrors.cep = "CEP é obrigatório";
-      if (!affiliate.rua) newErrors.rua = "Rua é obrigatório";
-      if (!affiliate.numero_endereco)
-        newErrors.numeroEndereco = "Número é obrigatório";
-      if (!affiliate.bairro) newErrors.bairro = "Bairro é obrigatório";
-      if (!affiliate.cidade) newErrors.cidade = "Cidade é obrigatório";
-      if (!affiliate.uf) newErrors.uf = "UF é obrigatório";
+    if (!affiliate.birth_date) {
+      newErrors.birth_date = "Data de nascimento é obrigatória";
+    }
+
+    const birthDate = new Date(affiliate.birth_date);
+    const today = new Date();
+
+    let age = today.getFullYear() - birthDate.getFullYear();
+
+    const hasHadBirthdayThisYear =
+      today.getMonth() > birthDate.getMonth() ||
+      (today.getMonth() === birthDate.getMonth() &&
+        today.getDay() >= birthDate.getDay());
+
+    if (!hasHadBirthdayThisYear) {
+      age--;
+    }
+
+    if (age < 18) {
+      newErrors.birth_date = "Você precisa ter 18 anos para se cadastrar";
+    }
+
+    if (!affiliate.password) {
+      newErrors.password = "Senha é obrigatória";
+    }
+
+    if (affiliate.password !== affiliate.password_confirmation) {
+      newErrors.password_confirmation = "As senhas não coincidem";
+    }
+
+    if (!affiliate.establishment_name) {
+      newErrors.establishment_name = "Nome do estabelecimento é obrigatório";
+    }
+
+    if (!affiliate.phone_number) {
+      newErrors.phone_number = "Telefone é obrigatório";
+    }
+
+    if (!affiliate.category_id) {
+      newErrors.category_id = "Categoria é obrigatória";
     }
 
     if (!affiliate.instagram && !affiliate.site) {
-      newErrors.site = "Insira pelo menos um site ou instagram.";
-      newErrors.instagram = "Insira pelo menos um site ou instagram.";
+      newErrors.instagram = "Informe o Instagram ou site";
+      newErrors.site = "Informe o site ou Instagram";
+    }
+
+    if (hasPhysicalAddress && affiliate.address) {
+      const addr = affiliate.address;
+
+      if (!addr.zip_code) newErrors.zip_code = "CEP é obrigatório";
+      if (!addr.street) newErrors.street = "Rua é obrigatória";
+      if (!addr.number) newErrors.number = "Número é obrigatório";
+      if (!addr.neighborhood) newErrors.neighborhood = "Bairro é obrigatório";
+      if (!addr.city) newErrors.city = "Cidade é obrigatória";
+      if (!addr.state) newErrors.state = "Estado (UF) é obrigatório";
     }
 
     setErrors(newErrors);
-    console.log({});
+
     return Object.keys(newErrors).length === 0;
   };
 
   const handleFetchCep = async () => {
-    if (affiliate.cep.replace(/\D/g, "").length !== 8) return;
+    if (!affiliate.address) return;
+    if (!affiliate.address.zip_code) return;
+    const cleanedZipCode = affiliate.address.zip_code.replace(/\D/g, "");
+    if (cleanedZipCode.length !== 8) return;
 
-    const response = await fetchCep(affiliate.cep);
+    const response = await fetchCep(cleanedZipCode);
     if (response.cep) {
       setAffiliate({
         ...affiliate,
-        cep: response.cep,
-        rua: response.logradouro,
-        complemento: response.complemento,
-        bairro: response.bairro,
-        cidade: response.localidade,
-        uf: response.uf,
+        address: {
+          ...affiliate.address,
+          zip_code: response.cep,
+          street: response.logradouro,
+          complement: response.complemento,
+          neighborhood: response.bairro,
+          city: response.localidade,
+          state: response.uf,
+        },
+      });
+      setErrors({});
+    } else {
+      setErrors({
+        street: "Não foi possível encontrar o CEP informado.",
+      });
+    }
+  };
+
+  const fetchCoords = async () => {
+    if (
+      !affiliate.address ||
+      !affiliate.address.street ||
+      !affiliate.address.number ||
+      !affiliate.address.city ||
+      !affiliate.address.state
+    )
+      return;
+    console.log("Tried to fetch coords");
+    try {
+      const coords = await GeocodeService.getCoordsByAddress({
+        street: affiliate.address.street,
+        number: affiliate.address.number,
+        city: affiliate.address.city,
+        state: affiliate.address.state,
+      });
+
+      return coords;
+    } catch (e) {
+      console.error(e);
+      setErrors({
+        street:
+          "Não foi possível encontrar coordenadas para o endereço informado. Por favor, verifique se o endereço está correto. Ou tente novamente mais tarde.",
       });
     }
   };
@@ -124,14 +190,27 @@ const AffiliateRegister: React.FC = () => {
     if (!validateForm()) return;
 
     try {
-      await registerAffiliate({
-        ...affiliate,
-      });
+      if (hasPhysicalAddress) {
+        const coords = await fetchCoords();
+        if (!coords) throw new Error("Coords not found");
+        await registerAffiliate({
+          ...affiliate,
+          address: {
+            ...affiliate.address,
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+          },
+        });
+      } else {
+        await registerAffiliate({
+          ...affiliate,
+        });
+      }
 
       // Se deu tudo certo, vamos para a tela de sucesso
       history.push("/register/verify-email", {
         email: affiliate.email,
-        nextPage: affiliate.codigo_aprovacao //TODO: Implementar verificação de código de aprovação, se correto redirecionar para a tela de approved, senão para pending
+        nextPage: affiliate.auto_approve_code //TODO: Implementar verificação de código de aprovação, se correto redirecionar para a tela de approved, senão para pending
           ? "/register/affiliate/approved/success"
           : "/register/affiliate/pending/success",
       });
@@ -175,31 +254,39 @@ const AffiliateRegister: React.FC = () => {
 
   const resetForm = () => {
     setAffiliate({
-      nome_completo: "",
-      data_nascimento: "",
-      telefone: "",
+      name: "",
       email: "",
-
-      nome_marca: "",
-      categoria: "",
-
-      cep: "",
-      rua: "",
-      numero_endereco: "",
-      complemento: "",
-      bairro: "",
-      cidade: "",
-      uf: "",
-
-      instagram: "",
-      site: "",
-
       password: "",
       password_confirmation: "",
-
-      codigo_aprovacao: "",
+      phone_number: "",
+      establishment_name: "",
+      category_id: 0,
+      instagram: "",
+      site: "",
+      birth_date: "",
+      address: {
+        zip_code: "",
+        street: "",
+        number: "",
+        neighborhood: "",
+        city: "",
+        state: "",
+        complement: "",
+      },
     });
+
+    setErrors({});
+    setHasPhysicalAddress(false);
   };
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const response = await CategoryService.getCategories();
+      setCategories(response.data);
+    };
+
+    fetchCategories();
+  }, []);
 
   return (
     <IonPage>
@@ -215,42 +302,40 @@ const AffiliateRegister: React.FC = () => {
             <BaseDataContainer>
               <FloatingInput
                 label="Nome Completo"
-                value={affiliate.nome_completo}
-                onChange={(v) =>
-                  setAffiliate({ ...affiliate, nome_completo: v })
-                }
-                error={!!errors.nome_completo}
+                value={affiliate.name}
+                onChange={(v) => setAffiliate({ ...affiliate, name: v })}
+                error={!!errors.name}
               />
-              {errors.nome_completo && (
-                <AffiliateErrorMessage>
-                  {errors.nome_completo}
-                </AffiliateErrorMessage>
+              {errors.name && (
+                <AffiliateErrorMessage>{errors.name}</AffiliateErrorMessage>
               )}
 
               <FloatingInput
                 label="Data de Nascimento"
-                value={affiliate.data_nascimento}
-                onChange={(v) =>
-                  setAffiliate({ ...affiliate, data_nascimento: v })
-                }
+                value={affiliate.birth_date}
+                onChange={(v) => setAffiliate({ ...affiliate, birth_date: v })}
                 type="date"
-                error={!!errors.data_nascimento}
+                error={!!errors.birth_date}
               />
-              {errors.data_nascimento && (
+              {errors.birth_date && (
                 <AffiliateErrorMessage>
-                  {errors.data_nascimento}
+                  {errors.birth_date}
                 </AffiliateErrorMessage>
               )}
 
               <FloatingInput
                 label="Telefone"
-                value={affiliate.telefone}
-                onChange={(v) => setAffiliate({ ...affiliate, telefone: v })}
-                error={!!errors.telefone}
+                value={affiliate.phone_number}
+                onChange={(v) =>
+                  setAffiliate({ ...affiliate, phone_number: v })
+                }
+                error={!!errors.phone_number}
                 mask="(99)99999-9999"
               />
-              {errors.telefone && (
-                <AffiliateErrorMessage>{errors.telefone}</AffiliateErrorMessage>
+              {errors.phone_number && (
+                <AffiliateErrorMessage>
+                  {errors.phone_number}
+                </AffiliateErrorMessage>
               )}
 
               <FloatingInput
@@ -269,15 +354,15 @@ const AffiliateRegister: React.FC = () => {
               {/* Nome da Marca */}
               <FloatingInput
                 label="Nome da Marca"
-                value={affiliate.nome_marca}
+                value={affiliate.establishment_name}
                 onChange={(value) =>
-                  setAffiliate({ ...affiliate, nome_marca: value })
+                  setAffiliate({ ...affiliate, establishment_name: value })
                 }
-                error={!!errors.nome_marca}
+                error={!!errors.establishment_name}
               />
-              {errors.nome_marca && (
+              {errors.establishment_name && (
                 <AffiliateErrorMessage>
-                  {errors.nome_marca}
+                  {errors.establishment_name}
                 </AffiliateErrorMessage>
               )}
 
@@ -285,25 +370,23 @@ const AffiliateRegister: React.FC = () => {
                 <IonText color="light">Selecione uma categoria</IonText>
                 <CustomSelect
                   placeholder="Categoria"
-                  value={affiliate.categoria}
+                  value={affiliate.category_id}
                   fill="solid"
                   onIonChange={(e) =>
-                    setAffiliate({ ...affiliate, categoria: e.detail.value })
+                    setAffiliate({ ...affiliate, category_id: e.detail.value })
                   }
                 >
-                  <IonSelectOption value="arte">Arte</IonSelectOption>
-                  <IonSelectOption value="brecho">Brechó</IonSelectOption>
-                  <IonSelectOption value="cosmeticos">
-                    Cosméticos
-                  </IonSelectOption>
-                  <IonSelectOption value="cultura">Cultura</IonSelectOption>
-                  <IonSelectOption value="decoracao">Decoração</IonSelectOption>
-                  <IonSelectOption value="gastronomia">
-                    Gastronomia
-                  </IonSelectOption>
-                  <IonSelectOption value="moda">Moda Autoral</IonSelectOption>
-                  <IonSelectOption value="outros">Serviços</IonSelectOption>
+                  {categories.map((category) => (
+                    <IonSelectOption key={category.id} value={category.id}>
+                      {category.name}
+                    </IonSelectOption>
+                  ))}
                 </CustomSelect>
+                {errors.category_id && (
+                  <AffiliateErrorMessage>
+                    {errors.category_id}
+                  </AffiliateErrorMessage>
+                )}
               </InputLabelContainer>
 
               <InputLabelContainer>
@@ -332,9 +415,15 @@ const AffiliateRegister: React.FC = () => {
                     {/* CEP */}
                     <FloatingInput
                       label="CEP"
-                      value={affiliate.cep}
+                      value={affiliate?.address?.zip_code || ""}
                       onChange={(value) =>
-                        setAffiliate({ ...affiliate, cep: value })
+                        setAffiliate({
+                          ...affiliate,
+                          address: {
+                            ...affiliate.address,
+                            zip_code: value,
+                          },
+                        })
                       }
                       mask="99999-999"
                       error={!!errors.cep}
@@ -355,64 +444,84 @@ const AffiliateRegister: React.FC = () => {
                   {/* Rua */}
                   <FloatingInput
                     label="Rua"
-                    value={affiliate.rua}
+                    value={affiliate?.address?.street || ""}
                     onChange={(value) =>
-                      setAffiliate({ ...affiliate, rua: value })
+                      setAffiliate({
+                        ...affiliate,
+                        address: { ...affiliate.address, street: value },
+                      })
                     }
-                    error={!!errors.rua}
+                    error={!!errors.street}
                   />
-                  {errors.rua && (
-                    <AffiliateErrorMessage>{errors.rua}</AffiliateErrorMessage>
+                  {errors.street && (
+                    <AffiliateErrorMessage>
+                      {errors.street}
+                    </AffiliateErrorMessage>
                   )}
 
                   <FormInputRow>
-                    <>
+                    <FormInputColumns>
                       {/* Numero */}
                       <FloatingInput
                         label="Número"
-                        value={affiliate.numero_endereco}
+                        value={affiliate?.address?.number || ""}
                         onChange={(value) =>
-                          setAffiliate({ ...affiliate, numero_endereco: value })
+                          setAffiliate({
+                            ...affiliate,
+                            address: { ...affiliate.address, number: value },
+                          })
                         }
-                        error={!!errors.numeroEndereco}
+                        error={!!errors.number}
                         type="number"
                       />
-                      {errors.numeroEndereco && (
+                      {errors.number && (
                         <AffiliateErrorMessage>
-                          {errors.numeroEndereco}
+                          {errors.number}
                         </AffiliateErrorMessage>
                       )}
-                    </>
-                    <>
+                    </FormInputColumns>
+                    <FormInputColumns>
                       {/* Complemento */}
                       <FloatingInput
                         label="Complemento"
-                        value={affiliate.complemento}
+                        value={affiliate?.address?.complement || ""}
                         onChange={(value) =>
-                          setAffiliate({ ...affiliate, complemento: value })
+                          setAffiliate({
+                            ...affiliate,
+                            address: {
+                              ...affiliate.address,
+                              complement: value,
+                            },
+                          })
                         }
-                        error={!!errors.complemento}
+                        error={!!errors.complement}
                       />
-                      {errors.complemento && (
+                      {errors.complement && (
                         <AffiliateErrorMessage>
-                          {errors.complemento}
+                          {errors.complement}
                         </AffiliateErrorMessage>
                       )}
-                    </>
+                    </FormInputColumns>
                   </FormInputRow>
 
                   {/* Bairro */}
                   <FloatingInput
                     label="Bairro"
-                    value={affiliate.bairro}
+                    value={affiliate?.address?.neighborhood || ""}
                     onChange={(value) =>
-                      setAffiliate({ ...affiliate, bairro: value })
+                      setAffiliate({
+                        ...affiliate,
+                        address: {
+                          ...affiliate.address,
+                          neighborhood: value,
+                        },
+                      })
                     }
-                    error={!!errors.bairro}
+                    error={!!errors.neighborhood}
                   />
-                  {errors.bairro && (
+                  {errors.neighborhood && (
                     <AffiliateErrorMessage>
-                      {errors.bairro}
+                      {errors.neighborhood}
                     </AffiliateErrorMessage>
                   )}
 
@@ -421,15 +530,21 @@ const AffiliateRegister: React.FC = () => {
                       {/* Cidade */}
                       <FloatingInput
                         label="Cidade"
-                        value={affiliate.cidade}
+                        value={affiliate?.address?.city || ""}
                         onChange={(value) =>
-                          setAffiliate({ ...affiliate, cidade: value })
+                          setAffiliate({
+                            ...affiliate,
+                            address: {
+                              ...affiliate.address,
+                              city: value,
+                            },
+                          })
                         }
-                        error={!!errors.cidade}
+                        error={!!errors.city}
                       />
-                      {errors.cidade && (
+                      {errors.city && (
                         <AffiliateErrorMessage>
-                          {errors.cidade}
+                          {errors.city}
                         </AffiliateErrorMessage>
                       )}
                     </>
@@ -437,15 +552,21 @@ const AffiliateRegister: React.FC = () => {
                       {/* UF */}
                       <FloatingInput
                         label="UF"
-                        value={affiliate.uf}
+                        value={affiliate?.address?.state || ""}
                         onChange={(value) =>
-                          setAffiliate({ ...affiliate, uf: value })
+                          setAffiliate({
+                            ...affiliate,
+                            address: {
+                              ...affiliate.address,
+                              state: value,
+                            },
+                          })
                         }
-                        error={!!errors.uf}
+                        error={!!errors.state}
                       />
-                      {errors.uf && (
+                      {errors.state && (
                         <AffiliateErrorMessage>
-                          {errors.uf}
+                          {errors.state}
                         </AffiliateErrorMessage>
                       )}
                     </>
@@ -456,7 +577,7 @@ const AffiliateRegister: React.FC = () => {
               {/* Site */}
               <FloatingInput
                 label="Site"
-                value={affiliate.site}
+                value={affiliate.site || ""}
                 onChange={(value) =>
                   setAffiliate({
                     ...affiliate,
@@ -527,16 +648,16 @@ const AffiliateRegister: React.FC = () => {
           {/* Código de Pré-aprovação */}
           <FloatingInput
             label="Código de aprovação"
-            value={affiliate.codigo_aprovacao}
+            value={affiliate.auto_approve_code || ""}
             onChange={(value) =>
-              setAffiliate({ ...affiliate, codigo_aprovacao: value })
+              setAffiliate({ ...affiliate, auto_approve_code: value })
             }
-            error={!!errors.codigo_aprovacao}
+            error={!!errors.auto_approve_code}
           />
 
           <AffiliateButtonContainer>
             <Button onClick={handleAffiliateRegister} variant="secondary">
-              {affiliate.codigo_aprovacao
+              {affiliate.auto_approve_code
                 ? "CADASTRAR-SE"
                 : "SOLICITAR APROVAÇÃO"}
             </Button>

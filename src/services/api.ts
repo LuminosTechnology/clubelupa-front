@@ -1,8 +1,9 @@
 import axios from "axios";
 import { getToken } from "./auth-service";
 
-const API_URL =
-  "https://y57yu3j3k2.execute-api.sa-east-1.amazonaws.com/prod/api";
+// const API_URL =
+//   "https://y57yu3j3k2.execute-api.sa-east-1.amazonaws.com/prod/api";
+const API_URL = "https://y57yu3j3k2.execute-api.sa-east-1.amazonaws.com/api/v1";
 
 const api = axios.create({
   baseURL: API_URL,

@@ -2,39 +2,37 @@
  * Footer principal do usuário – V7 + blur + confetes
  * ──────────────────────────────────────────── */
 import React, { useEffect, useRef, useState } from "react";
-import { useLocation, useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 
 import {
-  FooterContainer,
-  UserImageContainer,
-  UserImage,
-  UserName,
-  ExpandedContent,
-  QuickActions,
-  ActionItem,
   ActionIcon,
+  ActionItem,
   ActionTitle,
+  BlurOverlay,
+  CloseFooterBtn,
+  CollapsedNav,
+  ConfettiPiece,
+  CongratsText,
+  ExpandedContent,
+  FooterContainer,
   InfoList,
   LevelBadge,
-  CollapsedNav,
   NavButton,
-  CloseFooterBtn,
-  BlurOverlay,
-  CongratsText,
-  ConfettiPiece,
+  QuickActions,
+  UserImage,
+  UserImageContainer,
+  UserName,
 } from "./footer.style";
 
+import footerClose from "../../assets/footer-close.svg";
+import homeConquistas from "../../assets/home-conquistas.svg";
 import homeHome from "../../assets/home-home.svg";
+import homeLugares from "../../assets/home-lugares.svg";
 import homeLupa from "../../assets/home-lupa.svg";
 import homeNivel from "../../assets/moeda_vazia.png";
-import homeConquistas from "../../assets/home-conquistas.svg";
-import homeLugares from "../../assets/home-lugares.svg";
-import footerClose from "../../assets/footer-close.svg";
 
-import FooterAchievements from "../Footer-Achievements/FooterAchievements";
-import { getUserByToken } from "../../services/auth-service";
-import type { User } from "../../services/interfaces/Auth";
 import { useAuthContext } from "../../contexts/AuthContext";
+import FooterAchievements from "../Footer-Achievements/FooterAchievements";
 
 interface FooterProps {
   userData?: {
@@ -45,7 +43,7 @@ interface FooterProps {
 }
 
 const Footer: React.FC<FooterProps> = ({
-  userData = { nivel: 10, experiencia: 750, proximo_nivel: 1000 },
+  userData = { nivel: 1, experiencia: 0, proximo_nivel: 100 },
 }) => {
   const location = useLocation();
   const history = useHistory();
@@ -111,26 +109,26 @@ const Footer: React.FC<FooterProps> = ({
   /* ─────────── helpers ────────────────── */
   const progressPct = Math.min(
     100,
-    (userData.experiencia! / userData.proximo_nivel!) * 150 // → saturado em 100
+    (userData.experiencia! / userData.proximo_nivel!) * 100 // → saturado em 100
   );
 
   const daysUsing = () => {
     if (!user?.created_at) return 0;
     return Math.ceil(
-      Math.abs(Date.now() - new Date(user.created_at).getTime()) /
+      Math.abs(Date.now() - new Date(user.created_at.default).getTime()) /
         (1000 * 60 * 60 * 24)
     );
   };
 
   /* ─────────── blur / parabéns + confete ─ */
-  const [showBlur, setShowBlur] = useState(false);
+  const [congratsScreen, setCongratsScreen] = useState(false);
 
   useEffect(() => {
     if (progressPct >= 100) {
-      setShowBlur(true);
+      setCongratsScreen(true);
 
       const timer = setTimeout(() => {
-        setShowBlur(false);
+        setCongratsScreen(false);
       }, 3300); // 0,3 s fade-in + 2,7 s visível + 0,3 s fade-out
 
       return () => clearTimeout(timer);
@@ -151,7 +149,7 @@ const Footer: React.FC<FooterProps> = ({
   /* ─────────── render ─────────────────── */
   return (
     <>
-      {showBlur && (
+      {congratsScreen && (
         <BlurOverlay>
           <CongratsText>PARABÉNS!</CongratsText>
 
@@ -180,11 +178,7 @@ const Footer: React.FC<FooterProps> = ({
         {/* foto + anel de nível + moedinha */}
         <UserImageContainer $progress={progressPct}>
           <UserImage
-            src={
-              user?.avatar_url ||
-              user?.profile_photo ||
-              "/assets/default-profile-photo.png"
-            }
+            src={user?.avatar_url || "/assets/default-profile-photo.png"}
           />
           <LevelBadge>
             <img src={homeNivel} alt="Moeda de nível" />
@@ -192,7 +186,7 @@ const Footer: React.FC<FooterProps> = ({
         </UserImageContainer>
 
         {/* nome somente quando expandido */}
-        {isExpanded && <UserName>{user?.nome_completo ?? "Usuário"}</UserName>}
+        {isExpanded && <UserName>{user?.name ?? "Usuário"}</UserName>}
 
         {/* navegação colapsada */}
         {isCollapsed && (

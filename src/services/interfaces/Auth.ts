@@ -1,23 +1,6 @@
 // src/services/interfaces/Auth.ts
-export interface User {
-  id: number;
-  nome_completo: string;
-  data_nascimento: string;
-  telefone: string;
-  celular: string;
-  cpf: string;
-  cep: string;
-  rua: string;
-  bairro: string;
-  cidade: string;
-  uf: string;
-  email: string;
-  email_verified_at: string;
-  created_at: string;
-  updated_at: string;
-  profile_photo?: string; // URL da foto vinda da API
-  avatar_url?: string; // opcional, manter para compatibilidade
-}
+
+import { User } from "../../types/api/api";
 
 export interface LoginUserRequest {
   email: string;
@@ -25,12 +8,12 @@ export interface LoginUserRequest {
 }
 
 export interface LoginUserResponse {
-  access_token: string;
-  token_type: string;
-  refresh_token: string;
+  data: {
+    token: string;
+    user: User;
+  };
   message: string;
-  user: User & { email_verified_at: null | string };
-  role: string;
+  status: number;
 }
 
 export interface ForgotPasswordRequest {

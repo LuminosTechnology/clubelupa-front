@@ -1,23 +1,21 @@
 /* ──────────────────────────────────────────────────────────────
  * src/components/SlideMenu/SlideMenu.tsx
  * ────────────────────────────────────────────────────────────── */
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Preferences } from "@capacitor/preferences";
 import { IonIcon } from "@ionic/react";
 import { close, logOut } from "ionicons/icons";
-import {
-  MenuOverlay,
-  MenuContainer,
-  CloseButton,
-  MenuItems,
-  MenuItem,
-  LogoutButton,
-} from "./SlideMenu.style";
+import React, { useEffect, useMemo, useRef } from "react";
 import { useHistory, useLocation } from "react-router-dom";
-import { logout, getUserByToken } from "../../services/auth-service";
-import { getMyFirstAffiliate } from "../../services/affiliateService";
-import { Preferences } from "@capacitor/preferences";
-import type { User } from "../../services/interfaces/Auth";
 import { useAuthContext } from "../../contexts/AuthContext";
+import { logout } from "../../services/auth-service";
+import {
+  CloseButton,
+  LogoutButton,
+  MenuContainer,
+  MenuItem,
+  MenuItems,
+  MenuOverlay,
+} from "./SlideMenu.style";
 
 interface SlideMenuProps {
   isOpen: boolean;
@@ -27,11 +25,7 @@ interface SlideMenuProps {
 const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
   const history = useHistory();
   const location = useLocation();
-  const { setIsAuthenticated } = useAuthContext();
-
-  const [user, setUser] = useState<User | null>(null);
-  // undefined = carregando | false = sem afiliado | true = tem afiliado
-  const [hasAffiliate, setHasAffiliate] = useState<boolean | undefined>(false);
+  const { setIsAuthenticated, user, setUser } = useAuthContext();
 
   /* ---------- fecha menu quando a rota mudar ----------------- */
   const prevPath = useRef(location.pathname);
@@ -42,33 +36,12 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
     prevPath.current = location.pathname;
   }, [location.pathname, isOpen, onClose]);
 
-  /* ---------- carrega usuário + status de afiliado ------------ */
-  // useEffect(() => {
-  //   let mounted = true;
-
-  //   (async () => {
-  //     try {
-  //       const fetchedUser = await getUserByToken();
-  //       if (mounted) setUser(fetchedUser);
-
-  //       const affiliate = await getMyFirstAffiliate();
-  //       if (mounted) setHasAffiliate(!!affiliate); // true | false
-  //     } catch (err) {
-  //       console.error("[SlideMenu] Erro ao carregar dados:", err);
-  //       if (mounted) setHasAffiliate(false);
-  //     }
-  //   })();
-
-  //   return () => {
-  //     mounted = false;
-  //   };
-  // }, []);
-
   /* ---------- logout ----------------------------------------- */
   const handleLogout = async () => {
     try {
       await logout();
       setIsAuthenticated(false);
+      setUser(undefined);
     } catch (e) {
       console.error("Logout error:", e);
     } finally {
@@ -91,29 +64,22 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
       { label: "Indique e Ganhe", path: "/recommendandwin", enabled: false },
     ];
 
-    // Enquanto carrega, mostramos um placeholder
-    if (hasAffiliate === undefined) {
-      return [
-        ...base,
-        { label: "Carregando…", path: location.pathname, enabled: false },
-      ];
+    if (user?.is_affiliate) {
+      base.push({
+        label: "Área do Afiliado",
+        path: "/affiliate/area",
+        enabled: true,
+      });
+    } else {
+      base.push({
+        label: "Seja um Afiliado",
+        path: "/affiliate/paywall",
+        enabled: true,
+      });
     }
 
-    // Após carregado, acrescenta o item correto
-    return hasAffiliate
-      ? [
-          ...base,
-          { label: "Área do Afiliado", path: "/affiliate/area", enabled: true },
-        ]
-      : [
-          ...base,
-          {
-            label: "Seja um Afiliado",
-            path: "/affiliate/paywall",
-            enabled: true,
-          },
-        ];
-  }, [hasAffiliate, location.pathname]);
+    return base;
+  }, [user, location.pathname]);
 
   /* ---------- render ----------------------------------------- */
   return (

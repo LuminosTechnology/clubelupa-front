@@ -17,6 +17,9 @@ import {
 
 import { affiliates } from "../../contexts/mock";
 import { AffiliateData } from "../../services/interfaces/Affiliate";
+import { Establishment } from "../../types/api/api";
+import { getAllEstablishments } from "../../services/affiliateService";
+import { useDebounce } from "../../hooks/useDebounce";
 
 /* ---------------- extras específicos do mapa ------------------- */
 interface ExtraFields {
@@ -53,40 +56,24 @@ export interface Restaurant extends AffiliateData, ExtraFields {
 interface MapProps {
   apiKey: string;
   onViewMore: (r: Restaurant) => void;
+  searchValue: string;
 }
 
-const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
+const Map: React.FC<MapProps> = ({ apiKey, onViewMore, searchValue }) => {
   // const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(
     null
   );
   const mapRef = useRef<HTMLDivElement>(null);
-  const [selected, setSelected] = useState<Restaurant | null>(null);
+  const [selected, setSelected] = useState<Establishment | undefined>();
   const [map, setMap] = useState<GoogleMap | null>(null);
   const [loading, setLoading] = useState(false);
   const [checkInMessage, setCheckInMessage] = useState<string | null>(null);
 
+  const [establishments, setEstablishments] = useState<Establishment[]>([]);
+
   const DEFAULT_LOCATION = { lat: -25.4415, lng: -49.291 };
   const CHECKIN_RADIUS = 5000000; // m
-
-  /* ─── carrega afiliados ───────────────────────────────────────────────── */
-  // useEffect(() => {
-  //   (async () => {
-  //     try {
-  //       const data = await getAllAffiliates();
-  //       const full = data
-  //         .filter((a) => extraById[a.id])
-  //         .map<Restaurant>((a) => ({
-  //           ...a,
-  //           ...extraById[a.id],
-  //           image: extraById[a.id].image ?? a.foto_perfil ?? sampleImg,
-  //         }));
-  //       setRestaurants(full);
-  //     } catch (err) {
-  //       console.error("[MAP] Falha ao carregar afiliados:", err);
-  //     }
-  //   })();
-  // }, []);
 
   /* ─── localização do usuário ─────────────────────────────────────────── */
   useEffect(() => {
@@ -101,6 +88,15 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
       }
     })();
   }, []);
+  const debouncedSearchValue = useDebounce(searchValue, 300);
+
+  useEffect(() => {
+    const fetchEstablishments = async () => {
+      const response = await getAllEstablishments(debouncedSearchValue);
+      setEstablishments(response.data);
+    };
+    fetchEstablishments();
+  }, [debouncedSearchValue]);
 
   /* ─── inicia o mapa e marcadores ─────────────────────────────────────── */
   useEffect(() => {
@@ -109,6 +105,8 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
 
       const el = mapRef.current;
       if (!el) return;
+
+      if (establishments.length <= 0) return;
 
       console.log("mapRef.current", mapRef.current);
       console.log("typeof mapRef.current", typeof mapRef.current);
@@ -125,7 +123,7 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
           androidLiteMode: false,
           center: userLoc,
 
-          zoom: 15,
+          zoom: 11,
           disableDefaultUI: true,
           clickableIcons: false,
           styles: [
@@ -152,28 +150,53 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
       // });
 
       // markers dos afiliados
-      for (const a of affiliates) {
-        await gMap.addMarker({
-          coordinate: a.location,
-          iconUrl:
-            a.iconType === "green"
-              ? "assets/affiliate_pin.png"
-              : a.iconType === "yellow"
-              ? "assets/affiliate_shack.png"
-              : "assets/affiliate_star.png",
-          iconSize: { width: 40, height: 55 },
-          iconAnchor: { x: 20, y: 55 },
-        });
+      // for (const a of affiliates) {
+      //   await gMap.addMarker({
+      //     coordinate: a.location,
+      //     iconUrl:
+      //       a.iconType === "green"
+      //         ? "assets/affiliate_pin.png"
+      //         : a.iconType === "yellow"
+      //         ? "assets/affiliate_shack.png"
+      //         : "assets/affiliate_star.png",
+      //     iconSize: { width: 40, height: 55 },
+      //     iconAnchor: { x: 20, y: 55 },
+      //   });
+      // }
+
+      for (const e of establishments) {
+        if (e.addresses.length <= 0) continue;
+        const address = e.addresses[0];
+        const location = {
+          lat: Number(address.latitude),
+          lng: Number(address.longitude),
+        };
+        if (address) {
+          await gMap.addMarker({
+            coordinate: location,
+            iconUrl: "assets/affiliate_pin.png",
+            iconSize: { width: 40, height: 55 },
+            iconAnchor: { x: 20, y: 55 },
+          });
+        }
       }
 
       await gMap.setOnMarkerClickListener(async (m) => {
-        const hit = affiliates.find(
-          (r) => r.location.lat === m.latitude && r.location.lng === m.longitude
+        const hit = establishments.find(
+          (e) =>
+            Number(e.addresses[0].latitude) == m.latitude &&
+            Number(e.addresses[0].longitude) == m.longitude
         );
         if (hit) {
-          await gMap.setCamera({ coordinate: hit.location, animate: true });
           setSelected(hit);
           setCheckInMessage(null);
+          await gMap.setCamera({
+            coordinate: {
+              lat: hit.addresses[0].latitude,
+              lng: hit.addresses[0].longitude,
+            },
+            animate: true,
+          });
         }
       });
 
@@ -183,7 +206,7 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
     const timeout = setTimeout(initMap, 300);
 
     return () => clearTimeout(timeout);
-  }, [userLoc, apiKey, mapRef]);
+  }, [userLoc, apiKey, mapRef, establishments, debouncedSearchValue]);
 
   /* ─── check-in ───────────────────────────────────────────────────────── */
   const haversine = (
@@ -203,27 +226,27 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
     return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
   };
 
-  const handleCheckIn = () => {
-    if (!selected || !userLoc) return;
+  // const handleCheckIn = () => {
+  //   if (!selected || !userLoc) return;
 
-    setLoading(true);
-    const d = haversine(
-      userLoc.lat,
-      userLoc.lng,
-      selected.location.lat,
-      selected.location.lng
-    );
+  //   setLoading(true);
+  //   const d = haversine(
+  //     userLoc.lat,
+  //     userLoc.lng,
+  //     selected.addresses[0].latitude,
+  //     selected.addresses[0].longitude
+  //   );
 
-    if (d <= CHECKIN_RADIUS) {
-      setSelected({ ...selected, checkedIn: true });
-      setCheckInMessage("✅ Check-in realizado!");
-    } else {
-      setCheckInMessage("❌ Você está muito longe.");
-    }
+  //   if (d <= CHECKIN_RADIUS) {
+  //     setSelected({ ...selected, checkedIn: true });
+  //     setCheckInMessage("✅ Check-in realizado!");
+  //   } else {
+  //     setCheckInMessage("❌ Você está muito longe.");
+  //   }
 
-    setLoading(false);
-    setTimeout(() => setCheckInMessage(null), 3000);
-  };
+  //   setLoading(false);
+  //   setTimeout(() => setCheckInMessage(null), 3000);
+  // };
 
   /* ─── UI ─────────────────────────────────────────────────────────────── */
   return (
@@ -242,7 +265,7 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
       <RestaurantCard className={!!selected ? "show" : ""}>
         <CloseButton
           onClick={() => {
-            setSelected(null);
+            setSelected(undefined);
             setCheckInMessage(null);
           }}
         >
@@ -252,43 +275,46 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
         {/* imagem de ponta a ponta */}
         <RestaurantInfo>
           <RestaurantImage
-            src={selected?.image}
-            alt={selected?.nome_fantasia}
+            src={selected?.cover_photo_url || "/assets/default-photo.png"}
+            alt={selected?.name}
           />
           <RestaurantDetails>
             {selected && (
               <>
-                <h3>{selected?.nome_local || selected?.nome_fantasia}</h3>
-                <p>{selected?.address}</p>
+                <h3>{selected?.name}</h3>
+                <p>
+                  {selected?.addresses[0]?.street},{" "}
+                  {selected?.addresses[0]?.number}
+                </p>
                 {userLoc && (
                   <p>
                     {Math.round(
                       haversine(
                         userLoc?.lat,
                         userLoc?.lng,
-                        selected!.location.lat,
-                        selected!.location.lng
+                        selected!.addresses[0].latitude,
+                        selected!.addresses[0].longitude
                       ) / 1000
                     )}
                     Km
                   </p>
                 )}
-                <p>{selected?.hours}</p>
+                <p>Horário de funcionamento: </p>
               </>
             )}
             <p>
-              <strong>Vale {selected?.value} pontos</strong>
+              <strong>Vale alguns pontos</strong>
             </p>
           </RestaurantDetails>
         </RestaurantInfo>
 
-        {selected && (
+        {/* {selected && (
           <ViewMoreButton onClick={() => onViewMore(selected)}>
             Ver mais sobre
           </ViewMoreButton>
-        )}
+        )} */}
 
-        {!selected?.checkedIn && (
+        {/* {!selected?.checkedIn && (
           <>
             <CheckInButton onClick={handleCheckIn} disabled={loading}>
               {loading ? "Carregando…" : "Check-in"}
@@ -297,11 +323,11 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore }) => {
               <CheckInMessage>{checkInMessage}</CheckInMessage>
             )}
           </>
-        )}
-
+        )} */}
+        {/* 
         {selected?.checkedIn && (
           <CheckInMessage>✅ Check-in já realizado</CheckInMessage>
-        )}
+        )} */}
       </RestaurantCard>
     </MapWrapper>
   );

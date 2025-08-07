@@ -22,7 +22,7 @@ export const SearchInput = styled.input`
   background: transparent;
   font-family: "Karla", sans-serif;
   font-size: 14px;
-  color: #cbccce;
+  color: black;
   outline: none;
 
   &::placeholder {

@@ -1,11 +1,7 @@
+import { Establishment, PaginatedResponse } from "../types/api/api";
 import api from "./api";
-import { AffiliateData } from "./interfaces/Affiliate";
 import { getToken } from "./auth-service";
-import { Affiliate } from "../types/api/affiliate";
-
-const withAuth = async () => ({
-  headers: { Authorization: `Bearer ${await getToken()}` },
-});
+import { AffiliateData } from "./interfaces/Affiliate";
 
 /** Retorna o primeiro afiliado associado ao token ou null. */
 export const getMyFirstAffiliate = async (): Promise<AffiliateData | null> => {
@@ -25,9 +21,17 @@ export const getMyFirstAffiliate = async (): Promise<AffiliateData | null> => {
   return list.length ? list[0] : null;
 };
 
-export const getAllAffiliates = async () => {
-  const { data } = await api.get<{ affiliates: Affiliate[] }>("/affiliates");
-  return data.affiliates;
+export const getAllEstablishments = async (search?: string | null) => {
+  let params: Record<string, string> = {};
+  if (!!search) params["filter[Search]"] = search;
+
+  const response = await api.get<PaginatedResponse<Establishment[]>>(
+    "/establishments",
+    {
+      params,
+    }
+  );
+  return response.data;
 };
 
 export const getAffiliateById = async (
@@ -60,4 +64,9 @@ export const uploadAffiliatePhoto = async (
     }
   );
   return data;
+};
+
+export const fetchMyEstablishmentData = async (id: number) => {
+  const response = await api.get<Establishment>("/my-establishments/" + id);
+  return response.data;
 };

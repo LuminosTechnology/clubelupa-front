@@ -70,20 +70,13 @@ const ProfilePage: React.FC = () => {
       />
 
       <AvatarWrapper>
-        <Avatar
-          src={
-            user?.avatar_url ||
-            user?.profile_photo ||
-            "/assets/default-profile-photo.png"
-          }
-        />
+        <Avatar src={user?.avatar_url || "/assets/default-profile-photo.png"} />
       </AvatarWrapper>
 
       <IonContent fullscreen style={{ "--background": "#FFFFFF" } as any}>
         <ProfileContainer>
-          <UserName>{user?.nome_completo ?? ""}</UserName>
-          <UserSubInfo>{user?.cpf ?? ""}</UserSubInfo>
-          <UserSubInfo>{user?.email ?? ""}</UserSubInfo>
+          <UserName>{user?.name}</UserName>
+          <UserSubInfo>{user?.email}</UserSubInfo>
 
           <MenuOption primary onClick={goToEditProfile}>
             <MenuIcon src={editIcon} alt="Ícone Editar Perfil" />

@@ -1,40 +1,39 @@
 // src/pages/ProfileEditPage/ProfileEditPage.tsx
-import React, { useState, useEffect, useRef } from "react";
-import { IonPage, IonContent } from "@ionic/react";
+import { IonContent, IonPage } from "@ionic/react";
+import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 
 import InputMask from "react-input-mask";
 
-import AppHeader from "../../components/SimpleHeader";
-import ScrollArea from "../../components/ScrollArea/ScrollArea";
 import profilePlaceholder from "../../assets/default-profile-photo.png";
+import ScrollArea from "../../components/ScrollArea/ScrollArea";
+import AppHeader from "../../components/SimpleHeader";
 
 import {
-  Content,
-  ProfileWrapper,
-  PhotoContainer,
-  ProfilePhoto,
-  EditOverlay,
-  EditContainer,
-  TitleSection,
-  FieldWrapper,
-  CepRow,
   BuscarButton,
-  SaveButtonWrapper,
+  CepRow,
+  Content,
+  EditContainer,
+  EditOverlay,
+  FieldWrapper,
   GreenLabelTheme,
   InputTextTheme,
+  PhotoContainer,
+  ProfilePhoto,
+  ProfileWrapper,
   SalvarButton,
+  SaveButtonWrapper,
+  TitleSection,
 } from "./ProfileEditPage.style";
 
-import {
-  getUserByToken,
-  updateUserProfile,
-  updateProfilePhoto,
-} from "../../services/auth-service";
-import { User } from "../../services/interfaces/Auth";
 import { Input } from "../../components/FloatingInput/floating.style";
 import { useAuthContext } from "../../contexts/AuthContext";
+import {
+  updateProfilePhoto,
+  updateUserProfile,
+} from "../../services/auth-service";
 import { fetchCep } from "../../services/viacepService";
+import { UpdateUserRequest } from "../../types/api/user";
 
 const ProfileEditPage: React.FC = () => {
   const history = useHistory();
@@ -43,46 +42,40 @@ const ProfileEditPage: React.FC = () => {
   const { setUser, user } = useAuthContext();
   const [scrolled, setScrolled] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string>(
-    user?.profile_photo || profilePlaceholder
+    user?.avatar_url || profilePlaceholder
   );
   const [photoFile, setPhotoFile] = useState<File | null>(null);
 
   const FullProfileInformation = false;
 
-  const [form, setForm] = useState<Partial<User>>({
-    nome_completo: "",
-    data_nascimento: "",
-    telefone: "",
-    celular: "",
-    cpf: "",
+  const [form, setForm] = useState<UpdateUserRequest>({
+    address: {
+      zip_code: "",
+      street: "",
+      number: undefined,
+      neighborhood: "",
+      city: "",
+      state: "",
+    },
+    birth_date: "",
+    phone_number: "",
     email: "",
-    cep: "",
-    rua: "",
-    bairro: "",
-    cidade: "",
-    uf: "",
+    name: "",
+    avatar: undefined,
   });
 
   useEffect(() => {
     (async () => {
       try {
         setForm({
-          nome_completo: user?.nome_completo,
-          data_nascimento: user?.data_nascimento
-            ? user.data_nascimento.slice(0, 10)
-            : "",
-          telefone: user?.telefone,
-          celular: user?.celular,
-          cpf: user?.cpf,
+          ...form,
+          name: user?.name,
           email: user?.email,
-          cep: user?.cep,
-          rua: user?.rua,
-          bairro: user?.bairro,
-          cidade: user?.cidade,
-          uf: user?.uf,
+          birth_date: user?.birth_date?.default.slice(0, 10),
+          phone_number: user?.phone_number,
         });
 
-        setPhotoUrl(user?.profile_photo ?? profilePlaceholder);
+        setPhotoUrl(user?.avatar_url ?? profilePlaceholder);
       } catch (err) {
         console.error("Erro ao carregar usuário:", err);
       }
@@ -100,22 +93,15 @@ const ProfileEditPage: React.FC = () => {
 
   const handleSave = async () => {
     try {
-      const updatedUser = await updateUserProfile(form);
-
-      let newProfilePhotoUrl = updatedUser.profile_photo;
-      if (photoFile) {
-        const newUrl = await updateProfilePhoto(photoFile);
-        newProfilePhotoUrl = `${newUrl}?cb=${Date.now()}`;
-        // atualiza localmente para preview imediato
-        setPhotoUrl(`${newUrl}?cb=${Date.now()}`);
-      }
-      console.log(newProfilePhotoUrl);
+      const updatedUser = await updateUserProfile({
+        ...form,
+        avatar: photoFile || undefined,
+      });
 
       setUser({
         ...user,
         ...updatedUser,
-        profile_photo: newProfilePhotoUrl,
-        avatar_url: newProfilePhotoUrl,
+        avatar: photoFile,
       });
     } catch (err) {
       console.error("Erro ao salvar perfil/foto:", err);
@@ -127,18 +113,22 @@ const ProfileEditPage: React.FC = () => {
   };
 
   const handleFetchCep = async () => {
-    const value = form.cep;
+    const value = form?.address?.zip_code;
     if (!value) return;
     if (value.replace(/\D/g, "").length !== 8) return;
     const response = await fetchCep(value);
     if (response.cep) {
       setForm({
         ...form,
-        cep: response.cep,
-        cidade: response.localidade,
-        uf: response.uf,
-        bairro: response.bairro,
-        rua: response.logradouro,
+        address: {
+          ...form.address,
+          zip_code: response.cep,
+          street: response.logradouro,
+          complement: response.complemento,
+          neighborhood: response.bairro,
+          city: response.localidade,
+          state: response.uf,
+        },
       });
     }
   };
@@ -185,9 +175,9 @@ const ProfileEditPage: React.FC = () => {
                     <label>Nome Completo</label>
                     <input
                       placeholder="Nome Completo"
-                      value={form.nome_completo}
+                      value={form?.name}
                       onChange={(e) =>
-                        setForm({ ...form, nome_completo: e.target.value })
+                        setForm({ ...form, name: e.target.value })
                       }
                     />
                   </FieldWrapper>
@@ -196,9 +186,9 @@ const ProfileEditPage: React.FC = () => {
                     <label>Data de Nascimento</label>
                     <input
                       type="date"
-                      value={form.data_nascimento}
+                      value={form.birth_date}
                       onChange={(e) =>
-                        setForm({ ...form, data_nascimento: e.target.value })
+                        setForm({ ...form, birth_date: e.target.value })
                       }
                     />
                   </FieldWrapper>
@@ -207,9 +197,9 @@ const ProfileEditPage: React.FC = () => {
                     <label>Telefone</label>
                     <input
                       placeholder="(11) 91234-5678"
-                      value={form.telefone}
+                      value={form.phone_number}
                       onChange={(e) =>
-                        setForm({ ...form, telefone: e.target.value })
+                        setForm({ ...form, phone_number: e.target.value })
                       }
                     />
                   </FieldWrapper>
@@ -249,10 +239,16 @@ const ProfileEditPage: React.FC = () => {
                       <label>CEP</label>
                       <input
                         placeholder="12345-678"
-                        value={form.cep}
+                        value={form?.address?.zip_code}
                         disabled={!FullProfileInformation}
                         onChange={(e) =>
-                          setForm({ ...form, cep: e.target.value })
+                          setForm({
+                            ...form,
+                            address: {
+                              ...form.address,
+                              zip_code: e.target.value,
+                            },
+                          })
                         }
                       />
                     </FieldWrapper>
@@ -268,10 +264,13 @@ const ProfileEditPage: React.FC = () => {
                     <label>Rua</label>
                     <input
                       placeholder="Rua Exemplo"
-                      value={form.rua}
+                      value={form?.address?.street}
                       disabled={!FullProfileInformation}
                       onChange={(e) =>
-                        setForm({ ...form, rua: e.target.value })
+                        setForm({
+                          ...form,
+                          address: { ...form.address, street: e.target.value },
+                        })
                       }
                     />
                   </FieldWrapper>
@@ -280,10 +279,16 @@ const ProfileEditPage: React.FC = () => {
                     <label>Bairro</label>
                     <input
                       placeholder="Bairro Exemplo"
-                      value={form.bairro}
+                      value={form?.address?.neighborhood}
                       disabled={!FullProfileInformation}
                       onChange={(e) =>
-                        setForm({ ...form, bairro: e.target.value })
+                        setForm({
+                          ...form,
+                          address: {
+                            ...form.address,
+                            neighborhood: e.target.value,
+                          },
+                        })
                       }
                     />
                   </FieldWrapper>
@@ -292,10 +297,13 @@ const ProfileEditPage: React.FC = () => {
                     <label>Cidade</label>
                     <input
                       placeholder="Cidade Exemplo"
-                      value={form.cidade}
+                      value={form?.address?.city}
                       disabled={!FullProfileInformation}
                       onChange={(e) =>
-                        setForm({ ...form, cidade: e.target.value })
+                        setForm({
+                          ...form,
+                          address: { ...form.address, city: e.target.value },
+                        })
                       }
                     />
                   </FieldWrapper>
@@ -305,12 +313,12 @@ const ProfileEditPage: React.FC = () => {
                     <input
                       placeholder="SP"
                       maxLength={2}
-                      value={form.uf}
+                      value={form?.address?.state}
                       disabled={!FullProfileInformation}
                       onChange={(e) =>
                         setForm({
                           ...form,
-                          uf: e.target.value.toUpperCase().slice(0, 2),
+                          address: { ...form.address, state: e.target.value },
                         })
                       }
                     />

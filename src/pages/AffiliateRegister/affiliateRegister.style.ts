@@ -183,6 +183,12 @@ export const FormInputRow = styled.div`
   gap: 0.5rem;
 `;
 
+export const FormInputColumns = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
 export const SearchCEPButton = styled(IonButton)`
   --background: white;
   --color: var(--orange);

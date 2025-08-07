@@ -17,12 +17,13 @@ import {
   StoreListContainer,
 } from "./AffiliateStoresPage.style";
 
-import { getAllAffiliates } from "../../services/affiliateService";
+import { getAllEstablishments } from "../../services/affiliateService";
 import { AffiliateData } from "../../services/interfaces/Affiliate";
 
 import sampleImg from "../../assets/sample-store.png";
 import AppHeader from "../../components/SimpleHeader";
-import { Affiliate } from "../../types/api/affiliate";
+import { Establishment } from "../../types/api/api";
+import { useDebounce } from "../../hooks/useDebounce";
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 interface CardStore {
@@ -49,10 +50,11 @@ const AffiliateStoresPage: React.FC = () => {
   const history = useHistory();
   const firstLetters = new Set<string>();
 
-  const [affiliates, setAffiliates] = useState<Affiliate[]>([]);
+  const [establishments, setEstablishments] = useState<Establishment[]>([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
+  const debouncedSearchValue = useDebounce(query, 300);
 
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
 
@@ -88,27 +90,13 @@ const AffiliateStoresPage: React.FC = () => {
 
   /* ─── carrega da API ───────────────────────────────────────────── */
   useEffect(() => {
-    (async () => {
-      try {
-        const data = await getAllAffiliates();
-        setAffiliates(data);
-      } catch (err: any) {
-        setError(
-          err?.response?.data?.message ??
-            "Não foi possível carregar os afiliados."
-        );
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+    const fetchEstablishments = async () => {
+      const response = await getAllEstablishments(debouncedSearchValue);
+      setEstablishments(response.data);
+    };
 
-  /* ─── filtro local ─────────────────────────────────────────────── */
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return affiliates;
-    return affiliates.filter((s) => s.nome_marca.toLowerCase().includes(q));
-  }, [affiliates, query]);
+    fetchEstablishments();
+  }, [debouncedSearchValue]);
 
   const scrollToLetter = (letter: string) => {
     console.log({ letter });
@@ -147,8 +135,8 @@ const AffiliateStoresPage: React.FC = () => {
         <SearchBar value={query} onChange={setQuery} placeholder="Procurar" />
         <RowContainer>
           <StoreListContainer>
-            {filtered.map((s) => {
-              const firstLetter = s.nome_marca.charAt(0).toUpperCase();
+            {establishments.map((establishment) => {
+              const firstLetter = establishment.name.charAt(0).toUpperCase();
               let sectionId;
 
               if (!firstLetters.has(firstLetter)) {
@@ -158,15 +146,30 @@ const AffiliateStoresPage: React.FC = () => {
 
               return (
                 <StoreCard
-                  key={s.id}
+                  key={establishment.id}
                   id={sectionId}
-                  onClick={() => history.push(`/affiliate-view/${s.id}`)}
+                  onClick={() =>
+                    history.push(`/affiliate-view/${establishment.id}`)
+                  }
                 >
-                  <StoreImage src={sampleImg} alt={s.nome_marca} />
+                  <StoreImage
+                    src={
+                      establishment.cover_photo_url ??
+                      "/assets/default-photo.png"
+                    }
+                    alt={establishment.name}
+                  />
 
-                  <StoreInfo style={{ background: "#E6C178" }}>
-                    <StoreLine>{s.nome_marca}</StoreLine>
-                    {!!s.categoria && <StoreLine>{s.categoria}</StoreLine>}
+                  <StoreInfo
+                    style={{
+                      background:
+                        establishment.categories[0]?.color ?? "#E6C178",
+                    }}
+                  >
+                    <StoreLine>{establishment.name}</StoreLine>
+                    {!!establishment.categories[0] && (
+                      <StoreLine>{establishment.categories[0].name}</StoreLine>
+                    )}
                     {/* {!!s.horario && <StoreLine>{s.schedule}</StoreLine>} */}
                     {/* {!!s.benefits && <StoreLine>{s.benefits}</StoreLine>} */}
                   </StoreInfo>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   HeaderContainer,
   BarWrapper,
@@ -6,14 +6,19 @@ import {
   SearchIcon,
   SearchInput,
   MenuIcon,
-} from './header.style';
-import SlideMenu from '../SlideMenu';
+} from "./header.style";
+import SlideMenu from "../SlideMenu";
 
-import newSearchIcon from '../../assets/new_search.svg';
-import newMenuIcon   from '../../assets/new_menu.svg';
+import newSearchIcon from "../../assets/new_search.svg";
+import newMenuIcon from "../../assets/new_menu.svg";
+import { search } from "ionicons/icons";
+type Props = {
+  onSearchChange: (value: string) => void;
+};
 
-const Header: React.FC = () => {
+const Header: React.FC<Props> = ({ onSearchChange }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
 
   return (
     <>
@@ -22,7 +27,14 @@ const Header: React.FC = () => {
           {/* input com borda preta */}
           <SearchWrapper>
             <SearchIcon src={newSearchIcon} alt="Buscar" />
-            <SearchInput placeholder="O que você procura hoje?" />
+            <SearchInput
+              placeholder="O que você procura hoje?"
+              onChange={(e) => {
+                setSearchValue(e.target.value);
+                onSearchChange(e.target.value);
+              }}
+              value={searchValue}
+            />
           </SearchWrapper>
 
           {/* ícone de menu */}

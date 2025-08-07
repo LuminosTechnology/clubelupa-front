@@ -1,14 +1,13 @@
-import React, { useEffect, useMemo, useState } from "react";
 import { IonContent, IonPage } from "@ionic/react";
-import Header from "../../components/Header";
-import Map from "../../components/Map";
-import { getUserByToken } from "../../services/auth-service";
-import Footer from "../../components/Footer";
+import React, { useEffect, useMemo, useState } from "react";
+import { useHistory } from "react-router";
 import AffiliateFooter from "../../components/AffiliateFooter";
 import CheckinSuccessFooter from "../../components/CheckinSuccessFooter";
+import Footer from "../../components/Footer";
+import Header from "../../components/Header";
 import type { Restaurant } from "../../components/Map";
-import { User } from "../../services/interfaces/Auth";
-import { useHistory } from "react-router";
+import Map from "../../components/Map";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
 
@@ -18,30 +17,15 @@ if (!GOOGLE_MAPS_API_KEY) {
 
 const Home: React.FC = () => {
   const history = useHistory();
-  const [userData, setUserData] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuthContext();
 
   const [selectedAffiliate, setSelectedAffiliate] = useState<Restaurant | null>(
     null
   );
 
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
 
-  /* ─── usuário ─────────────────────────────────────────────────── */
-  useEffect(() => {
-    (async () => {
-      try {
-        const user = await getUserByToken();
-        setUserData(user);
-      } catch (err) {
-        console.error("Error fetching user data:", err);
-        setError("Failed to load user data");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   /* ─── remove aria-hidden que o Google Maps injeta ──────────────── */
   useEffect(() => {
@@ -79,20 +63,20 @@ const Home: React.FC = () => {
     );
   }, [selectedAffiliate]);
 
-  /* ─── adaptador para o AffiliateFooter (espera .name) ──────────── */
   const affiliateForFooter = useMemo(() => {
     if (!selectedAffiliate) return null;
     return {
       ...selectedAffiliate,
-      name: affiliateDisplayName, // garante compatibilidade
+      name: affiliateDisplayName,
     };
   }, [selectedAffiliate, affiliateDisplayName]);
 
   return (
     <IonPage>
       <IonContent>
-        <Header />
+        <Header onSearchChange={setSearchValue} />
         <Map
+          searchValue={searchValue}
           apiKey={GOOGLE_MAPS_API_KEY}
           onViewMore={(affiliate) => {
             history.push(`/affiliate-view/${affiliate.id}`);
@@ -101,27 +85,19 @@ const Home: React.FC = () => {
         />
 
         {/* Footer padrão do usuário */}
-        {userData && !affiliateForFooter && !showSuccess && (
-          <Footer
-            userData={{
-              experiencia: 1,
-              proximo_nivel: 1000,
-              profile_photo: userData.profile_photo,
-            }}
-          />
-        )}
-
+        {user && !affiliateForFooter && !showSuccess && <Footer />}
+        {/* 
         <AffiliateFooter
-          visible={!!affiliateForFooter && !showSuccess}
+          visible={true}
           affiliate={affiliateForFooter}
           onClose={() => setSelectedAffiliate(null)}
           onAction={() =>
             history.push(`/affiliate-view/${affiliateForFooter.id}`)
           }
-        />
+        /> */}
 
         {/* Footer de sucesso de check-in */}
-        {affiliateForFooter && showSuccess && (
+        {/* {affiliateForFooter && showSuccess && (
           <CheckinSuccessFooter
             affiliateName={affiliateDisplayName}
             coinsEarned={affiliateForFooter.value}
@@ -134,7 +110,7 @@ const Home: React.FC = () => {
               setSelectedAffiliate(null);
             }}
           />
-        )}
+        )} */}
       </IonContent>
     </IonPage>
   );
