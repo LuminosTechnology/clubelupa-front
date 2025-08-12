@@ -52,19 +52,24 @@ const AffiliateEdit: React.FC = () => {
   const history = useHistory();
   const [scrolled, setScrolled] = useState(false);
 
-  const [logoFile, setLogoFile] = useState<File | undefined>(undefined);
-  const logoFileRef = useRef<HTMLInputElement>(null);
-  const [logoUrl, setLogoUrl] = useState<string>();
-
-  const [coverPhotoFile, setCoverPhotoFile] = useState<File | undefined>(
+  const [shopPhotoFile, setShopPhotoFile] = useState<File | undefined>(
     undefined
   );
-  const coverPhotoFileRef = useRef<HTMLInputElement>(null);
-  const [coverPhotoUrl, setCoverPhotoUrl] = useState<string>();
+  const shopPhotoFileRef = useRef<HTMLInputElement>(null);
+  const [shopPhotoUrl, setShopPhotoUrl] = useState<string>();
 
-  const [galleryFile, setGalleryFile] = useState<File | undefined>(undefined);
-  const galleryFileRef = useRef<HTMLInputElement>(null);
-  const [galleryUrl, setGalleryUrl] = useState<string>();
+  const [productPhotoFile, setProductPhotoFile] = useState<File | undefined>(
+    undefined
+  );
+  const productPhotoFileRef = useRef<HTMLInputElement>(null);
+  const [productPhotoUrl, setProductPhotoUrl] = useState<string>();
+
+  const [behindTheScenesPhotoFile, setBehindTheScenesPhotoFile] = useState<
+    File | undefined
+  >(undefined);
+  const behindTheScenesFileRef = useRef<HTMLInputElement>(null);
+  const [behindTheScenesPhotoUrl, setBehindTheScenesPhotoUrl] =
+    useState<string>();
 
   const [hasPhysicalAddress, setHasPhysicalAddress] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -138,23 +143,23 @@ const AffiliateEdit: React.FC = () => {
         setHasPhysicalAddress(true);
       }
 
-      setLogoUrl(establishment.logo_url);
-      setCoverPhotoUrl(establishment.cover_photo_url);
-      setGalleryUrl(establishment.gallery_urls[0].url);
+      setShopPhotoUrl(establishment.shop_photo_url);
+      setProductPhotoUrl(establishment.product_photo_url);
+      setBehindTheScenesPhotoUrl(establishment.behind_the_scenes_photo_url);
     };
 
     fetchEstablishment();
   }, []);
 
-  const onLogoClick = () => logoFileRef.current?.click();
-  const onCoverPhotoClick = () => coverPhotoFileRef.current?.click();
-  const onGalleryClick = () => galleryFileRef.current?.click();
+  const onLogoClick = () => shopPhotoFileRef.current?.click();
+  const onCoverPhotoClick = () => productPhotoFileRef.current?.click();
+  const onGalleryClick = () => behindTheScenesFileRef.current?.click();
 
   const onLogoChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setLogoFile(file);
-    setLogoUrl(URL.createObjectURL(file));
+    setShopPhotoFile(file);
+    setShopPhotoUrl(URL.createObjectURL(file));
   };
 
   const onCoverPhotoChange: React.ChangeEventHandler<HTMLInputElement> = (
@@ -162,15 +167,15 @@ const AffiliateEdit: React.FC = () => {
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setCoverPhotoFile(file);
-    setCoverPhotoUrl(URL.createObjectURL(file));
+    setProductPhotoFile(file);
+    setProductPhotoUrl(URL.createObjectURL(file));
   };
 
   const onGalleryChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setGalleryFile(file);
-    setGalleryUrl(URL.createObjectURL(file));
+    setBehindTheScenesPhotoFile(file);
+    setBehindTheScenesPhotoUrl(URL.createObjectURL(file));
   };
 
   const handleFetchCep = async () => {
@@ -237,9 +242,9 @@ const AffiliateEdit: React.FC = () => {
     const data = {
       ...form,
       address,
-      logo: logoFile,
-      cover_photo: coverPhotoFile,
-      gallery: galleryFile,
+      shop_photo: shopPhotoFile,
+      product_photo: productPhotoFile,
+      behind_the_scenes_photo: behindTheScenesPhotoFile,
     };
 
     console.log(data);
@@ -547,7 +552,7 @@ const AffiliateEdit: React.FC = () => {
                     <UploadLogoColumn>
                       <input
                         type="file"
-                        ref={coverPhotoFileRef}
+                        ref={productPhotoFileRef}
                         style={{ display: "none" }}
                         onChange={onCoverPhotoChange}
                       />
@@ -556,7 +561,7 @@ const AffiliateEdit: React.FC = () => {
                       </p>
                       <UploadImageButton onClick={onCoverPhotoClick}>
                         <img
-                          src={coverPhotoUrl || "/assets/default-photo.png"}
+                          src={productPhotoUrl || "/assets/default-photo.png"}
                           alt="Foto da marca"
                         />
                       </UploadImageButton>
@@ -568,7 +573,7 @@ const AffiliateEdit: React.FC = () => {
                     <UploadLogoColumn>
                       <input
                         type="file"
-                        ref={logoFileRef}
+                        ref={shopPhotoFileRef}
                         style={{ display: "none" }}
                         onChange={onLogoChange}
                       />
@@ -577,7 +582,7 @@ const AffiliateEdit: React.FC = () => {
                       </p>
                       <UploadImageButton onClick={onLogoClick}>
                         <img
-                          src={logoUrl || "/assets/default-photo.png"}
+                          src={shopPhotoUrl || "/assets/default-photo.png"}
                           alt="Foto da marca"
                         />
                       </UploadImageButton>
@@ -589,7 +594,7 @@ const AffiliateEdit: React.FC = () => {
                     <UploadLogoColumn>
                       <input
                         type="file"
-                        ref={galleryFileRef}
+                        ref={behindTheScenesFileRef}
                         style={{ display: "none" }}
                         onChange={onGalleryChange}
                       />
@@ -599,7 +604,10 @@ const AffiliateEdit: React.FC = () => {
                       </p>
                       <UploadPersonPhotoButton onClick={onGalleryClick}>
                         <img
-                          src={galleryUrl || "/assets/default-photo.png"}
+                          src={
+                            behindTheScenesPhotoUrl ||
+                            "/assets/default-photo.png"
+                          }
                           alt="Foto da marca"
                         />
                       </UploadPersonPhotoButton>

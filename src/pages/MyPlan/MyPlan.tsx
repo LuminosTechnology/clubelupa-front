@@ -117,14 +117,14 @@ const MyPlan: React.FC = () => {
 
       <AvatarWrapper>
         <Avatar
-          src={user?.profile_photo || "/assets/default-profile-photo.png"}
+          src={user?.avatar_url || "/assets/default-profile-photo.png"}
           alt="Foto de perfil"
         />
       </AvatarWrapper>
 
       <IonContent fullscreen style={{ "--background": "#FFFFFF" } as any}>
         <ProfileContainer>
-          <UserName>{user?.nome_completo}</UserName>
+          <UserName>{user?.name}</UserName>
           <UserSubInfo>{user?.email}</UserSubInfo>
 
           <InfoText>

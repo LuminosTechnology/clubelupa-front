@@ -142,14 +142,12 @@ export interface Establishment {
   whatsapp_number?: string;
   social_links: Record<string?, string>;
   opening_hours: Record<string?, string>;
-  logo_url?: string;
-  cover_photo_url?: string;
-  gallery_urls: { id: number; url: string }[];
   is_active: boolean;
   is_favorited_by_me: boolean;
   is_checked_in_by_me_last_hour: boolean;
   has_ever_been_checked_in_by_me: boolean;
   is_checked_in_by_me_last_hour: boolean;
+  checkins_count: number;
   approved_status: string;
   approved_status_text: string;
   created_at?: FormattedDate;
@@ -162,6 +160,9 @@ export interface Establishment {
     site: string;
     instagram: string;
   };
+  shop_photo_url?: string;
+  product_photo_url?: string;
+  behind_the_scenes_photo_url?: string;
 }
 
 export interface QueryParams {

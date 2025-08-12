@@ -83,9 +83,10 @@ export const updateEstablishment = async ({
     }
   }
 
-  if (data.logo) formData.append("logo", data.logo);
-  if (data.cover_photo) formData.append("cover_photo", data.cover_photo);
-  if (data.gallery) formData.append("gallery[]", data.gallery);
+  if (data.shop_photo) formData.append("shop_photo", data.shop_photo);
+  if (data.product_photo) formData.append("product_photo", data.product_photo);
+  if (data.behind_the_scenes_photo)
+    formData.append("behind_the_scenes_photo", data.behind_the_scenes_photo);
 
   const response = await api.post(`/my-establishments/${id}`, formData, {
     headers: {
@@ -105,13 +106,8 @@ export const logout = async () => {
     return;
   }
   console.log("[Auth Service] Logging out with token:", token);
-  const response = await api.post(
-    "/logout",
-    {},
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
-  console.log("[Auth Service] Logout response:", response.data);
-  await Preferences.remove({ key: AUTH_TOKEN_KEY });
+  const response = await api.post("/logout");
+
   console.log("[Auth Service] Token removed successfully, logout complete");
 };
 
@@ -168,4 +164,12 @@ export const updateUserProfile = async (userData: UpdateUserRequest) => {
 
 export const updateProfilePhoto = async (file: File): Promise<string> => {
   throw new Error("Not implemented");
+};
+
+export const deleteAccount = async ({ password }: { password: string }) => {
+  const response = await api.post(`/user/delete`, {
+    password,
+  });
+
+  return response.data;
 };

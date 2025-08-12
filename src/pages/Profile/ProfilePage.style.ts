@@ -1,4 +1,5 @@
-import styled from 'styled-components';
+import { IonContent, IonHeader, IonToolbar } from "@ionic/react";
+import styled from "styled-components";
 
 /* ------ Avatar sobreposto ao header ------ */
 export const AvatarWrapper = styled.div`
@@ -45,8 +46,18 @@ export const MenuOption = styled.p<{ primary?: boolean }>`
   align-items: center;
   font-size: 16px;
   color: #868950;
-  margin: ${({ primary }) => (primary ? '58px 0 0 0' : '12px 0 0 0')};
+  margin: ${({ primary }) => (primary ? "58px 0 0 0" : "12px 0 0 0")};
   cursor: pointer;
+`;
+
+export const DeleteAccountOption = styled.p<{ primary?: boolean }>`
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  color: var(--ion-color-danger);
+  margin: ${({ primary }) => (primary ? "58px 0 0 0" : "12px 0 0 0")};
+  cursor: pointer;
+  margin-top: 2rem;
 `;
 
 export const MenuIcon = styled.img`
@@ -69,4 +80,47 @@ export const LogoutWrapper = styled.div`
   margin: 70px 0 0 0;
   display: flex;
   justify-content: center;
+`;
+
+export const PasswordInput = styled.input`
+  background-color: transparent;
+  border: 1px solid black;
+  font-size: 1.2rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+`;
+
+export const DeleteAccountModalContent = styled(IonContent)`
+  display: flex;
+  flex-direction: column;
+
+  --background: white;
+  --color: black;
+`;
+export const DeleteAccountModalHeader = styled(IonHeader)``;
+export const DeleteAccountModalToolbar = styled(IonToolbar)`
+  --background: var(--ion-color-danger);
+  --color: white;
+`;
+
+export const DeleteAccountColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  padding: 1rem;
+
+  p {
+    margin: 0;
+  }
+`;
+
+export const DeleteButton = styled.button`
+  background-color: var(--ion-color-danger);
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 0.75rem 2rem;
+  border-radius: 999px;
 `;

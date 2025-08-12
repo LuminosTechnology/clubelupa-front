@@ -94,7 +94,7 @@ const AffiliateView: React.FC = () => {
 
       console.log({ myLocation: userLocation.coords });
 
-      const DISTANCE_THRESHOLD = 100;
+      const DISTANCE_THRESHOLD = 200;
       setCanCheckIn(distance < DISTANCE_THRESHOLD);
     };
 
@@ -121,7 +121,7 @@ const AffiliateView: React.FC = () => {
           </SpinnerContainer>
         ) : (
           <ScrollArea>
-            <PhotoHeader image={data?.cover_photo_url || ""}>
+            <PhotoHeader image={data?.product_photo_url || ""}>
               <BackButtonWrapper color={color} onClick={() => history.goBack()}>
                 <BackButton src={backButtonVerde} alt="Voltar" />
               </BackButtonWrapper>

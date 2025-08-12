@@ -19,6 +19,7 @@ import {
   TermsLink,
   RegisterAffiliateLink,
 } from "./login.style";
+import { Browser } from "@capacitor/browser";
 
 import FloatingInput from "../../components/FloatingInput";
 import Link from "../../components/Link";
@@ -87,6 +88,12 @@ const Login: React.FC = () => {
   const handleRegister = () => history.push("/register");
   const handleRegisterAffiliate = () => history.push("/register/affiliate");
 
+  const handleDeleteAccountByWeb = async () => {
+    await Browser.open({
+      url: "https://app.clubelupa.com.br/request-account-deletion",
+    });
+  };
+
   /* ─────────── UI ─────────── */
   return (
     <IonPage>
@@ -125,6 +132,11 @@ const Login: React.FC = () => {
               </Link>
             </ForgotPasswordWrapper>
 
+            <ForgotPasswordWrapper>
+              <Link onClick={handleDeleteAccountByWeb}>
+                Excluir minha conta via web
+              </Link>
+            </ForgotPasswordWrapper>
             <LoginButtonWrapper>
               <Button onClick={handleLogin}>ENTRAR</Button>
             </LoginButtonWrapper>
@@ -155,18 +167,6 @@ const Login: React.FC = () => {
               Quero cadastrar minha marca
             </RegisterAffiliateLink>
           </RegisterContainer>
-
-          {errors.form && (
-            <ErrorMessage
-              style={{
-                fontSize: 16,
-                fontWeight: "bold",
-                textAlign: "center",
-              }}
-            >
-              {errors.form}
-            </ErrorMessage>
-          )}
         </Container>
       </IonContent>
     </IonPage>

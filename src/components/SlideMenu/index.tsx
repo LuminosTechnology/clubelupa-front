@@ -40,6 +40,7 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
   const handleLogout = async () => {
     try {
       await logout();
+      history.replace("/login");
       setIsAuthenticated(false);
       setUser(undefined);
     } catch (e) {
@@ -47,7 +48,6 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
     } finally {
       await Preferences.remove({ key: "auth_token" });
       onClose();
-      history.replace("/login");
     }
   };
 

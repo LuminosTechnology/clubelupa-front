@@ -125,7 +125,7 @@ const AffiliateStoresPage: React.FC = () => {
                 >
                   <StoreImage
                     src={
-                      establishment.cover_photo_url ??
+                      establishment.shop_photo_url ??
                       "/assets/default-photo.png"
                     }
                     alt={establishment.name}

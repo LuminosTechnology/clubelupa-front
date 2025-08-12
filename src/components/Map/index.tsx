@@ -211,7 +211,7 @@ const Map: React.FC<MapProps> = ({ apiKey, searchValue }) => {
 
         <RestaurantInfo>
           <RestaurantImage
-            src={selected?.cover_photo_url || "/assets/default-photo.png"}
+            src={selected?.product_photo_url || "/assets/default-photo.png"}
             alt={selected?.name}
           />
           <RestaurantDetails>

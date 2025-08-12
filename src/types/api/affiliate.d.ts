@@ -35,14 +35,19 @@ export interface UpdateAffiliateEstablishmentRequest {
   document_number?: string /**CNPJ */;
   company_age?: string;
   business_model?: string;
+
   email?: string;
   phone_number?: string;
   whatsapp_number?: string;
+
   category_id?: number;
+
   address: Partial<CreateAddress>;
-  logo?: File;
-  cover_photo?: File;
-  gallery?: File;
+
   instagram?: string;
   site?: string;
+
+  shop_photo?: File;
+  product_photo?: File;
+  behind_the_scenes_photo?: File;
 }
