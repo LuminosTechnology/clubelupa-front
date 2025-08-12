@@ -1,32 +1,40 @@
-import React, { useCallback, useMemo, useState } from "react";
-import { IonPage, IonContent } from "@ionic/react";
+import { IonContent, IonPage, IonSpinner, IonToast } from "@ionic/react";
+import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import {
-  ScrollArea,
-  PhotoHeader,
-  BackButtonWrapper,
-  BackButton,
-  InfoContainer,
-  TitleWrapper,
-  Title,
-  LikeButton,
-  Description,
-  CTAButton,
-  Section,
-  SectionTitle,
-  SectionText,
-  LinkRow,
-  LinkIcon,
-  LinkText,
-  PlainLinkRow,
-  PlainLink,
-  ConfettiPiece
-} from "./AffiliateView.style";
 import backButtonVerde from "../../assets/arrow-left.svg";
-import heartIcon from "../../assets/like.svg";
-import InstaIcon from "../../components/icons/InstaIcon";
-import { affiliates } from "../../contexts/mock";
+import HeartIcon from "../../assets/like.svg?react";
 import CheckinSuccessFooter from "../../components/CheckinSuccessFooter";
+import InstaIcon from "../../components/icons/InstaIcon";
+import {
+  doCheckIn,
+  fetchSingleEstablishmentData,
+  toggleFavorite,
+} from "../../services/affiliateService";
+import { Establishment } from "../../types/api/api";
+import {
+  BackButton,
+  BackButtonWrapper,
+  CTAButton,
+  Description,
+  InfoContainer,
+  LikeButton,
+  LinkIcon,
+  LinkRow,
+  LinkText,
+  PhotoHeader,
+  PlainLink,
+  PlainLinkRow,
+  ScrollArea,
+  Section,
+  SectionText,
+  SectionTitle,
+  SpinnerContainer,
+  Title,
+  TitleWrapper,
+} from "./AffiliateView.style";
+import { haversine } from "../../utils/haversine";
+import { Geolocation } from "@capacitor/geolocation";
+import { AxiosError } from "axios";
 
 interface Params {
   id: string;
@@ -35,138 +43,196 @@ interface Params {
 const AffiliateView: React.FC = () => {
   const history = useHistory();
   const { id } = useParams<Params>();
-  const mockData = affiliates.find(a => a.id === Number(id));
-  const [liked, setLiked] = useState(false);
+  const [data, setData] = useState<Establishment | undefined>();
+  const [favorite, setFavorite] = useState(false);
   const [animating, setAnimating] = useState(false);
-  const [showFooter, setShowFooter] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
+  const [showCheckIn, setShowCheckIn] = useState(false);
+  const [canCheckIn, setCanCheckIn] = useState(true);
+  const [cantCheckIn, setCantCheckIn] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(
+    undefined
+  );
 
-  const color = "#E6C178";
-  const img = mockData?.image || "";
-  const name = mockData?.nome_fantasia || "";
-  const category = mockData?.category?.join(", ") || "N/|";
-  const schedule = mockData?.hours || "";
+  const color = data?.categories[0]?.color || "#E6C178";
 
-  const handleLike = useCallback(() => {
-    setAnimating(true);
-    setLiked(v => !v);
-    setTimeout(() => setAnimating(false), 300);
-  }, []);
-
-  const handleCheckin = () => {
-    setShowFooter(true);
-    setShowConfetti(true);
-    setTimeout(() => setShowConfetti(false), 3500);
+  const handleCheckIn = async () => {
+    try {
+      await doCheckIn(Number(id));
+      setShowCheckIn(true);
+    } catch (e) {
+      if (e instanceof AxiosError) {
+        if (e.status === 429) {
+          const message =
+            e?.response?.data.message || "Erro ao realizar check-in";
+          setErrorMessage(message);
+          setCantCheckIn(true);
+        }
+      }
+      console.error("Erro ao fazer check-in:", e);
+    }
   };
 
-  const confettiPieces = useMemo(() => {
-    if (!showConfetti) return [];
-    const amount = 60;
-    const colors = ["#FF4D4F", "#40A9FF", "#73D13D", "#FAAD14", "#EB2F96", "#13C2C2"];
-    const minDur = 1800;
-    const maxDur = 3200;
-    const delaySpread = 400;
-    return Array.from({ length: amount }).map((_, i) => {
-      const left = Math.random() * 100;
-      const size = 6 + Math.random() * 10;
-      const colorPiece = colors[i % colors.length];
-      const duration = minDur + Math.random() * (maxDur - minDur);
-      const delay = Math.random() * delaySpread;
-      return { left, size, colorPiece, duration, delay, key: i };
-    });
-  }, [showConfetti]);
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!id) return;
+      const response = await fetchSingleEstablishmentData(Number(id));
+      setData(response.data);
+      setFavorite(response.data.is_favorited_by_me);
+
+      const userLocation = await Geolocation.getCurrentPosition({
+        enableHighAccuracy: true,
+      });
+
+      const distance = haversine(
+        userLocation.coords.latitude,
+        userLocation.coords.longitude,
+        response.data.addresses[0].latitude,
+        response.data.addresses[0].longitude
+      );
+
+      console.log("distance:", distance);
+
+      console.log({ myLocation: userLocation.coords });
+
+      const DISTANCE_THRESHOLD = 100;
+      setCanCheckIn(distance < DISTANCE_THRESHOLD);
+    };
+
+    fetchData();
+  }, []);
+
+  const handleFavorite = async () => {
+    setAnimating(true);
+    setTimeout(() => setAnimating(false), 300);
+    try {
+      await toggleFavorite(Number(id));
+      setFavorite((v) => !v);
+    } catch (e) {
+      setFavorite((v) => !v);
+    }
+  };
 
   return (
     <IonPage>
       <IonContent fullscreen style={{ "--background": "#ffffff" } as any}>
-        <ScrollArea>
-          <PhotoHeader image={img}>
-            <BackButtonWrapper color={color} onClick={() => history.goBack()}>
-              <BackButton src={backButtonVerde} alt="Voltar" />
-            </BackButtonWrapper>
-          </PhotoHeader>
+        {!data ? (
+          <SpinnerContainer>
+            <IonSpinner color={"primary"} />
+          </SpinnerContainer>
+        ) : (
+          <ScrollArea>
+            <PhotoHeader image={data?.cover_photo_url || ""}>
+              <BackButtonWrapper color={color} onClick={() => history.goBack()}>
+                <BackButton src={backButtonVerde} alt="Voltar" />
+              </BackButtonWrapper>
+            </PhotoHeader>
 
-          <InfoContainer>
-            <TitleWrapper>
-              <Title color={color}>{name}</Title>
-              <LikeButton onClick={handleLike} liked={liked} animate={animating}>
-                <img src={heartIcon} alt="Coração" />
-              </LikeButton>
-            </TitleWrapper>
+            <InfoContainer>
+              <TitleWrapper>
+                <Title color={color}>{data?.name}</Title>
+                <LikeButton
+                  color={color}
+                  onClick={handleFavorite}
+                  liked={favorite}
+                  animate={animating}
+                >
+                  <HeartIcon />
+                </LikeButton>
+              </TitleWrapper>
 
-            {!!category && (
+              {data?.categories.length > 0 &&
+                data?.categories.map((c, i) => (
+                  <Section key={i}>
+                    <SectionTitle color={color}>Categoria</SectionTitle>
+                    <SectionText>{c.name}</SectionText>
+                  </Section>
+                ))}
+              {/* 
               <Section>
-                <SectionTitle color={color}>Categoria</SectionTitle>
-                <SectionText>{category}</SectionText>
-              </Section>
-            )}
+                <SectionTitle color={color}>Estrutura</SectionTitle>
+                <SectionText>Física e online</SectionText>
+              </Section> */}
 
-            <Section>
-              <SectionTitle color={color}>Estrutura</SectionTitle>
-              <SectionText>Física e online</SectionText>
-            </Section>
+              {data?.addresses.length > 0 && (
+                <Section>
+                  <SectionTitle color={color}>Endereço</SectionTitle>
+                  <SectionText>
+                    {data?.addresses[0].street}, {data?.addresses[0].number}
+                  </SectionText>
+                </Section>
+              )}
 
-            <Section>
-              <SectionTitle color={color}>Endereço</SectionTitle>
-              <SectionText>{mockData?.address}</SectionText>
-            </Section>
+              {/* {!!schedule && (
+                <Section>
+                  <SectionTitle color={color}>
+                    Horário de atendimento
+                  </SectionTitle>
+                  <SectionText>{schedule}</SectionText>
+                </Section>
+              )} */}
 
-            {!!schedule && (
-              <Section>
-                <SectionTitle color={color}>Horário de atendimento</SectionTitle>
-                <SectionText>{schedule}</SectionText>
-              </Section>
-            )}
+              {data?.description && (
+                <Section>
+                  <SectionTitle color={color}>Sobre nós</SectionTitle>
+                  <Description>{data?.description}</Description>
+                </Section>
+              )}
 
-            <Section>
-              <SectionTitle color={color}>Sobre nós</SectionTitle>
-              <Description>{mockData?.description}</Description>
-            </Section>
+              {data?.social_links.instagram && (
+                <LinkRow>
+                  <LinkIcon color={color}>
+                    <InstaIcon size={18} />
+                  </LinkIcon>
+                  <LinkText
+                    href={`https://instagram.com/${data?.social_links.instagram}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    color={color}
+                  >
+                    Acesse o instagram
+                  </LinkText>
+                </LinkRow>
+              )}
 
-            <LinkRow>
-              <LinkIcon color={color}>
-                <InstaIcon size={18} />
-              </LinkIcon>
-              <LinkText href={`https://instagram.com/@`} target="_blank" rel="noopener noreferrer" color={color}>
-                Acesse o instagram
-              </LinkText>
-            </LinkRow>
+              {data?.social_links.website && (
+                <PlainLinkRow>
+                  <PlainLink href="#" target="_blank" color={color}>
+                    Acesse o site
+                  </PlainLink>
+                </PlainLinkRow>
+              )}
 
-            <PlainLinkRow>
-              <PlainLink href="#" target="_blank" color={color}>
-                Acesse o site
-              </PlainLink>
-            </PlainLinkRow>
+              <CTAButton
+                bg={color}
+                onClick={handleCheckIn}
+                disabled={!canCheckIn}
+              >
+                FAZER CHECK-IN
+              </CTAButton>
+              <CTAButton
+                bg={color}
+                onClick={() => history.push("/affiliate/scanner")}
+              >
+                ESCANEAR NOTA
+              </CTAButton>
+            </InfoContainer>
+          </ScrollArea>
+        )}
 
-            <CTAButton bg={color} onClick={handleCheckin}>
-              FAZER CHECK-IN
-            </CTAButton>
-            <CTAButton bg={color} onClick={() => history.push("/affiliate/scanner")}>
-              ESCANEAR NOTA
-            </CTAButton>
-          </InfoContainer>
-        </ScrollArea>
-
-        {showConfetti &&
-          confettiPieces.map(p => (
-            <ConfettiPiece
-              key={p.key}
-              left={p.left}
-              size={p.size}
-              color={p.colorPiece}
-              duration={p.duration}
-              delay={p.delay}
-            />
-          ))}
-
-        {showFooter && (
+        {showCheckIn && (
           <CheckinSuccessFooter
-            affiliateName={name}
-            coinsEarned={50}
-            onRedeem={() => {}}
-            onClose={() => setShowFooter(false)}
+            isOpen={showCheckIn}
+            onClose={() => setShowCheckIn(false)}
           />
         )}
+
+        <IonToast
+          isOpen={cantCheckIn}
+          message={errorMessage}
+          color="warning"
+          duration={5000}
+          onDidDismiss={() => setCantCheckIn(false)}
+        />
       </IonContent>
     </IonPage>
   );

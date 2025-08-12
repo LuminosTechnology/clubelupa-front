@@ -53,18 +53,19 @@ export const RestaurantInfo = styled.div`
 
 export const RestaurantImage = styled.img`
   width: 100%;
-  height: 140px; /* ↓ altura */
+  aspect-ratio: 16/9;
   object-fit: cover;
 `;
 
 export const RestaurantDetails = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  padding: 10px;
+  gap: 0.5rem;
+  padding: 0.5rem;
 
   h3 {
-    font-size: 14px; /* ↓ */
+    font-size: 1.2rem;
+    font-weight: bold;
     color: #333;
     margin: 0;
     white-space: nowrap;
@@ -73,7 +74,7 @@ export const RestaurantDetails = styled.div`
   }
 
   p {
-    font-size: 11px; /* ↓ */
+    font-size: 1rem;
     color: #666;
     margin: 0;
     white-space: nowrap;
@@ -83,16 +84,16 @@ export const RestaurantDetails = styled.div`
 `;
 
 export const ViewMoreButton = styled.button`
-  margin: 0 10px 10px;
-  height: 32px; /* ↓ */
   background: var(--ion-color-primary);
   border: none;
   border-radius: 100px;
   color: #fff;
-  font-size: 13px; /* ↓ */
+  font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
   transition: opacity 0.2s;
+  padding: 0.75rem;
+  text-transform: uppercase;
 
   &:hover {
     opacity: 0.9;

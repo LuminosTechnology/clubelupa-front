@@ -59,7 +59,7 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
       { label: "Afiliados", path: "/affiliates", enabled: true },
       { label: "Troca de Moedas Lupa", path: "/lupacoins", enabled: false },
       { label: "Meu Plano", path: "/myplan", enabled: true },
-      { label: "Meus Favoritos", path: "/favorites", enabled: false },
+      { label: "Meus Favoritos", path: "/favorites", enabled: true },
       { label: "Histórico", path: "/experience", enabled: false },
       { label: "Indique e Ganhe", path: "/recommendandwin", enabled: false },
     ];
@@ -99,8 +99,13 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
               enabled={item.enabled}
               key={item.path}
               onClick={() => {
+                const isHome = history.location.pathname === "/home";
                 if (item.enabled) {
-                  history.push(item.path);
+                  if (isHome) {
+                    history.push(item.path);
+                  } else {
+                    history.replace(item.path);
+                  }
                   onClose();
                 }
               }}

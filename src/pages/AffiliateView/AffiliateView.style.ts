@@ -1,5 +1,13 @@
 import styled, { keyframes, css } from "styled-components";
 
+export const SpinnerContainer = styled.div`
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+`;
+
 export const ScrollArea = styled.div`
   height: 100%;
   overflow-y: auto;
@@ -10,7 +18,7 @@ export const PhotoHeader = styled.div<{ image: string }>`
   position: relative;
   height: 280px;
   width: 100%;
-  background: url(${p => p.image}) center/cover no-repeat;
+  background: url(${(p) => p.image}) center/cover no-repeat;
   border-bottom-left-radius: 35px;
   border-bottom-right-radius: 35px;
 `;
@@ -49,6 +57,7 @@ const bump = keyframes`
 export const LikeButton = styled.button.attrs({ type: "button" })<{
   liked: boolean;
   animate: boolean;
+  color: string;
 }>`
   background: transparent;
   border: none;
@@ -58,11 +67,11 @@ export const LikeButton = styled.button.attrs({ type: "button" })<{
   outline: none;
   -webkit-tap-highlight-color: transparent;
 
-  img {
+  svg {
     width: 38px;
     height: 38px;
-    filter: ${({ liked }) => (liked ? "none" : "grayscale(100%)")};
-    transition: filter 200ms ease-in-out;
+    color: ${({ liked, color }) => (liked ? color : "#666")};
+    transition: all 200ms ease-in-out;
 
     ${({ animate }) =>
       animate &&
@@ -108,6 +117,11 @@ export const CTAButton = styled.button<{ bg: string }>`
   font-weight: 700;
   text-align: center;
   cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 `;
 
 export const Section = styled.div`
@@ -186,12 +200,14 @@ export const HistoryRow = styled.div`
   margin-bottom: 4px;
 `;
 export const HistoryIcon = styled(LinkIcon)``;
+
 export const HistTitle = styled.h3<{ color: string }>`
   font-size: 14px;
   font-weight: 700;
   color: ${({ color }) => color};
   margin: 0;
 `;
+
 export const HistText = styled.p`
   font-size: 16px;
   color: #666;
@@ -199,9 +215,9 @@ export const HistText = styled.p`
   margin: 0;
 `;
 
-const fall = keyframes`
+const fall = (turns: number) => keyframes`
   0% { transform: translateY(-120vh) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(110vh) rotate(720deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(${360 * turns}deg); opacity: 1; }
 `;
 
 export const ConfettiPiece = styled.div<{
@@ -210,16 +226,19 @@ export const ConfettiPiece = styled.div<{
   duration: number;
   size: number;
   color: string;
+  turns: number;
+  showConfetti: boolean;
 }>`
   position: fixed;
-  top: -10vh;
+  top: -1rem;
   left: ${({ left }) => left}%;
   width: ${({ size }) => size}px;
   height: ${({ size }) => size * 0.4}px;
   background: ${({ color }) => color};
-  opacity: 1;
   z-index: 9999;
-  animation: ${fall} ${({ duration }) => duration}ms linear ${({ delay }) => delay}ms forwards;
+  animation: ${({ turns }) => fall(turns)} ${({ duration }) => duration}ms
+    linear ${({ delay }) => delay}ms forwards;
+  opacity: ${({ showConfetti }) => (showConfetti ? 1 : 0)};
   border-radius: 2px;
   pointer-events: none;
 `;

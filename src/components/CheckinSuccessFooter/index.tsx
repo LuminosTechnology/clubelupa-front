@@ -1,26 +1,31 @@
 // src/components/CheckinSuccessFooter/index.tsx
-import React, { useRef, useState, useEffect, useMemo } from 'react';
+import React, { useEffect, useRef, useState } from "react";
+import footerClose from "../../assets/footer-close.svg";
+import voucherSvg from "../../assets/moeda-checkin.svg";
 import {
-  Shell,
-  FooterContainer,
-  WhiteLine,
-  IconContainer,
-  Title,
-  Subtitle,
-  InfoText,
   CloseBtn,
-  ConfettiPiece
-} from './checkinSuccessFooter.style';
-import voucherSvg from '../../assets/moeda-checkin.svg';
-import footerClose from '../../assets/footer-close.svg';
+  FooterContainer,
+  IconContainer,
+  InfoText,
+  Shell,
+  Subtitle,
+  Title,
+  WhiteLine,
+} from "./checkinSuccessFooter.style";
+import { Confetti } from "../../pages/AffiliateView/components/Conffeti";
 
 interface CheckinSuccessFooterProps {
+  isOpen: boolean;
   onClose: () => void;
 }
 
-const CheckinSuccessFooter: React.FC<CheckinSuccessFooterProps> = ({ onClose }) => {
+const CheckinSuccessFooter: React.FC<CheckinSuccessFooterProps> = ({
+  onClose,
+  isOpen,
+}) => {
   const minHeight = 177;
-  const maxHeight = typeof window !== 'undefined' ? window.innerHeight * 0.8 : 600;
+  const maxHeight =
+    typeof window !== "undefined" ? window.innerHeight * 0.8 : 600;
 
   const [currentH, setCurrentH] = useState(minHeight);
   const [isDragging, setIsDragging] = useState(false);
@@ -28,12 +33,24 @@ const CheckinSuccessFooter: React.FC<CheckinSuccessFooterProps> = ({ onClose }) 
   const dragRef = useRef({ startY: 0, startHeight: minHeight });
 
   useEffect(() => {
+    if (!isOpen) {
+      setCurrentH(minHeight);
+      setShowConfetti(false);
+      return;
+    }
+
     setShowConfetti(true);
-    setTimeout(() => {
+    const openTimer = setTimeout(() => {
       setCurrentH(maxHeight);
-    }, 500);
-    setTimeout(() => setShowConfetti(false), 3500);
-  }, [maxHeight]);
+    }, 100);
+
+    const hideConfettiTimer = setTimeout(() => setShowConfetti(false), 5000);
+
+    return () => {
+      clearTimeout(openTimer);
+      clearTimeout(hideConfettiTimer);
+    };
+  }, [isOpen, minHeight, maxHeight]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setIsDragging(true);
@@ -43,7 +60,12 @@ const CheckinSuccessFooter: React.FC<CheckinSuccessFooterProps> = ({ onClose }) 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging) return;
     const delta = dragRef.current.startY - e.touches[0].clientY;
-    setCurrentH(Math.max(minHeight, Math.min(maxHeight, dragRef.current.startHeight + delta)));
+    setCurrentH(
+      Math.max(
+        minHeight,
+        Math.min(maxHeight, dragRef.current.startHeight + delta)
+      )
+    );
   };
 
   const handleTouchEnd = () => {
@@ -52,44 +74,21 @@ const CheckinSuccessFooter: React.FC<CheckinSuccessFooterProps> = ({ onClose }) 
     else setCurrentH(maxHeight);
   };
 
-  const confettiPieces = useMemo(() => {
-    if (!showConfetti) return [];
-    const amount = 60;
-    const colors = ['#FF4D4F', '#40A9FF', '#73D13D', '#FAAD14', '#EB2F96', '#13C2C2'];
-    const minDur = 1800;
-    const maxDur = 3200;
-    const delaySpread = 400;
-    return Array.from({ length: amount }).map((_, i) => {
-      const left = Math.random() * 100;
-      const size = 6 + Math.random() * 10;
-      const colorPiece = colors[i % colors.length];
-      const duration = minDur + Math.random() * (maxDur - minDur);
-      const delay = Math.random() * delaySpread;
-      return { left, size, colorPiece, duration, delay, key: i };
-    });
-  }, [showConfetti]);
-
   const translate = maxHeight - currentH;
 
   return (
     <>
-      {showConfetti &&
-        confettiPieces.map(p => (
-          <ConfettiPiece
-            key={p.key}
-            left={p.left}
-            size={p.size}
-            color={p.colorPiece}
-            duration={p.duration}
-            delay={p.delay}
-          />
-        ))}
-
+      <Confetti showConfetti={showConfetti} />
       <Shell
         style={{
           height: maxHeight,
           transform: `translateY(${translate}px)`,
-          transition: isDragging ? 'none' : 'transform 0.45s cubic-bezier(0.22,1,0.36,1)'
+          opacity: isOpen ? 1 : 0,
+          pointerEvents: isOpen ? "auto" : "none",
+          touchAction: isOpen ? "auto" : "none",
+          transition: isDragging
+            ? "none"
+            : "opacity 0.45s ease, transform 0.45s cubic-bezier(0.22,1,0.36,1)",
         }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -102,10 +101,11 @@ const CheckinSuccessFooter: React.FC<CheckinSuccessFooterProps> = ({ onClose }) 
           </IconContainer>
           <Title>Parabéns</Title>
           <Subtitle>
-            Explorar rende <br /> conquistas incriveis
+            Explorar rende <br /> conquistas incríveis
           </Subtitle>
           <InfoText>
-            Você acaba de acumular <br /> +10 pontos e 0 moedas Lupa <br /> em sua conta.
+            Você acaba de acumular <br /> +10 pontos e 0 moedas Lupa <br /> em
+            sua conta.
           </InfoText>
           <CloseBtn onClick={onClose}>
             <img src={footerClose} alt="Fechar" />

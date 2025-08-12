@@ -1,4 +1,10 @@
-import { IonContent, IonLoading, IonPage, IonToast } from "@ionic/react";
+import {
+  IonContent,
+  IonLoading,
+  IonPage,
+  IonToast,
+  useIonViewWillEnter,
+} from "@ionic/react";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 
@@ -7,23 +13,26 @@ import SearchBar from "../../components/SearchButton/SearchBar";
 import {
   AlphabetContainer,
   AlphabetLetter,
+  ExploreButton,
+  Paragraph,
   RowContainer,
   StoreCard,
   StoreImage,
   StoreInfo,
   StoreLine,
   StoreListContainer,
-} from "./AffiliateStoresPage.style";
+} from "./AffiliateFavorites.style";
 
-import { getAllEstablishments } from "../../services/affiliateService";
+import { fetchFavorites } from "../../services/affiliateService";
 
 import AppHeader from "../../components/SimpleHeader";
 import { useDebounce } from "../../hooks/useDebounce";
 import { Establishment } from "../../types/api/api";
+import Button from "../../components/Button";
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-const AffiliateStoresPage: React.FC = () => {
+const AffiliateFavoritesPage: React.FC = () => {
   const history = useHistory();
   const firstLetters = new Set<string>();
 
@@ -66,14 +75,16 @@ const AffiliateStoresPage: React.FC = () => {
   };
 
   /* ─── carrega da API ───────────────────────────────────────────── */
+  const fetchEstablishments = async () => {
+    const response = await fetchFavorites({ query: debouncedSearchValue });
+    setEstablishments(response.data);
+  };
   useEffect(() => {
-    const fetchEstablishments = async () => {
-      const response = await getAllEstablishments(debouncedSearchValue);
-      setEstablishments(response.data);
-    };
-
     fetchEstablishments();
   }, [debouncedSearchValue]);
+  useIonViewWillEnter(() => {
+    fetchEstablishments();
+  });
 
   const scrollToLetter = (letter: string) => {
     const element = document.getElementById(letter);
@@ -82,10 +93,14 @@ const AffiliateStoresPage: React.FC = () => {
 
   const containerRef = useRef<HTMLIonContentElement>(null);
 
+  const handleGoToAffiliates = () => {
+    history.replace("/affiliates");
+  };
+
   return (
     <IonPage style={{ "--background": "#ffffff" }}>
       <AppHeader
-        title="Afiliados"
+        title="Meus Favoritos"
         backgroundColor="#E6C178"
         textColor="#FFFFFF"
       />
@@ -106,6 +121,14 @@ const AffiliateStoresPage: React.FC = () => {
         <SearchBar value={query} onChange={setQuery} placeholder="Procurar" />
         <RowContainer>
           <StoreListContainer>
+            {establishments.length === 0 && (
+              <>
+                <Paragraph>Você ainda não tem favoritos.</Paragraph>
+                <ExploreButton onClick={handleGoToAffiliates}>
+                  Explorar
+                </ExploreButton>
+              </>
+            )}
             {establishments.map((establishment) => {
               const firstLetter = establishment.name.charAt(0).toUpperCase();
               let sectionId;
@@ -173,4 +196,4 @@ const AffiliateStoresPage: React.FC = () => {
   );
 };
 
-export default AffiliateStoresPage;
+export default AffiliateFavoritesPage;

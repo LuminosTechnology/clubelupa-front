@@ -11,7 +11,7 @@ import AffiliateRegister from "./pages/AffiliateRegister/AffiliateRegister";
 import AffiliateStores from "./pages/AffiliateStores/AffiliateStoresPage";
 import AffiliateView from "./pages/AffiliateView/AffiliateView";
 import Experience from "./pages/Experience/Experience";
-import Favorites from "./pages/Favorites/Favorites";
+import AffiliateFavorites from "./pages/AffiliateFavorites/AffiliateFavorites";
 import ForgotPassword from "./pages/ForgotPassword";
 import ChangePassword from "./pages/ForgotPassword/ChangePassword";
 import Home from "./pages/Home";
@@ -183,7 +183,11 @@ const App: React.FC = () => {
           <PrivateRoute exact path="/myplan" component={MyPlan} />
           <PrivateRoute exact path="/myplan/upgrade" component={UpgradePlan} />
           <PrivateRoute exact path="/experience" component={Experience} />
-          <PrivateRoute exact path="/favorites" component={Favorites} />
+          <PrivateRoute
+            exact
+            path="/favorites"
+            component={AffiliateFavorites}
+          />
           <PrivateRoute
             exact
             path="/affiliate/scanner"

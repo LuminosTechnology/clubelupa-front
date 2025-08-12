@@ -1,7 +1,7 @@
 // src/components/CheckinSuccessFooter/checkinSuccessFooter.style.ts
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes } from "styled-components";
 
-const olive = '#8e9455';
+const olive = "#8e9455";
 const addington = "'Addington CF', serif";
 
 export const Shell = styled.div`
@@ -9,7 +9,7 @@ export const Shell = styled.div`
   bottom: 0;
   left: 0;
   width: 100%;
-  will-change: transform;
+  will-change: transform, opacity;
   z-index: 10;
   touch-action: none;
   user-select: none;
@@ -113,7 +113,8 @@ export const ConfettiPiece = styled.div<{
   height: ${({ size }) => size * 0.4}px;
   background: ${({ color }) => color};
   z-index: 9999;
-  animation: ${fall} ${({ duration }) => duration}ms linear ${({ delay }) => delay}ms forwards;
+  animation: ${fall} ${({ duration }) => duration}ms linear
+    ${({ delay }) => delay}ms forwards;
   border-radius: 2px;
   pointer-events: none;
 `;

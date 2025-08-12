@@ -1,8 +1,6 @@
 import { IonContent, IonPage } from "@ionic/react";
 import React, { useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router";
-import AffiliateFooter from "../../components/AffiliateFooter";
-import CheckinSuccessFooter from "../../components/CheckinSuccessFooter";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import type { Restaurant } from "../../components/Map";

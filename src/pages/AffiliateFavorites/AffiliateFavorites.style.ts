@@ -48,6 +48,25 @@ export const StoreListContainer = styled.div`
   flex: 1;
 `;
 
+export const Paragraph = styled.p`
+  font-size: 16px;
+  color: #666;
+  line-height: 1.5;
+  padding: 0 1rem;
+  text-align: center;
+  margin: 0;
+`;
+
+export const ExploreButton = styled.button`
+  background-color: #e6c178;
+  color: white;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 1rem 4rem;
+  margin: 0 auto;
+`;
+
 export const StoreCard = styled.div`
   display: flex;
   width: 100%;

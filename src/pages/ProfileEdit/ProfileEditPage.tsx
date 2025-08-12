@@ -3,7 +3,7 @@ import { IonContent, IonPage } from "@ionic/react";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 
-import InputMask from "react-input-mask";
+import InputMask, { ReactInputMask } from "react-input-mask";
 
 import profilePlaceholder from "../../assets/default-profile-photo.png";
 import ScrollArea from "../../components/ScrollArea/ScrollArea";
@@ -195,7 +195,9 @@ const ProfileEditPage: React.FC = () => {
 
                   <FieldWrapper>
                     <label>Telefone</label>
-                    <input
+                    <InputMask
+                      mask={"(99) 99999-9999"}
+                      maskChar={null}
                       placeholder="(11) 91234-5678"
                       value={form.phone_number}
                       onChange={(e) =>

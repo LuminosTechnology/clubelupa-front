@@ -1,3 +1,4 @@
+import { escape } from "querystring";
 import { Establishment, PaginatedResponse } from "../types/api/api";
 import api from "./api";
 import { getToken } from "./auth-service";
@@ -68,5 +69,34 @@ export const uploadAffiliatePhoto = async (
 
 export const fetchMyEstablishmentData = async (id: number) => {
   const response = await api.get<Establishment>("/my-establishments/" + id);
+  return response.data;
+};
+
+export const fetchSingleEstablishmentData = async (id: number) => {
+  const response = await api.get<{ data: Establishment }>(
+    `/establishments/${id}`
+  );
+  return response.data;
+};
+
+export const toggleFavorite = async (id: number) => {
+  const response = await api.post(`/establishments/${id}/toggle-favorite`);
+  return response.data;
+};
+
+export const fetchFavorites = async ({ query }: { query?: string }) => {
+  let params: Record<string, string> = {};
+  if (!!query) params["filter[Search]"] = query;
+  const response = await api.get<PaginatedResponse<Establishment[]>>(
+    `/user/favorites/establishments`,
+    {
+      params,
+    }
+  );
+  return response.data;
+};
+
+export const doCheckIn = async (id: number) => {
+  const response = await api.post(`/establishments/${id}/checkin`);
   return response.data;
 };

@@ -1,10 +1,10 @@
 // src/pages/Notification/Notification.tsx
-import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { IonPage, IonContent } from '@ionic/react';
-import { useHistory } from 'react-router-dom';
-import AppHeader from '../../components/SimpleHeader';
-import Button from '../../components/Button';
+import React, { useEffect, useState } from "react";
+import styled from "styled-components";
+import { IonPage, IonContent } from "@ionic/react";
+import { useHistory } from "react-router-dom";
+import AppHeader from "../../components/SimpleHeader";
+import Button from "../../components/Button";
 
 import {
   ProfileContainer,
@@ -18,35 +18,24 @@ import {
   ToggleOption,
   ToggleLabel,
   ToggleSwitch,
-} from './Notification.style';
+} from "./Notification.style";
 
-import { logout, getUserByToken } from '../../services/auth-service';
-import { User } from '../../services/interfaces/Auth';
+import { logout, getUserByToken } from "../../services/auth-service";
 
-import avatarPic from '../../assets/profile-pic.svg';
+import avatarPic from "../../assets/profile-pic.svg";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 /** Botão “ÚLTIMAS NOTIFICAÇÕES” centralizado */
 const LogoutButton = styled(Button)`
   display: block;
   margin: 0 auto;
-  background-color: #8E9455 !important;
+  background-color: #8e9455 !important;
   color: #ffffff !important;
 `;
 
 const Notification: React.FC = () => {
   const history = useHistory();
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const fetched = await getUserByToken();
-        setUser(fetched);
-      } catch (err) {
-        console.error('Erro ao buscar dados do usuário', err);
-      }
-    })();
-  }, []);
+  const { user } = useAuthContext();
 
   const handleLogout = async () => {
     await logout();
@@ -62,14 +51,13 @@ const Notification: React.FC = () => {
       />
 
       <AvatarWrapper>
-        <Avatar src={avatarPic} alt="Foto de perfil" />
+        <Avatar src={user?.avatar_url || "/assets/default-photo.png"} />
       </AvatarWrapper>
 
-      <IonContent fullscreen style={{ '--background': '#FFFFFF' } as any}>
+      <IonContent fullscreen style={{ "--background": "#FFFFFF" } as any}>
         <ProfileContainer>
-          <UserName>{user?.nome_completo ?? ''}</UserName>
-          <UserSubInfo>{user?.cpf ?? ''}</UserSubInfo>
-          <UserSubInfo>{user?.email ?? ''}</UserSubInfo>
+          <UserName>{user?.name ?? ""}</UserName>
+          <UserSubInfo>{user?.email ?? ""}</UserSubInfo>
 
           {/* Dois toggles com labels */}
           <ToggleWrapper>

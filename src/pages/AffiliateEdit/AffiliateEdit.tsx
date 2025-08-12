@@ -44,10 +44,12 @@ import {
   UploadPersonPhotoButton,
 } from "./AffiliateEdit.style";
 import { GeocodeService } from "../../services/geocode-service";
+import { useHistory } from "react-router";
 
 /* ---------- estado (todos campos opcionais) ------------------- */
 
 const AffiliateEdit: React.FC = () => {
+  const history = useHistory();
   const [scrolled, setScrolled] = useState(false);
 
   const [logoFile, setLogoFile] = useState<File | undefined>(undefined);
@@ -241,7 +243,13 @@ const AffiliateEdit: React.FC = () => {
     };
 
     console.log(data);
-    await updateEstablishment({ id: establishment.id, data });
+    try {
+      await updateEstablishment({ id: establishment.id, data });
+
+      history.goBack();
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   useEffect(() => {

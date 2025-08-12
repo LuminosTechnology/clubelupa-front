@@ -20,6 +20,8 @@ import { AffiliateData } from "../../services/interfaces/Affiliate";
 import { Establishment } from "../../types/api/api";
 import { getAllEstablishments } from "../../services/affiliateService";
 import { useDebounce } from "../../hooks/useDebounce";
+import { useHistory } from "react-router";
+import { haversine } from "../../utils/haversine";
 
 /* ---------------- extras específicos do mapa ------------------- */
 interface ExtraFields {
@@ -59,16 +61,13 @@ interface MapProps {
   searchValue: string;
 }
 
-const Map: React.FC<MapProps> = ({ apiKey, onViewMore, searchValue }) => {
-  // const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+const Map: React.FC<MapProps> = ({ apiKey, searchValue }) => {
+  const history = useHistory();
   const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(
     null
   );
   const mapRef = useRef<HTMLDivElement>(null);
   const [selected, setSelected] = useState<Establishment | undefined>();
-  const [map, setMap] = useState<GoogleMap | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [checkInMessage, setCheckInMessage] = useState<string | null>(null);
 
   const [establishments, setEstablishments] = useState<Establishment[]>([]);
 
@@ -142,28 +141,6 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore, searchValue }) => {
 
       await gMap.enableCurrentLocation(true);
 
-      // marker do usuário
-      // await gMap.addMarker({
-      //   coordinate: userLoc,
-      //   iconUrl: accessibilityOutline,
-      //   iconSize: { width: 32, height: 32 },
-      // });
-
-      // markers dos afiliados
-      // for (const a of affiliates) {
-      //   await gMap.addMarker({
-      //     coordinate: a.location,
-      //     iconUrl:
-      //       a.iconType === "green"
-      //         ? "assets/affiliate_pin.png"
-      //         : a.iconType === "yellow"
-      //         ? "assets/affiliate_shack.png"
-      //         : "assets/affiliate_star.png",
-      //     iconSize: { width: 40, height: 55 },
-      //     iconAnchor: { x: 20, y: 55 },
-      //   });
-      // }
-
       for (const e of establishments) {
         if (e.addresses.length <= 0) continue;
         const address = e.addresses[0];
@@ -189,7 +166,6 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore, searchValue }) => {
         );
         if (hit) {
           setSelected(hit);
-          setCheckInMessage(null);
           await gMap.setCamera({
             coordinate: {
               lat: hit.addresses[0].latitude,
@@ -199,8 +175,6 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore, searchValue }) => {
           });
         }
       });
-
-      setMap(gMap);
     };
 
     const timeout = setTimeout(initMap, 300);
@@ -208,45 +182,9 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore, searchValue }) => {
     return () => clearTimeout(timeout);
   }, [userLoc, apiKey, mapRef, establishments, debouncedSearchValue]);
 
-  /* ─── check-in ───────────────────────────────────────────────────────── */
-  const haversine = (
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number
-  ) => {
-    const R = 6371e3;
-    const dLat = ((lat2 - lat1) * Math.PI) / 180;
-    const dLon = ((lon2 - lon1) * Math.PI) / 180;
-    const a =
-      Math.sin(dLat / 2) ** 2 +
-      Math.cos((lat1 * Math.PI) / 180) *
-        Math.cos((lat2 * Math.PI) / 180) *
-        Math.sin(dLon / 2) ** 2;
-    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+  const handleViewMore = (id: number) => {
+    history.push(`/affiliate-view/${id}`);
   };
-
-  // const handleCheckIn = () => {
-  //   if (!selected || !userLoc) return;
-
-  //   setLoading(true);
-  //   const d = haversine(
-  //     userLoc.lat,
-  //     userLoc.lng,
-  //     selected.addresses[0].latitude,
-  //     selected.addresses[0].longitude
-  //   );
-
-  //   if (d <= CHECKIN_RADIUS) {
-  //     setSelected({ ...selected, checkedIn: true });
-  //     setCheckInMessage("✅ Check-in realizado!");
-  //   } else {
-  //     setCheckInMessage("❌ Você está muito longe.");
-  //   }
-
-  //   setLoading(false);
-  //   setTimeout(() => setCheckInMessage(null), 3000);
-  // };
 
   /* ─── UI ─────────────────────────────────────────────────────────────── */
   return (
@@ -266,13 +204,11 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore, searchValue }) => {
         <CloseButton
           onClick={() => {
             setSelected(undefined);
-            setCheckInMessage(null);
           }}
         >
           <IonIcon icon={close} />
         </CloseButton>
 
-        {/* imagem de ponta a ponta */}
         <RestaurantInfo>
           <RestaurantImage
             src={selected?.cover_photo_url || "/assets/default-photo.png"}
@@ -288,6 +224,7 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore, searchValue }) => {
                 </p>
                 {userLoc && (
                   <p>
+                    Distância:{" "}
                     {Math.round(
                       haversine(
                         userLoc?.lat,
@@ -295,39 +232,23 @@ const Map: React.FC<MapProps> = ({ apiKey, onViewMore, searchValue }) => {
                         selected!.addresses[0].latitude,
                         selected!.addresses[0].longitude
                       ) / 1000
-                    )}
+                    )}{" "}
                     Km
                   </p>
                 )}
-                <p>Horário de funcionamento: </p>
+                {/* <p>Horário de funcionamento: </p> */}
               </>
             )}
-            <p>
+            {/* <p>
               <strong>Vale alguns pontos</strong>
-            </p>
+            </p> */}
+            {selected && (
+              <ViewMoreButton onClick={() => handleViewMore(selected.id)}>
+                Ver mais sobre
+              </ViewMoreButton>
+            )}
           </RestaurantDetails>
         </RestaurantInfo>
-
-        {/* {selected && (
-          <ViewMoreButton onClick={() => onViewMore(selected)}>
-            Ver mais sobre
-          </ViewMoreButton>
-        )} */}
-
-        {/* {!selected?.checkedIn && (
-          <>
-            <CheckInButton onClick={handleCheckIn} disabled={loading}>
-              {loading ? "Carregando…" : "Check-in"}
-            </CheckInButton>
-            {checkInMessage && (
-              <CheckInMessage>{checkInMessage}</CheckInMessage>
-            )}
-          </>
-        )} */}
-        {/* 
-        {selected?.checkedIn && (
-          <CheckInMessage>✅ Check-in já realizado</CheckInMessage>
-        )} */}
       </RestaurantCard>
     </MapWrapper>
   );

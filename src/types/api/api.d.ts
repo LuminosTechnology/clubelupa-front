@@ -146,6 +146,10 @@ export interface Establishment {
   cover_photo_url?: string;
   gallery_urls: { id: number; url: string }[];
   is_active: boolean;
+  is_favorited_by_me: boolean;
+  is_checked_in_by_me_last_hour: boolean;
+  has_ever_been_checked_in_by_me: boolean;
+  is_checked_in_by_me_last_hour: boolean;
   approved_status: string;
   approved_status_text: string;
   created_at?: FormattedDate;
