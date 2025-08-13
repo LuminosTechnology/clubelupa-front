@@ -1,13 +1,14 @@
 import axios from "axios";
-import { getToken } from "./auth-service";
+import { getToken } from "../services/auth-service";
+import { API_CONFIG } from "./constants";
 
 // const API_URL =
 //   "https://y57yu3j3k2.execute-api.sa-east-1.amazonaws.com/prod/api";
 // const API_URL = "https://y57yu3j3k2.execute-api.sa-east-1.amazonaws.com/api/v1";
-const API_URL = "https://app.clubelupa.com.br/api/v1";
+// const API_URL = "https://app.clubelupa.com.br/api/v1";
 
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: API_CONFIG.BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },

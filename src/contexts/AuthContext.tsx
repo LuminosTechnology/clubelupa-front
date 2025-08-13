@@ -1,6 +1,10 @@
 import { useState, createContext, useContext, useEffect } from "react";
 import { getToken, getUserByToken } from "../services/auth-service";
 import { User } from "../types/api/api";
+import { AxiosError } from "axios";
+import { useHistory } from "react-router";
+import { Preferences } from "@capacitor/preferences";
+import { LOCAL_STORAGE_KEYS } from "../config/constants";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -8,6 +12,7 @@ interface AuthContextType {
   loading: boolean;
   user?: User;
   setUser: (value?: User) => void;
+  logout: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType>(
@@ -19,21 +24,37 @@ type Props = {
 };
 
 export const AuthContextProvider: React.FC<Props> = ({ children }) => {
+  const history = useHistory();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | undefined>();
 
+  const logout = () => {
+    setIsAuthenticated(false);
+    setUser(undefined);
+    Preferences.remove({ key: LOCAL_STORAGE_KEYS.AUTH_TOKEN });
+  };
+
   const fetchToken = async () => {
     const token = await getToken();
 
-    if (token) {
-      setIsAuthenticated(true);
+    if (!token) {
+      setIsAuthenticated(false);
+      setUser(undefined);
+      logout();
+    }
+
+    try {
       const user = await getUserByToken();
       setUser(user);
-    } else {
-      setIsAuthenticated(false);
+      setIsAuthenticated(true);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        logout();
+      }
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -54,6 +75,7 @@ export const AuthContextProvider: React.FC<Props> = ({ children }) => {
         loading,
         user,
         setUser,
+        logout,
       }}
     >
       {children}

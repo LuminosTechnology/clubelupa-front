@@ -1,6 +1,6 @@
 import { Preferences } from "@capacitor/preferences";
 import { User } from "../types/api/api";
-import api from "./api";
+import api from "../config/api";
 import {
   ForgotPasswordRequest,
   LoginUserRequest,
@@ -12,14 +12,14 @@ import {
   UpdateAffiliateEstablishmentRequest,
 } from "../types/api/affiliate";
 import { RegisterUserRequest, UpdateUserRequest } from "../types/api/user";
-
-const AUTH_TOKEN_KEY = "auth_token";
+import { LOCAL_STORAGE_KEYS } from "../config/constants";
+import { ChangePasswordRequest } from "../types/api/auth";
 
 export const login = async ({ email, password }: LoginUserRequest) => {
   const data = { email, password, device_name: "react-app" };
   const response = await api.post<LoginUserResponse>("/login", data);
   const token = response.data.data.token;
-  await Preferences.set({ key: AUTH_TOKEN_KEY, value: token });
+  await Preferences.set({ key: LOCAL_STORAGE_KEYS.AUTH_TOKEN, value: token });
   return response.data;
 };
 
@@ -112,8 +112,7 @@ export const logout = async () => {
 };
 
 export const getToken = async () => {
-  const token = await Preferences.get({ key: AUTH_TOKEN_KEY });
-  console.log("[Auth Service] Retrieved token:", token.value);
+  const token = await Preferences.get({ key: LOCAL_STORAGE_KEYS.AUTH_TOKEN });
   return token.value;
 };
 
@@ -171,5 +170,18 @@ export const deleteAccount = async ({ password }: { password: string }) => {
     password,
   });
 
+  return response.data;
+};
+
+export const changePassword = async ({
+  current_password,
+  password,
+  password_confirmation,
+}: ChangePasswordRequest) => {
+  const response = await api.post(`/user/change-password`, {
+    current_password,
+    password,
+    password_confirmation,
+  });
   return response.data;
 };

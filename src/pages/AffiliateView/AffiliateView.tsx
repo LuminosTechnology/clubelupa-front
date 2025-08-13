@@ -14,8 +14,10 @@ import { Establishment } from "../../types/api/api";
 import {
   BackButton,
   BackButtonWrapper,
+  ButtonsContainer,
   CTAButton,
   Description,
+  ErrorMessage,
   InfoContainer,
   LikeButton,
   LinkIcon,
@@ -49,6 +51,7 @@ const AffiliateView: React.FC = () => {
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [canCheckIn, setCanCheckIn] = useState(true);
   const [cantCheckIn, setCantCheckIn] = useState(false);
+  const [checkInMessage, setCheckInMessage] = useState<string | undefined>();
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined
   );
@@ -73,29 +76,48 @@ const AffiliateView: React.FC = () => {
   };
 
   useEffect(() => {
+    if (!id) return;
+
     const fetchData = async () => {
-      if (!id) return;
-      const response = await fetchSingleEstablishmentData(Number(id));
-      setData(response.data);
-      setFavorite(response.data.is_favorited_by_me);
+      try {
+        const response = await fetchSingleEstablishmentData(Number(id));
+        const establishment = response.data;
 
-      const userLocation = await Geolocation.getCurrentPosition({
-        enableHighAccuracy: true,
-      });
+        setData(establishment);
+        setFavorite(establishment.is_favorited_by_me);
 
-      const distance = haversine(
-        userLocation.coords.latitude,
-        userLocation.coords.longitude,
-        response.data.addresses[0].latitude,
-        response.data.addresses[0].longitude
-      );
+        const { coords } = await Geolocation.getCurrentPosition({
+          enableHighAccuracy: true,
+        });
 
-      console.log("distance:", distance);
+        const distance = haversine(
+          coords.latitude,
+          coords.longitude,
+          response.data.addresses[0].latitude,
+          response.data.addresses[0].longitude
+        );
 
-      console.log({ myLocation: userLocation.coords });
+        const DISTANCE_THRESHOLD = 10_000;
+        const isWithinDistance = distance < DISTANCE_THRESHOLD;
+        const hasNotCheckedInLastHour =
+          !establishment.is_checked_in_by_me_last_hour;
 
-      const DISTANCE_THRESHOLD = 200;
-      setCanCheckIn(distance < DISTANCE_THRESHOLD);
+        setCanCheckIn(isWithinDistance && hasNotCheckedInLastHour);
+
+        if (!isWithinDistance) {
+          return setCheckInMessage(
+            "Você está muito longe do local para fazer check-in."
+          );
+        }
+        if (!hasNotCheckedInLastHour) {
+          return setCheckInMessage(
+            "Você já fez check-in neste local. Tente novamente mais tarde."
+          );
+        }
+      } catch (error) {
+        console.error("Erro ao buscar dados do afiliado:", error);
+        setCheckInMessage("Erro ao buscar dados do afiliado.");
+      }
     };
 
     fetchData();
@@ -201,20 +223,25 @@ const AffiliateView: React.FC = () => {
                   </PlainLink>
                 </PlainLinkRow>
               )}
-
-              <CTAButton
-                bg={color}
-                onClick={handleCheckIn}
-                disabled={!canCheckIn}
-              >
-                FAZER CHECK-IN
-              </CTAButton>
-              <CTAButton
-                bg={color}
-                onClick={() => history.push("/affiliate/scanner")}
-              >
-                ESCANEAR NOTA
-              </CTAButton>
+              <ButtonsContainer>
+                {checkInMessage && (
+                  <ErrorMessage>{checkInMessage}</ErrorMessage>
+                )}
+                <CTAButton
+                  bg={color}
+                  onClick={handleCheckIn}
+                  disabled={!canCheckIn}
+                >
+                  FAZER CHECK-IN
+                </CTAButton>
+                <CTAButton
+                  disabled
+                  bg={color}
+                  onClick={() => history.push("/affiliate/scanner")}
+                >
+                  ESCANEAR NOTA
+                </CTAButton>
+              </ButtonsContainer>
             </InfoContainer>
           </ScrollArea>
         )}

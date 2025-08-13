@@ -1,8 +1,9 @@
 import { escape } from "querystring";
 import { Establishment, PaginatedResponse } from "../types/api/api";
-import api from "./api";
+import api from "../config/api";
 import { getToken } from "./auth-service";
 import { AffiliateData } from "./interfaces/Affiliate";
+import { AdvertisementData } from "../types/api/affiliate";
 
 /** Retorna o primeiro afiliado associado ao token ou null. */
 export const getMyFirstAffiliate = async (): Promise<AffiliateData | null> => {
@@ -98,5 +99,10 @@ export const fetchFavorites = async ({ query }: { query?: string }) => {
 
 export const doCheckIn = async (id: number) => {
   const response = await api.post(`/establishments/${id}/checkin`);
+  return response.data;
+};
+
+export const getAdvertisingProducts = async () => {
+  const response = await api.get<{ data: AdvertisementData[] }>(`/products`);
   return response.data;
 };

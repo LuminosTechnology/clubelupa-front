@@ -20,6 +20,8 @@ import { logout } from "../../services/auth-service";
 import emailIcon from "../../assets/emailwhite.svg";
 import whatsIcon from "../../assets/whatswhite.svg";
 import { useAuthContext } from "../../contexts/AuthContext";
+import { CONTACT } from "../../config/constants";
+import { Browser } from "@capacitor/browser";
 
 const TalkToUs: React.FC = () => {
   const history = useHistory();
@@ -30,13 +32,14 @@ const TalkToUs: React.FC = () => {
     history.goBack();
   };
 
-  const handleWhats = () => {
-    // abra o WhatsApp (exemplo de link; ajuste conforme necessário)
-    window.open("https://wa.me/seunumerodetelefone", "_blank");
+  const handleWhats = async () => {
+    await Browser.open({ url: `https://wa.me/${CONTACT.WHATSAPP}` });
   };
 
-  const handleEmail = () => {
-    window.location.href = "mailto:contato@clubelupa.com.br";
+  const handleEmail = async () => {
+    await Browser.open({
+      url: `mailto:${CONTACT.EMAIL}`,
+    });
   };
 
   return (

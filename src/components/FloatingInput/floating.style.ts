@@ -1,5 +1,5 @@
-import styled from 'styled-components';
-import { IonButton } from '@ionic/react';
+import styled from "styled-components";
+import { IonButton } from "@ionic/react";
 
 export const Container = styled.div`
   position: relative;
@@ -109,7 +109,7 @@ export const EyeButton = styled(IonButton)`
   --background-hover: transparent;
   --background-activated: transparent;
   --box-shadow: none;
-  
+
   &::part(native) {
     padding: 0;
   }

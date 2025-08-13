@@ -16,6 +16,7 @@ import {
   MenuItems,
   MenuOverlay,
 } from "./SlideMenu.style";
+import { LOCAL_STORAGE_KEYS } from "../../config/constants";
 
 interface SlideMenuProps {
   isOpen: boolean;
@@ -46,7 +47,7 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
     } catch (e) {
       console.error("Logout error:", e);
     } finally {
-      await Preferences.remove({ key: "auth_token" });
+      await Preferences.remove({ key: LOCAL_STORAGE_KEYS.AUTH_TOKEN });
       onClose();
     }
   };

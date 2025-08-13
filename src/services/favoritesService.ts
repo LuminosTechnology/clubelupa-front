@@ -1,4 +1,4 @@
-import api from "./api";
+import api from "../config/api";
 import { getToken } from "./auth-service";
 import { AffiliateData } from "./interfaces/Affiliate";
 
@@ -11,7 +11,6 @@ const withAuth = async () => {
   const token = await getToken();
   return { headers: { Authorization: `Bearer ${token}` } };
 };
-
 
 export const getFavorites = async (): Promise<FavoriteStore[]> => {
   const opts = await withAuth();
@@ -27,12 +26,10 @@ export const getFavorites = async (): Promise<FavoriteStore[]> => {
   return [];
 };
 
-
 export const addFavorite = async (affiliateId: number): Promise<void> => {
   const opts = await withAuth();
   await api.post(`/affiliates/${affiliateId}/favorite`, {}, opts);
 };
-
 
 export const removeFavorite = async (affiliateId: number): Promise<void> => {
   const opts = await withAuth();

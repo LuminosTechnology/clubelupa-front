@@ -1,4 +1,4 @@
-import { Address, CreateAddress } from "./api";
+import { Address, CreateAddress, FormattedDate } from "./api";
 
 export interface RegisterAffiliateRequest {
   name: string;
@@ -50,4 +50,17 @@ export interface UpdateAffiliateEstablishmentRequest {
   shop_photo?: File;
   product_photo?: File;
   behind_the_scenes_photo?: File;
+}
+
+export interface AdvertisementData {
+  id: number;
+  name: string;
+  description: string;
+  image_url: string;
+  price: number;
+  is_active: boolean;
+  is_active_text: string;
+  created_at: FormattedDate;
+  updated_at: FormattedDate;
+  deleted_at?: FormattedDate;
 }

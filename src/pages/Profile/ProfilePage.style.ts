@@ -35,7 +35,7 @@ export const UserName = styled.h2`
 `;
 
 export const UserSubInfo = styled.p`
-  margin: 0 0 4px 0;
+  margin-bottom: 2rem;
   font-size: 16px;
   color: #868950;
 `;
@@ -46,7 +46,8 @@ export const MenuOption = styled.p<{ primary?: boolean }>`
   align-items: center;
   font-size: 16px;
   color: #868950;
-  margin: ${({ primary }) => (primary ? "58px 0 0 0" : "12px 0 0 0")};
+  margin: 0;
+  padding: 12px;
   cursor: pointer;
 `;
 
@@ -67,8 +68,7 @@ export const MenuIcon = styled.img`
 `;
 
 export const Divider = styled.hr`
-  width: 65%;
-  max-width: 280px;
+  width: 100%;
   margin: 6px 0 0 0;
   border: none;
   border-top: 1px solid #868950;
@@ -79,6 +79,8 @@ export const LogoutWrapper = styled.div`
   width: 100%;
   margin: 70px 0 0 0;
   display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   justify-content: center;
 `;
 

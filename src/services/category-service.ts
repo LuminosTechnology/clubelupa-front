@@ -1,6 +1,6 @@
 import { PaginatedResponse } from "../types/api/api";
 import { Category } from "../types/api/category";
-import api from "./api";
+import api from "../config/api";
 
 export const CategoryService = {
   getCategories: async () => {

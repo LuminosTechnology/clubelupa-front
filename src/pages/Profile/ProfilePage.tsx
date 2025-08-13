@@ -32,7 +32,7 @@ import {
   UserSubInfo,
 } from "./ProfilePage.style";
 
-import { deleteAccount, logout } from "../../services/auth-service";
+import { deleteAccount } from "../../services/auth-service";
 
 import { Preferences } from "@capacitor/preferences";
 import { AxiosError } from "axios";
@@ -43,18 +43,27 @@ import instagramIcon from "../../assets/insta.svg";
 import lockIcon from "../../assets/lock.svg";
 import notificationIcon from "../../assets/notification.svg";
 import { useAuthContext } from "../../contexts/AuthContext";
+import { CONTACT, LOCAL_STORAGE_KEYS } from "../../config/constants";
+import { Browser } from "@capacitor/browser";
 
 /** Botão “SAIR” centralizado */
 const LogoutButton = styled(Button)`
-  display: block;
   margin: 0 auto;
   background-color: #8e9455 !important;
   color: #ffffff !important;
 `;
 
+const DeleteAccountButton = styled.button`
+  background-color: var(--ion-color-danger);
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 1rem 2rem;
+  margin: 0;
+`;
+
 const ProfilePage: React.FC = () => {
   const history = useHistory();
-  const { user, setIsAuthenticated, setUser } = useAuthContext();
+  const { user, setIsAuthenticated, setUser, logout } = useAuthContext();
   const [passwordInput, setPasswordInput] = useState("");
   const [isOpenDeleteAccountModal, setIsOpenDeleteAccountModal] =
     useState(false);
@@ -64,8 +73,8 @@ const ProfilePage: React.FC = () => {
   >(undefined);
 
   const handleLogout = async () => {
+    history.replace("/login");
     await logout();
-    history.goBack();
   };
 
   const goToEditProfile = () => {
@@ -87,7 +96,7 @@ const ProfilePage: React.FC = () => {
     if (!passwordInput) return;
     try {
       await deleteAccount({ password: passwordInput });
-      await Preferences.remove({ key: "auth_token" });
+      await Preferences.remove({ key: LOCAL_STORAGE_KEYS.AUTH_TOKEN });
       history.replace("/login");
       setUser(undefined);
       setIsAuthenticated(false);
@@ -101,6 +110,18 @@ const ProfilePage: React.FC = () => {
         }
       }
     }
+  };
+
+  const handleClickEmail = async () => {
+    await Browser.open({
+      url: `mailto:${CONTACT.EMAIL}`,
+    });
+  };
+
+  const handleClickInstagram = async () => {
+    await Browser.open({
+      url: `https://instagram.com/${CONTACT.INSTAGRAM}`,
+    });
   };
 
   // Escolhe a foto do usuário se existir, senão o placeholder
@@ -139,25 +160,27 @@ const ProfilePage: React.FC = () => {
             <MenuIcon src={chatIcon} alt="Ícone Fale Conosco" />
             Fale Conosco
           </MenuOption>
-          <Divider style={{ marginBottom: "80px" }} />
-
+          <Divider />
           <MenuOption>
+            <DeleteAccountButton
+              onClick={() => setIsOpenDeleteAccountModal(true)}
+            >
+              Excluir minha conta
+            </DeleteAccountButton>
+          </MenuOption>
+          <Divider />
+
+          <MenuOption onAbort={handleClickEmail}>
             <MenuIcon src={emailIcon} alt="Ícone Email" />
             contato@clubelupa.com.br
           </MenuOption>
-          <MenuOption>
+          <MenuOption onClick={handleClickInstagram}>
             <MenuIcon src={instagramIcon} alt="Ícone Instagram" />
             ClubeLupa
           </MenuOption>
 
-          <DeleteAccountOption
-            onClick={() => setIsOpenDeleteAccountModal(true)}
-          >
-            Excluir minha conta
-          </DeleteAccountOption>
-
           <LogoutWrapper>
-            <LogoutButton onClick={handleLogout}>SAIR</LogoutButton>
+            <LogoutButton onClick={handleLogout}>DESCONECTAR</LogoutButton>
           </LogoutWrapper>
         </ProfileContainer>
 

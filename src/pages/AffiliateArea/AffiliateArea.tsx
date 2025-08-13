@@ -55,6 +55,10 @@ const AffiliateArea: React.FC = () => {
     history.push("/affiliate/area/edit");
   };
 
+  const goToAdvertising = () => {
+    history.push("/affiliate/advertising");
+  };
+
   const establishment = user?.establishments[0];
   const displayName = establishment?.name;
   const profilePhoto = user?.avatar_url;
@@ -85,7 +89,7 @@ const AffiliateArea: React.FC = () => {
           </Option>
           <Divider />
 
-          <Option>
+          <Option onClick={goToAdvertising}>
             <OptionIcon src={publicidadeIcon} alt="Ícone Publicidade" />
             Publicidade
           </Option>

@@ -53,6 +53,7 @@ import { Redirect } from "react-router";
 import { GlobalFonts } from "./styles/GlobalFonts";
 import BecomeAnAffiliatePage from "./pages/BecomeAnAffiliate/BecomeAnAffiliate";
 import ProfileChangePasswordPage from "./pages/ChangePassword/ChangePassword";
+import { AffiliateAdsPage } from "./pages/AffiliateAds/AffiliateAds";
 
 declare global {
   interface Window {
@@ -141,6 +142,11 @@ const App: React.FC = () => {
             exact
             path="/affiliate/area"
             component={AffiliateArea}
+          />
+          <PrivateRoute
+            exact
+            path="/affiliate/advertising"
+            component={AffiliateAdsPage}
           />
           <PrivateRoute
             exact

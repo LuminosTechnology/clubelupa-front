@@ -1,46 +1,57 @@
 // src/pages/Notification/Notification.tsx
-import React, { useEffect, useState } from "react";
-import styled from "styled-components";
-import { IonPage, IonContent } from "@ionic/react";
-import { useHistory } from "react-router-dom";
+import { IonContent, IonPage } from "@ionic/react";
+import React, { useCallback, useEffect, useState } from "react";
 import AppHeader from "../../components/SimpleHeader";
-import Button from "../../components/Button";
 
 import {
-  ProfileContainer,
-  AvatarWrapper,
   Avatar,
+  AvatarWrapper,
+  ProfileContainer,
+  ToggleLabel,
+  ToggleOption,
+  ToggleSwitch,
+  ToggleWrapper,
   UserName,
   UserSubInfo,
-  Divider,
-  LogoutWrapper,
-  ToggleWrapper,
-  ToggleOption,
-  ToggleLabel,
-  ToggleSwitch,
 } from "./Notification.style";
 
-import { logout, getUserByToken } from "../../services/auth-service";
-
-import avatarPic from "../../assets/profile-pic.svg";
+import { Preferences } from "@capacitor/preferences";
+import { LOCAL_STORAGE_KEYS } from "../../config/constants";
 import { useAuthContext } from "../../contexts/AuthContext";
 
-/** Botão “ÚLTIMAS NOTIFICAÇÕES” centralizado */
-const LogoutButton = styled(Button)`
-  display: block;
-  margin: 0 auto;
-  background-color: #8e9455 !important;
-  color: #ffffff !important;
-`;
+type PreferenceKey = "receiveEmailAds" | "notifications";
+
+const preferenceMap: Record<PreferenceKey, string> = {
+  receiveEmailAds: LOCAL_STORAGE_KEYS.RECEIVE_EMAIL_ADS,
+  notifications: LOCAL_STORAGE_KEYS.NOTIFICATIONS,
+};
 
 const Notification: React.FC = () => {
-  const history = useHistory();
   const { user } = useAuthContext();
+  const [prefs, setPrefs] = useState<Record<PreferenceKey, boolean>>({
+    receiveEmailAds: false,
+    notifications: false,
+  });
 
-  const handleLogout = async () => {
-    await logout();
-    history.goBack();
+  const loadPreferences = useCallback(async () => {
+    const entries = await Promise.all(
+      (Object.keys(preferenceMap) as PreferenceKey[]).map(async (key) => {
+        const { value } = await Preferences.get({ key: preferenceMap[key] });
+        return [key, value === "true"] as const;
+      })
+    );
+    setPrefs(Object.fromEntries(entries) as typeof prefs);
+  }, []);
+
+  const togglePreference = async (key: PreferenceKey) => {
+    const newValue = !prefs[key];
+    setPrefs((prev) => ({ ...prev, [key]: newValue }));
+    await Preferences.set({ key: preferenceMap[key], value: String(newValue) });
   };
+
+  useEffect(() => {
+    loadPreferences();
+  }, [loadPreferences]);
 
   return (
     <IonPage>
@@ -63,25 +74,27 @@ const Notification: React.FC = () => {
           <ToggleWrapper>
             <ToggleOption>
               <ToggleSwitch>
-                <input type="checkbox" />
+                <input
+                  type="checkbox"
+                  checked={prefs.receiveEmailAds}
+                  onChange={() => togglePreference("receiveEmailAds")}
+                />
                 <span />
               </ToggleSwitch>
               <ToggleLabel>Receber e‑mails de promoção</ToggleLabel>
             </ToggleOption>
             <ToggleOption>
               <ToggleSwitch>
-                <input type="checkbox" />
+                <input
+                  type="checkbox"
+                  checked={prefs.notifications}
+                  onChange={() => togglePreference("notifications")}
+                />
                 <span />
               </ToggleSwitch>
               <ToggleLabel>Notificações</ToggleLabel>
             </ToggleOption>
           </ToggleWrapper>
-
-          <LogoutWrapper>
-            <LogoutButton onClick={handleLogout}>
-              ÚLTIMAS NOTIFICAÇÕES
-            </LogoutButton>
-          </LogoutWrapper>
         </ProfileContainer>
       </IonContent>
     </IonPage>

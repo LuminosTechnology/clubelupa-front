@@ -7,3 +7,9 @@ export interface RegisterUserRequest {
   password_confirmation: string;
   // avatar: File; // Não tem upload de avatar na hora de registar
 }
+
+export interface ChangePasswordRequest {
+  current_password: string;
+  password: string;
+  password_confirmation: string;
+}

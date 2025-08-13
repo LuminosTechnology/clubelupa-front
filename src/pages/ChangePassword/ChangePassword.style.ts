@@ -21,7 +21,7 @@ export const Avatar = styled.img`
 /* ------ Conteúdo principal ------ */
 export const ProfileContainer = styled.div`
   position: relative;
-  padding: 54px 30px 30px; /* espaço p/ header + metade do avatar */
+  padding: 0 2rem; /* espaço p/ header + metade do avatar */
   width: 100%;
   box-sizing: border-box;
   display: flex;
@@ -30,6 +30,7 @@ export const ProfileContainer = styled.div`
   flex: 1;
   height: 50%;
   justify-content: center;
+  margin-top: 5rem;
 `;
 
 export const Title = styled.h1`
@@ -38,16 +39,25 @@ export const Title = styled.h1`
   font-weight: bold;
 `;
 
-export const Input = styled.input`
+export const Input = styled.input<{ error: boolean }>`
   color: var(--ion-color-primary);
   background-color: transparent;
   border: none;
   border-bottom: 1px solid var(--ion-color-primary);
-  font-size: 1rem;
+  border-color: ${(props) =>
+    props.error ? "var(--ion-color-danger)" : "var(--ion-color-primary)"};
+  font-size: 1.2rem;
   padding: 6px;
   &::placeholder {
     color: var(--ion-color-primary);
   }
+`;
+
+export const ErrorMessage = styled.p`
+  font-size: 16px;
+  color: var(--ion-color-danger);
+  line-height: 1.5;
+  margin: 0;
 `;
 
 export const Button = styled.button`

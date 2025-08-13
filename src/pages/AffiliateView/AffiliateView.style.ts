@@ -103,6 +103,19 @@ export const Description = styled.p`
   margin: 0 0 24px;
 `;
 
+export const ErrorMessage = styled.p`
+  font-size: 16px;
+  color: var(--ion-color-danger);
+  line-height: 1.5;
+`;
+
+export const ButtonsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 4rem;
+`;
+
 export const CTAButton = styled.button<{ bg: string }>`
   display: block;
   width: 217px;
