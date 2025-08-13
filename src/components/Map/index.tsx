@@ -22,6 +22,7 @@ import { getAllEstablishments } from "../../services/affiliateService";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useHistory } from "react-router";
 import { haversine } from "../../utils/haversine";
+import { Capacitor } from "@capacitor/core";
 
 /* ---------------- extras específicos do mapa ------------------- */
 interface ExtraFields {
@@ -56,12 +57,14 @@ export interface Restaurant extends AffiliateData, ExtraFields {
 
 /* -------------------------------------------------------------------------*/
 interface MapProps {
-  apiKey: string;
   onViewMore: (r: Restaurant) => void;
   searchValue: string;
 }
 
-const Map: React.FC<MapProps> = ({ apiKey, searchValue }) => {
+const ANDROID_API_KEY = "AIzaSyDoIWw3SXNki0nyFrJGoTjzHO5CkTqU1ms";
+const IOS_API_KEY = "AIzaSyCGAcnhspK_rIozcUIXNX3Pe3DwpHMMaQc";
+
+const Map: React.FC<MapProps> = ({ searchValue }) => {
   const history = useHistory();
   const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(
     null
@@ -73,6 +76,9 @@ const Map: React.FC<MapProps> = ({ apiKey, searchValue }) => {
 
   const DEFAULT_LOCATION = { lat: -25.4415, lng: -49.291 };
   const CHECKIN_RADIUS = 5000000; // m
+
+  const apiKey =
+    Capacitor.getPlatform() === "ios" ? IOS_API_KEY : ANDROID_API_KEY;
 
   /* ─── localização do usuário ─────────────────────────────────────────── */
   useEffect(() => {
@@ -115,7 +121,7 @@ const Map: React.FC<MapProps> = ({ apiKey, searchValue }) => {
       );
 
       const gMap = await GoogleMap.create({
-        apiKey: "AIzaSyCADmNNz3iLtqV7UX-mY83WJnL6m3gpdkU",
+        apiKey: apiKey,
         id: "affiliates-map",
         element: el,
         config: {
@@ -180,7 +186,7 @@ const Map: React.FC<MapProps> = ({ apiKey, searchValue }) => {
     const timeout = setTimeout(initMap, 300);
 
     return () => clearTimeout(timeout);
-  }, [userLoc, apiKey, mapRef, establishments, debouncedSearchValue]);
+  }, [userLoc, mapRef, establishments, debouncedSearchValue]);
 
   const handleViewMore = (id: number) => {
     history.push(`/affiliate-view/${id}`);

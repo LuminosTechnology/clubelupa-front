@@ -7,12 +7,6 @@ import type { Restaurant } from "../../components/Map";
 import Map from "../../components/Map";
 import { useAuthContext } from "../../contexts/AuthContext";
 
-const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
-
-if (!GOOGLE_MAPS_API_KEY) {
-  console.warn("Google Maps API key is not defined in environment variables");
-}
-
 const Home: React.FC = () => {
   const history = useHistory();
   const { user } = useAuthContext();
@@ -75,7 +69,6 @@ const Home: React.FC = () => {
         <Header onSearchChange={setSearchValue} />
         <Map
           searchValue={searchValue}
-          apiKey={GOOGLE_MAPS_API_KEY}
           onViewMore={(affiliate) => {
             history.push(`/affiliate-view/${affiliate.id}`);
             setShowSuccess(false);
