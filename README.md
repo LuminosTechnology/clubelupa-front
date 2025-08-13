@@ -36,20 +36,20 @@ Certifique-se de ter as seguintes ferramentas instaladas:
    ```bash
    git clone https://github.com/seu-usuario/LupaApp.git
    cd LupaApp
-   
+
+   ```
+
 2. npm install
+3. npm run dev
 
-3. Configure as variáveis de ambiente no arquivo .env:
+## ⚙️ Configuração do Ambiente para rodar no Android Studio para gerar builds
 
-4. npm run dev
-
-## ⚙️ Configuração do Ambiente para rodar em ANDROID
-
-1. npm run build
+1. npx ionic build
 2. npx cap sync android
-3. npx cap run android
+3. npx cap open android
 
-## ⚙️ GERAR APK do ANDROID
+## ⚙️ Configuração do Ambiente para rodar no xcode para gerar builds
 
-The APK will be located at
-android/app/build/outputs/apk/debug/app-debug.apk
+1. npx ionic build
+2. npx cap sync ios
+3. npx cap run ios
