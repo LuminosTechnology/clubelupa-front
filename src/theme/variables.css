@@ -36,7 +36,8 @@
 
 ion-content {
   --padding-top: var(--ion-safe-area-top);
-  --background: transparent;
+  --background: transparent !important;
+  background: transparent !important;
 }
 
 ion-header {
@@ -55,6 +56,15 @@ html {
 body {
   overflow: hidden;
   background-color: transparent;
+}
+
+html,
+body,
+#root,
+ion-app,
+ion-router-outlet {
+  background: transparent !important;
+  height: 100%;
 }
 
 body.dark {
