@@ -14,10 +14,12 @@ import ScrollArea from "../../components/ScrollArea/ScrollArea";
 import AppHeader from "../../components/SimpleHeader";
 
 import InputMask from "react-input-mask";
+import { useHistory } from "react-router";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { fetchMyEstablishmentData } from "../../services/affiliateService";
 import { updateEstablishment } from "../../services/auth-service";
 import { CategoryService } from "../../services/category-service";
+import { GeocodeService } from "../../services/geocode-service";
 import { fetchCep } from "../../services/viacepService";
 import { UpdateAffiliateEstablishmentRequest } from "../../types/api/affiliate";
 import { Category } from "../../types/api/category";
@@ -28,13 +30,9 @@ import {
   Content,
   CustomSelect,
   EditContainer,
-  EditOverlay,
   FieldWrapper,
   GreenLabelTheme,
   InputTextTheme,
-  PhotoContainer,
-  ProfilePhoto,
-  ProfileWrapper,
   SalvarButton,
   SaveButtonWrapper,
   TextAreaWrapper,
@@ -43,8 +41,7 @@ import {
   UploadLogoColumn,
   UploadPersonPhotoButton,
 } from "./AffiliateEdit.style";
-import { GeocodeService } from "../../services/geocode-service";
-import { useHistory } from "react-router";
+import { add } from "ionicons/icons";
 
 /* ---------- estado (todos campos opcionais) ------------------- */
 
@@ -71,7 +68,7 @@ const AffiliateEdit: React.FC = () => {
   const [behindTheScenesPhotoUrl, setBehindTheScenesPhotoUrl] =
     useState<string>();
 
-  const [hasPhysicalAddress, setHasPhysicalAddress] = useState(false);
+  const [hasPhysicalAddress, setHasPhysicalAddress] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const { user } = useAuthContext();
 
@@ -103,52 +100,68 @@ const AffiliateEdit: React.FC = () => {
   const [form, setForm] =
     useState<UpdateAffiliateEstablishmentRequest>(initialForm);
 
-  useEffect(() => {
-    const fetchEstablishment = async () => {
-      if (!user?.establishments[0]) return;
-      const establishment = await fetchMyEstablishmentData(
-        user?.establishments[0].id
-      );
-      console.log({ establishment });
+  const fetchCategories = async () => {
+    const response = await CategoryService.getCategories();
+    setCategories(response.data);
+    console.log({ response });
+  };
 
-      setForm({
-        ...form,
-        name: establishment?.name,
-        legal_name: establishment?.legal_name,
-        description: establishment.description,
-        document_number: establishment.document_number,
-        company_age: establishment.company_age,
-        business_model: establishment.business_model,
-        email: establishment.email,
-        phone_number: establishment.phone_number,
-        whatsapp_number: establishment.whatsapp_number,
-        category_id: establishment.categories
+  console.log({ form });
+
+  const fetchEstablishment = async () => {
+    if (!user?.establishments[0]) return;
+
+    const establishment = await fetchMyEstablishmentData(
+      user?.establishments[0].id
+    );
+
+    const address = establishment?.addresses[0];
+
+    setForm((prev) => ({
+      ...prev,
+      name: establishment?.name,
+      legal_name: establishment?.legal_name,
+      description: establishment.description,
+      document_number: establishment.document_number,
+      company_age: establishment.company_age,
+      business_model: establishment.business_model,
+      email: establishment.email,
+      phone_number: establishment.phone_number,
+      whatsapp_number: establishment.whatsapp_number,
+      category_id:
+        establishment.categories.length > 0
           ? establishment.categories[0].id
           : undefined,
-        address: {
-          type: "main",
-          city: establishment.addresses[0].city,
-          state: establishment.addresses[0].state,
-          complement: establishment.addresses[0].complement,
-          zip_code: establishment.addresses[0].zip_code,
-          street: establishment.addresses[0].street,
-          number: establishment.addresses[0].number,
-          neighborhood: establishment.addresses[0].neighborhood,
-        },
-        instagram: establishment.social_links.instagram,
-        site: establishment.social_links.site,
-      });
+      address: {
+        ...form.address,
+        type: "main",
+        city: address.city,
+        state: address.state,
+        complement: address.complement,
+        zip_code: address.zip_code,
+        street: address.street,
+        number: address.number,
+        neighborhood: address.neighborhood,
+      },
+      instagram: establishment.social_links?.instagram || "",
+      site: establishment.social_links?.site || "",
+    }));
 
-      if (establishment?.addresses && establishment.addresses.length > 0) {
-        setHasPhysicalAddress(true);
-      }
+    // if (establishment?.addresses && establishment.addresses.length > 0) {
+    //   setHasPhysicalAddress(true);
+    // }
 
-      setShopPhotoUrl(establishment.shop_photo_url);
-      setProductPhotoUrl(establishment.product_photo_url);
-      setBehindTheScenesPhotoUrl(establishment.behind_the_scenes_photo_url);
+    setShopPhotoUrl(establishment.shop_photo_url);
+    setProductPhotoUrl(establishment.product_photo_url);
+    setBehindTheScenesPhotoUrl(establishment.behind_the_scenes_photo_url);
+  };
+  useEffect(() => {
+    const load = async () => {
+      await fetchCategories();
+      await fetchEstablishment();
     };
 
-    fetchEstablishment();
+    load();
   }, []);
 
   const onLogoClick = () => shopPhotoFileRef.current?.click();
@@ -226,6 +239,7 @@ const AffiliateEdit: React.FC = () => {
 
   const handleSave = async () => {
     if (!establishment?.id) return;
+    console.log({ form });
 
     let address = form.address;
     if (hasPhysicalAddress) {
@@ -241,13 +255,13 @@ const AffiliateEdit: React.FC = () => {
 
     const data = {
       ...form,
-      address,
+      address: { ...address, type: "main" },
       shop_photo: shopPhotoFile,
       product_photo: productPhotoFile,
       behind_the_scenes_photo: behindTheScenesPhotoFile,
     };
-
     console.log(data);
+
     try {
       await updateEstablishment({ id: establishment.id, data });
 
@@ -256,15 +270,6 @@ const AffiliateEdit: React.FC = () => {
       console.error(e);
     }
   };
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const response = await CategoryService.getCategories();
-      setCategories(response.data);
-    };
-
-    fetchCategories();
-  }, []);
 
   /* ─── UI ────────────────────────────────────────────────────── */
   return (
@@ -474,7 +479,9 @@ const AffiliateEdit: React.FC = () => {
                       placeholder="Categoria"
                       value={form.category_id}
                       fill="solid"
-                      onIonChange={(e) => {}}
+                      onIonChange={(e) => {
+                        setForm({ ...form, category_id: e.detail.value });
+                      }}
                     >
                       {categories.map((category) => (
                         <IonSelectOption key={category.id} value={category.id}>

@@ -200,13 +200,15 @@ const AffiliateView: React.FC = () => {
                 </Section>
               )}
 
-              {data?.social_links.instagram && (
+              {data?.social_links?.instagram && (
                 <LinkRow>
                   <LinkIcon color={color}>
                     <InstaIcon size={18} />
                   </LinkIcon>
                   <LinkText
-                    href={`https://instagram.com/${data?.social_links.instagram}`}
+                    href={`https://instagram.com/${
+                      data?.social_links?.instagram || ""
+                    }`}
                     target="_blank"
                     rel="noopener noreferrer"
                     color={color}
@@ -216,7 +218,7 @@ const AffiliateView: React.FC = () => {
                 </LinkRow>
               )}
 
-              {data?.social_links.website && (
+              {data?.social_links?.website && (
                 <PlainLinkRow>
                   <PlainLink href="#" target="_blank" color={color}>
                     Acesse o site

@@ -36,8 +36,7 @@
 
 ion-content {
   --padding-top: var(--ion-safe-area-top);
-  --background: transparent !important;
-  background: transparent !important;
+  --background: transparent;
 }
 
 ion-header {

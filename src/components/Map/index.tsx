@@ -63,6 +63,7 @@ interface MapProps {
 
 const ANDROID_API_KEY = "AIzaSyDoIWw3SXNki0nyFrJGoTjzHO5CkTqU1ms";
 const IOS_API_KEY = "AIzaSyCGAcnhspK_rIozcUIXNX3Pe3DwpHMMaQc";
+const HTTP_API_KEY = "AIzaSyCADmNNz3iLtqV7UX-mY83WJnL6m3gpdkU";
 
 const Map: React.FC<MapProps> = ({ searchValue }) => {
   const history = useHistory();
@@ -77,8 +78,9 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
   const DEFAULT_LOCATION = { lat: -25.4415, lng: -49.291 };
   const CHECKIN_RADIUS = 5000000; // m
 
-  const apiKey =
-    Capacitor.getPlatform() === "ios" ? IOS_API_KEY : ANDROID_API_KEY;
+  // const apiKey =
+  //   Capacitor.getPlatform() === "ios" ? IOS_API_KEY : ANDROID_API_KEY;
+  const apiKey = HTTP_API_KEY;
 
   /* ─── localização do usuário ─────────────────────────────────────────── */
   useEffect(() => {

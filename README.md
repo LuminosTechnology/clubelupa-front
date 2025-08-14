@@ -33,23 +33,36 @@ Certifique-se de ter as seguintes ferramentas instaladas:
 
 1. Clone o repositório:
 
-   ```bash
-   git clone https://github.com/seu-usuario/LupaApp.git
-   cd LupaApp
+```bash
+git clone https://github.com/seu-usuario/LupaApp.git
+cd LupaApp
+```
 
-   ```
+```bash
+npm install
+npm run dev
+```
 
-2. npm install
-3. npm run dev
+### IonicCLI
+
+Deve-se primeiro garantir que tem o CLI do Ionic instalado:
+
+```bash
+npm install -g @ionic/cli
+```
 
 ## ⚙️ Configuração do Ambiente para rodar no Android Studio para gerar builds
 
-1. npx ionic build
-2. npx cap sync android
-3. npx cap open android
+```bash
+npx ionic build
+npx cap sync android
+npx cap open android
+```
 
 ## ⚙️ Configuração do Ambiente para rodar no xcode para gerar builds
 
-1. npx ionic build
-2. npx cap sync ios
-3. npx cap run ios
+```bash
+npx ionic build
+npx cap sync ios
+npx cap open ios
+```
