@@ -4,6 +4,17 @@ const config: CapacitorConfig = {
   appId: "br.com.clubelupa.app",
   appName: "Clube Lupa",
   webDir: "dist",
+  ios: {
+    plist: {
+      // Localização
+      NSLocationWhenInUseUsageDescription:
+        "Precisamos da sua localização para mostrar experiências próximas.",
+      // Criptografia
+      ITSAppUsesNonExemptEncryption: false,
+      // Orientação
+      UISupportedInterfaceOrientations: ["UIInterfaceOrientationPortrait"],
+    },
+  },
   plugins: {
     CapacitorGoogleMaps: {
       apiKey: "AIzaSyDoIWw3SXNki0nyFrJGoTjzHO5CkTqU1ms",
