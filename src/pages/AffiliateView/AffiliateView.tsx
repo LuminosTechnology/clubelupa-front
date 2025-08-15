@@ -37,6 +37,8 @@ import {
 import { haversine } from "../../utils/haversine";
 import { Geolocation } from "@capacitor/geolocation";
 import { AxiosError } from "axios";
+import { useGamificationContext } from "../../contexts/GamificationContext";
+import { Browser } from "@capacitor/browser";
 
 interface Params {
   id: string;
@@ -56,12 +58,17 @@ const AffiliateView: React.FC = () => {
     undefined
   );
 
+  const { refetchGamificationSummary } = useGamificationContext();
+
   const color = data?.categories[0]?.color || "#E6C178";
 
   const handleCheckIn = async () => {
     try {
       await doCheckIn(Number(id));
       setShowCheckIn(true);
+      setTimeout(async () => {
+        await refetchGamificationSummary();
+      }, 1000);
     } catch (e) {
       if (e instanceof AxiosError) {
         if (e.status === 429) {
@@ -132,6 +139,10 @@ const AffiliateView: React.FC = () => {
     } catch (e) {
       setFavorite((v) => !v);
     }
+  };
+
+  const handleGoToSite = async (url: string) => {
+    await Browser.open({ url });
   };
 
   return (
@@ -206,10 +217,9 @@ const AffiliateView: React.FC = () => {
                     <InstaIcon size={18} />
                   </LinkIcon>
                   <LinkText
-                    href={`https://instagram.com/${
-                      data?.social_links?.instagram || ""
-                    }`}
-                    target="_blank"
+                    onClick={() =>
+                      handleGoToSite(data?.social_links?.instagram)
+                    }
                     rel="noopener noreferrer"
                     color={color}
                   >
@@ -218,9 +228,13 @@ const AffiliateView: React.FC = () => {
                 </LinkRow>
               )}
 
-              {data?.social_links?.website && (
+              {data?.social_links?.site && (
                 <PlainLinkRow>
-                  <PlainLink href="#" target="_blank" color={color}>
+                  <PlainLink
+                    onClick={() => handleGoToSite(data?.social_links?.site)}
+                    target="_blank"
+                    color={color}
+                  >
                     Acesse o site
                   </PlainLink>
                 </PlainLinkRow>

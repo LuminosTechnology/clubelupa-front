@@ -9,23 +9,21 @@ import {
   Heading,
   Description,
   ShareButton,
-  CloseBtn,               // import do novo botão
+  CloseBtn, // import do novo botão
 } from "./footerAchievementsSuccess.style";
 
-
-import footerClose from "../../assets/footer-close.svg";  // ícone de fechar
+import footerClose from "../../assets/footer-close.svg"; // ícone de fechar
+import { Medal } from "../../types/api/user";
 
 interface Props {
   visible: boolean;
-  icon: string;
-  title: string;
+  medal: Medal;
   onClose?: () => void;
 }
 
 const FooterAchievementsSuccess: React.FC<Props> = ({
   visible,
-  icon,
-  title,
+  medal,
   onClose,
 }) => {
   const minHeight = 0;
@@ -52,7 +50,9 @@ const FooterAchievementsSuccess: React.FC<Props> = ({
   const move = (e: React.TouchEvent) => {
     if (!dragging) return;
     const delta = drag.current.startY - e.touches[0].clientY;
-    setHeight(Math.max(minHeight, Math.min(maxHeight, drag.current.startHeight + delta)));
+    setHeight(
+      Math.max(minHeight, Math.min(maxHeight, drag.current.startHeight + delta))
+    );
   };
   const end = () => {
     if (!dragging) return;
@@ -79,17 +79,22 @@ const FooterAchievementsSuccess: React.FC<Props> = ({
 
       <ExpandedContent $expanded={height > minHeight + 20}>
         <HeartWrapper>
-          <img src={icon } alt={title} width={180} height={180} />
+          <img src={medal.icon_url} alt={medal.name} width={180} height={180} />
         </HeartWrapper>
 
-        <Heading>{title}</Heading>
+        <Heading>Parabéns!</Heading>
 
-        <Description>
-          Parabéns! Você desbloqueou a conquista <strong>{title}</strong>.
-        </Description>
+        <Description>{medal.description}</Description>
 
-        <ShareButton onClick={() => {/* lógica de compartilhamento */}}>
-          <IonIcon icon={shareSocialOutline} style={{ fontSize: 20, marginRight: 12 }} />
+        <ShareButton
+          onClick={() => {
+            /* lógica de compartilhamento */
+          }}
+        >
+          <IonIcon
+            icon={shareSocialOutline}
+            style={{ fontSize: 20, marginRight: 12 }}
+          />
           COMPARTILHAR CONQUISTA
         </ShareButton>
 

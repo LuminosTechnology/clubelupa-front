@@ -290,11 +290,7 @@ const AffiliateRegister: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent
-        forceOverscroll={true}
-        scrollY
-        style={{ "--background": "#E6C178" }}
-      >
+      <IonContent style={{ "--background": "#E6C178" }}>
         <AffiliateContainer>
           <BackButton />
           <h2>Cadastre-se para ser um afiliado</h2>

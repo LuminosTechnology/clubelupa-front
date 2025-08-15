@@ -44,12 +44,12 @@ export interface UpdateAffiliateEstablishmentRequest {
 
   address: Partial<CreateAddress>;
 
-  instagram?: string;
-  site?: string;
-
   shop_photo?: File;
   product_photo?: File;
   behind_the_scenes_photo?: File;
+
+  instagram?: string;
+  site?: string;
 }
 
 export interface AdvertisementData {

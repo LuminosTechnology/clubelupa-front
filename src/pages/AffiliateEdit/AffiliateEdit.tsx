@@ -30,18 +30,19 @@ import {
   Content,
   CustomSelect,
   EditContainer,
+  ErrorMessage,
   FieldWrapper,
   GreenLabelTheme,
   InputTextTheme,
   SalvarButton,
   SaveButtonWrapper,
+  SiteContainer,
   TextAreaWrapper,
   TitleSection,
   UploadImageButton,
   UploadLogoColumn,
   UploadPersonPhotoButton,
 } from "./AffiliateEdit.style";
-import { add } from "ionicons/icons";
 
 /* ---------- estado (todos campos opcionais) ------------------- */
 
@@ -71,6 +72,9 @@ const AffiliateEdit: React.FC = () => {
   const [hasPhysicalAddress, setHasPhysicalAddress] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
   const { user } = useAuthContext();
+
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const establishment = user?.establishments[0];
   const initialForm: UpdateAffiliateEstablishmentRequest = {
@@ -103,10 +107,7 @@ const AffiliateEdit: React.FC = () => {
   const fetchCategories = async () => {
     const response = await CategoryService.getCategories();
     setCategories(response.data);
-    console.log({ response });
   };
-
-  console.log({ form });
 
   const fetchEstablishment = async () => {
     if (!user?.establishments[0]) return;
@@ -237,37 +238,96 @@ const AffiliateEdit: React.FC = () => {
     }
   };
 
-  const handleSave = async () => {
-    if (!establishment?.id) return;
-    console.log({ form });
+  const validateForm = async () => {
+    const newErrors: { [key: string]: string } = {};
 
     let address = form.address;
     if (hasPhysicalAddress) {
-      const coords = await fetchCoords();
-      if (!coords) throw new Error("Coords not found");
-      address = {
-        ...form.address,
-        latitude: coords.latitude,
-        longitude: coords.longitude,
-      };
-    }
-    console.log({ address });
+      if (!form.address.street) newErrors.street = "Endereço é obrigatório";
+      if (!form.address.number) newErrors.number = "Número é obrigatório";
+      if (!form.address.city) newErrors.city = "Cidade é obrigatória";
+      if (!form.address.state) newErrors.state = "Estado (UF) é obrigatório";
+      if (!form.address.zip_code) newErrors.zip_code = "CEP é obrigatório";
 
-    const data = {
+      const coords = await fetchCoords();
+      if (coords) {
+        address = {
+          ...form.address,
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+        };
+      }
+    }
+
+    let newData: UpdateAffiliateEstablishmentRequest = {
       ...form,
       address: { ...address, type: "main" },
       shop_photo: shopPhotoFile,
       product_photo: productPhotoFile,
       behind_the_scenes_photo: behindTheScenesPhotoFile,
     };
-    console.log(data);
+
+    if (newData.site && newData.site?.trim().length > 0) {
+      try {
+        newData.site = formatWebsite(newData.site);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    const trimmedInstagram = newData.instagram?.trim();
+    const trimmedSite = newData.site?.trim();
+
+    const hasNoInstagram = !trimmedInstagram || trimmedInstagram.length === 0;
+    const hasNoSite = !trimmedSite || trimmedSite.length === 0;
+
+    if (hasNoInstagram && hasNoSite) {
+      newErrors.instagram = "Informe o Instagram ou site";
+      newErrors.site = "Informe o site ou Instagram";
+    }
+
+    setErrors(newErrors);
+
+    setForm(newData);
+    if (Object.keys(newErrors).length > 0) {
+      console.log({ newErrors });
+      setIsLoading(false);
+      return false;
+    }
+    return newData;
+  };
+
+  console.log(errors);
+  const formatWebsite = (value: string) => {
+    let trimmed = value.trim();
+
+    // Se não tiver protocolo, adiciona https://
+    if (!/^https?:\/\//i.test(trimmed)) {
+      trimmed = "https://" + trimmed.replace(/^www\./i, "");
+    }
 
     try {
-      await updateEstablishment({ id: establishment.id, data });
+      const parsed = new URL(trimmed);
+      return parsed.href; // retorna sempre com protocolo + domínio
+    } catch (error) {
+      return value; // se for inválida, mantém como está (para feedback de erro)
+    }
+  };
+
+  const handleSave = async () => {
+    setIsLoading(true);
+    if (!establishment?.id) return;
+    const validatedForm = await validateForm();
+    if (!validatedForm) return;
+
+    try {
+      await updateEstablishment({ data: validatedForm, id: establishment.id });
 
       history.goBack();
     } catch (e) {
       console.error(e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -404,6 +464,9 @@ const AffiliateEdit: React.FC = () => {
                             })
                           }
                         />
+                        {errors.street && (
+                          <ErrorMessage>{errors.street}</ErrorMessage>
+                        )}
                       </FieldWrapper>
 
                       <FieldWrapper>
@@ -420,6 +483,9 @@ const AffiliateEdit: React.FC = () => {
                             })
                           }
                         />
+                        {errors.number && (
+                          <ErrorMessage>{errors.number}</ErrorMessage>
+                        )}
                       </FieldWrapper>
 
                       <FieldWrapper>
@@ -452,6 +518,9 @@ const AffiliateEdit: React.FC = () => {
                             })
                           }
                         />
+                        {errors.city && (
+                          <ErrorMessage>{errors.city}</ErrorMessage>
+                        )}
                       </FieldWrapper>
 
                       <FieldWrapper>
@@ -470,6 +539,9 @@ const AffiliateEdit: React.FC = () => {
                           }
                         />
                       </FieldWrapper>
+                      {errors.state && (
+                        <ErrorMessage>{errors.state}</ErrorMessage>
+                      )}
                     </>
                   )}
 
@@ -493,12 +565,21 @@ const AffiliateEdit: React.FC = () => {
 
                   <FieldWrapper>
                     <label>Instagram</label>
-                    <input
-                      value={form.instagram}
-                      onChange={(e) =>
-                        setForm({ ...form, instagram: e.target.value })
-                      }
-                    />
+                    <SiteContainer>
+                      <p>@</p>
+                      <input
+                        value={form.instagram}
+                        onChange={(e) =>
+                          setForm({
+                            ...form,
+                            instagram: e.target.value,
+                          })
+                        }
+                      />
+                    </SiteContainer>
+                    {errors.instagram && (
+                      <ErrorMessage>{errors.instagram}</ErrorMessage>
+                    )}
                   </FieldWrapper>
 
                   <FieldWrapper>
@@ -506,10 +587,15 @@ const AffiliateEdit: React.FC = () => {
                     <input
                       type="url"
                       value={form.site}
+                      placeholder="exemplo.com"
                       onChange={(e) =>
-                        setForm({ ...form, site: e.target.value })
+                        setForm({
+                          ...form,
+                          site: e.target.value,
+                        })
                       }
                     />
+                    {errors.site && <ErrorMessage>{errors.site}</ErrorMessage>}
                   </FieldWrapper>
 
                   <TextAreaWrapper>
@@ -620,9 +706,16 @@ const AffiliateEdit: React.FC = () => {
                       </UploadPersonPhotoButton>
                     </UploadLogoColumn>
                   </FieldWrapper>
+                  {Object.keys(errors).length > 0 && (
+                    <ErrorMessage style={{ marginBottom: "16px" }}>
+                      Por favor, corrija os campos acima para continuar.
+                    </ErrorMessage>
+                  )}
 
                   <SaveButtonWrapper>
-                    <SalvarButton onClick={handleSave}>SALVAR</SalvarButton>
+                    <SalvarButton onClick={handleSave} disabled={isLoading}>
+                      {isLoading ? "SALVANDO..." : "SALVAR"}{" "}
+                    </SalvarButton>
                   </SaveButtonWrapper>
                 </EditContainer>
               </InputTextTheme>

@@ -1,6 +1,6 @@
 import { Geolocation } from "@capacitor/geolocation";
 import { GoogleMap } from "@capacitor/google-maps";
-import { IonIcon } from "@ionic/react";
+import { IonIcon, IonSpinner } from "@ionic/react";
 import { close } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -149,6 +149,8 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
 
       await gMap.enableCurrentLocation(true);
 
+      let markerMap: Record<number, number> = {};
+
       for (const e of establishments) {
         if (e.addresses.length <= 0) continue;
         const address = e.addresses[0];
@@ -157,21 +159,20 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
           lng: Number(address.longitude),
         };
         if (address) {
-          await gMap.addMarker({
+          const markerId = await gMap.addMarker({
             coordinate: location,
             iconUrl: "assets/affiliate_pin.png",
             iconSize: { width: 40, height: 55 },
             iconAnchor: { x: 20, y: 55 },
           });
+
+          markerMap[Number(markerId)] = Number(e.id);
         }
       }
 
       await gMap.setOnMarkerClickListener(async (m) => {
-        const hit = establishments.find(
-          (e) =>
-            Number(e.addresses[0].latitude) == m.latitude &&
-            Number(e.addresses[0].longitude) == m.longitude
-        );
+        const establishmentId = markerMap[Number(m.markerId)];
+        const hit = establishments.find((e) => e.id == establishmentId);
         if (hit) {
           setSelected(hit);
           await gMap.setCamera({
@@ -197,6 +198,7 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
   /* ─── UI ─────────────────────────────────────────────────────────────── */
   return (
     <MapWrapper>
+      <IonSpinner />
       <capacitor-google-map
         ref={mapRef}
         id="map"

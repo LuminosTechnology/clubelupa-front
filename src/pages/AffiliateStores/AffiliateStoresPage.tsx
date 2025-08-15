@@ -92,7 +92,11 @@ const AffiliateStoresPage: React.FC = () => {
       <IonContent
         ref={containerRef}
         fullscreen
-        style={{ "--background": "#ffffff", "--offset-bottom": "400px" }}
+        style={{
+          "--background": "#ffffff",
+          "--offset-bottom": "400px",
+          "--offset-top": "-1px",
+        }}
       >
         <IonLoading isOpen={loading} message="Carregando afiliados…" />
         <IonToast

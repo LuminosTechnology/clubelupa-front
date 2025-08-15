@@ -12,13 +12,15 @@ export const FooterContainer = styled.div`
   z-index: 14;
   touch-action: none;
   user-select: none;
+  display: flex;
 `;
 
 /* Removida a WhiteLine */
 
 /* Conteúdo interno */
 export const ExpandedContent = styled.div<{ $expanded: boolean }>`
-  max-height: calc(75vh - 50px);
+  flex: 1;
+  max-height: calc(75vh);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 
@@ -37,7 +39,6 @@ export const ExpandedContent = styled.div<{ $expanded: boolean }>`
 export const HeartWrapper = styled.div`
   width: 250px;
   height: 250px;
-  margin-bottom: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -64,12 +65,14 @@ export const ShareButton = styled(Button)`
   background: #fff;
   color: #8e9455 !important;
   font-weight: 700;
+  display: flex;
+  align-items: center;
 `;
 
 /* Novo: botão de fechar */
 export const CloseBtn = styled.button`
+  margin-top: auto;
   display: block;
-  margin: 20px auto 0;
   background: none;
   border: none;
   padding: 0;

@@ -68,6 +68,21 @@ export const FieldWrapper = styled.div`
   gap: 4px;
 `;
 
+export const ErrorMessage = styled.div`
+  color: var(--ion-color-danger);
+`;
+
+export const SiteContainer = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  p {
+    color: black;
+    margin: 0;
+  }
+`;
+
 export const UploadPhotoColumn = styled.div`
   display: flex;
   flex-direction: column;
@@ -212,10 +227,14 @@ export const BuscarButton = styled.button`
   }
 `;
 
-export const SalvarButton = styled(BuscarButton)``;
+export const SalvarButton = styled(BuscarButton)`
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
 
 export const SaveButtonWrapper = styled.div`
-  margin-top: 24px;
   display: flex;
   justify-content: center;
 `;

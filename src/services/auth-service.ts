@@ -11,7 +11,11 @@ import {
   RegisterAffiliateRequest,
   UpdateAffiliateEstablishmentRequest,
 } from "../types/api/affiliate";
-import { RegisterUserRequest, UpdateUserRequest } from "../types/api/user";
+import {
+  GamificationSummaryResponse,
+  RegisterUserRequest,
+  UpdateUserRequest,
+} from "../types/api/user";
 import { LOCAL_STORAGE_KEYS } from "../config/constants";
 import { ChangePasswordRequest } from "../types/api/auth";
 
@@ -184,4 +188,11 @@ export const changePassword = async ({
     password_confirmation,
   });
   return response.data;
+};
+
+export const getGamificationSummary = async () => {
+  const response = await api.get<{ data: GamificationSummaryResponse }>(
+    "/user/gamification-summary"
+  );
+  return response.data.data;
 };

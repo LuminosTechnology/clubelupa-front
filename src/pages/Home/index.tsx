@@ -1,5 +1,5 @@
 import { IonContent, IonPage } from "@ionic/react";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
@@ -45,24 +45,6 @@ const Home: React.FC = () => {
     return () => observer.disconnect();
   }, []);
 
-  /* ─── nome pronto para o footer de sucesso ─────────────────────── */
-  const affiliateDisplayName = useMemo(() => {
-    if (!selectedAffiliate) return "";
-    return (
-      selectedAffiliate.nome_local ||
-      selectedAffiliate.nome_fantasia ||
-      "Afiliado"
-    );
-  }, [selectedAffiliate]);
-
-  const affiliateForFooter = useMemo(() => {
-    if (!selectedAffiliate) return null;
-    return {
-      ...selectedAffiliate,
-      name: affiliateDisplayName,
-    };
-  }, [selectedAffiliate, affiliateDisplayName]);
-
   return (
     <IonPage>
       <IonContent>
@@ -71,37 +53,10 @@ const Home: React.FC = () => {
           searchValue={searchValue}
           onViewMore={(affiliate) => {
             history.push(`/affiliate-view/${affiliate.id}`);
-            setShowSuccess(false);
           }}
         />
 
-        {/* Footer padrão do usuário */}
-        {user && !affiliateForFooter && !showSuccess && <Footer />}
-        {/* 
-        <AffiliateFooter
-          visible={true}
-          affiliate={affiliateForFooter}
-          onClose={() => setSelectedAffiliate(null)}
-          onAction={() =>
-            history.push(`/affiliate-view/${affiliateForFooter.id}`)
-          }
-        /> */}
-
-        {/* Footer de sucesso de check-in */}
-        {/* {affiliateForFooter && showSuccess && (
-          <CheckinSuccessFooter
-            affiliateName={affiliateDisplayName}
-            coinsEarned={affiliateForFooter.value}
-            onRedeem={() => {
-              setShowSuccess(false);
-              setSelectedAffiliate(null);
-            }}
-            onClose={() => {
-              setShowSuccess(false);
-              setSelectedAffiliate(null);
-            }}
-          />
-        )} */}
+        <Footer />
       </IonContent>
     </IonPage>
   );

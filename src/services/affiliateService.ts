@@ -26,6 +26,7 @@ export const getMyFirstAffiliate = async (): Promise<AffiliateData | null> => {
 export const getAllEstablishments = async (search?: string | null) => {
   let params: Record<string, string> = {};
   if (!!search) params["filter[Search]"] = search;
+  params.sort = "name";
 
   const response = await api.get<PaginatedResponse<Establishment[]>>(
     "/establishments",
@@ -88,6 +89,7 @@ export const toggleFavorite = async (id: number) => {
 export const fetchFavorites = async ({ query }: { query?: string }) => {
   let params: Record<string, string> = {};
   if (!!query) params["filter[Search]"] = query;
+  params.sort = "name";
   const response = await api.get<PaginatedResponse<Establishment[]>>(
     `/user/favorites/establishments`,
     {
