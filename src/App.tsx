@@ -54,6 +54,7 @@ import { GlobalFonts } from "./styles/GlobalFonts";
 import BecomeAnAffiliatePage from "./pages/BecomeAnAffiliate/BecomeAnAffiliate";
 import ProfileChangePasswordPage from "./pages/ChangePassword/ChangePassword";
 import { AffiliateAdsPage } from "./pages/AffiliateAds/AffiliateAds";
+import { Capacitor } from "@capacitor/core";
 
 declare global {
   interface Window {
@@ -81,9 +82,12 @@ const App: React.FC = () => {
       if (!user) return;
 
       await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
+      const iosKey = "appl_dZZzxmzoRnKJwBglWujMEzWEExQ";
+      const androidKey = "goog_KxFoVBiQbkVTqqxwfazoyszXRtq";
+      const apiKey = Capacitor.getPlatform() === "ios" ? iosKey : androidKey;
       await Purchases.configure({
-        apiKey: "goog_KxFoVBiQbkVTqqxwfazoyszXRtq",
-        appUserID: String(user.id),
+        apiKey: apiKey,
+        appUserID: user.id.toString(),
       });
 
       window.Purchases = Purchases;
