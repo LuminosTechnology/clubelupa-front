@@ -6,6 +6,9 @@ import Header from "../../components/Header";
 import type { Restaurant } from "../../components/Map";
 import Map from "../../components/Map";
 import { useAuthContext } from "../../contexts/AuthContext";
+import { BottomSheet } from "../../components/BottomSheet";
+import { ColapseButtonsContainer, CollapsedButton } from "./home.style";
+import { HomeBottomSheet } from "./components/home-bottom-sheet";
 
 const Home: React.FC = () => {
   const history = useHistory();
@@ -47,7 +50,7 @@ const Home: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent>
+      <IonContent scrollY={false}>
         <Header onSearchChange={setSearchValue} />
         <Map
           searchValue={searchValue}
@@ -55,8 +58,8 @@ const Home: React.FC = () => {
             history.push(`/affiliate-view/${affiliate.id}`);
           }}
         />
-
-        <Footer />
+        {/* <Footer /> */}
+        <HomeBottomSheet />
       </IonContent>
     </IonPage>
   );

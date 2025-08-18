@@ -78,9 +78,16 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
   const DEFAULT_LOCATION = { lat: -25.4415, lng: -49.291 };
   const CHECKIN_RADIUS = 5000000; // m
 
-  // const apiKey =
-  //   Capacitor.getPlatform() === "ios" ? IOS_API_KEY : ANDROID_API_KEY;
-  const apiKey = HTTP_API_KEY;
+  const apiKey = () => {
+    switch (Capacitor.getPlatform()) {
+      case "ios":
+        return IOS_API_KEY;
+      case "android":
+        return ANDROID_API_KEY;
+      default:
+        return HTTP_API_KEY;
+    }
+  };
 
   /* ─── localização do usuário ─────────────────────────────────────────── */
   useEffect(() => {
@@ -123,7 +130,7 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
       );
 
       const gMap = await GoogleMap.create({
-        apiKey: apiKey,
+        apiKey: apiKey(),
         id: "affiliates-map",
         element: el,
         config: {
@@ -198,7 +205,6 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
   /* ─── UI ─────────────────────────────────────────────────────────────── */
   return (
     <MapWrapper>
-      <IonSpinner />
       <capacitor-google-map
         ref={mapRef}
         id="map"
