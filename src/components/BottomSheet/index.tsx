@@ -69,6 +69,8 @@ export const BottomSheet: React.FC<Props> = ({
 
     c.style.transform = `translateY(${CLOSED_Y}px)`;
     c.dataset.open = "false";
+
+    onClose();
   };
 
   return (
@@ -81,11 +83,14 @@ export const BottomSheet: React.FC<Props> = ({
       <div className="swipe-helper" />
       <div className="content-wrapper">
         <div className="closed">{closeContent}</div>
-        <div className="open">{openContent}</div>
+        <div className="open">
+          {openContent}
+
+          <CloseButton onClick={handleClose}>
+            <XIcon />
+          </CloseButton>
+        </div>
       </div>
-      <CloseButton onClick={handleClose}>
-        <XIcon />
-      </CloseButton>
     </CustomCard>
   );
 };

@@ -30,6 +30,8 @@ export const HomeBottomSheet = () => {
 
   return (
     <BottomSheet
+      displayAvatar
+      onClose={() => setView("main")}
       closeContent={
         <>
           <ColapseButtonsContainer>

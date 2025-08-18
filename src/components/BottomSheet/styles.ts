@@ -83,8 +83,10 @@ export const CloseButton = styled.button`
   border: 1px solid white;
   border-radius: 50%;
   aspect-ratio: 1;
-  padding: 10px;
+  padding: 1rem;
   display: flex;
   align-items: center;
   justify-items: center;
+  margin: 0 auto;
+  margin-top: 2rem;
 `;
