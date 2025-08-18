@@ -1,12 +1,14 @@
+# ios/App/Podfile
 require_relative '../../node_modules/@capacitor/ios/scripts/pods_helpers'
 
 platform :ios, '14.0'
 use_frameworks!
 
-# workaround to avoid Xcode caching of Pods that requires
-# Product -> Clean Build Folder after new Cordova plugins installed
-# Requires CocoaPods 1.6 or newer
-install! 'cocoapods', :disable_input_output_paths => true
+# NÃO usar: install! 'cocoapods', :disable_input_output_paths => true
+# (deixe comentado/fora para preservar Input/Output Paths dos scripts [CP])
+
+# Opcional: reduzir telemetria do CocoaPods
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
 def capacitor_pods
   pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
@@ -24,9 +26,53 @@ end
 
 target 'App' do
   capacitor_pods
-  # Add your Pods here
+
+  # Override para a versão 5.x do SDK nativo do RevenueCat (corrige o case .unsupported do StoreKit)
+  # Se preferir sempre a mais recente, você pode remover a versão e usar apenas: pod 'RevenueCat'
+  pod 'RevenueCat', '~> 5.0'
+  # ou: pod 'RevenueCat'   # pega a mais recente disponível
 end
 
 post_install do |installer|
+  # Alinha o target mínimo (helper do Capacitor)
   assertDeploymentTarget(installer)
+
+  # --------- Failsafe contra o User Script Sandboxing ---------
+  # Desliga o sandbox no PROJETO Pods
+  installer.pods_project.build_configurations.each do |config|
+    config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
+    # (opcionais — mantendo porque você já usava)
+    config.build_settings['CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER'] = 'NO'
+    config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
+  end
+
+  # Desliga o sandbox em TODOS os TARGETs dos Pods
+  installer.pods_project.targets.each do |t|
+    t.build_configurations.each do |config|
+      config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
+      config.build_settings['CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER'] = 'NO'
+      config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
+    end
+  end
+
+  # Desliga o sandbox no seu PROJETO App e TARGET(s) do App
+  installer.aggregate_targets.each do |agg|
+    # Projeto do usuário (seu .xcodeproj/.xcworkspace)
+    agg.user_project.build_configurations.each do |config|
+      config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
+    end
+    # Targets do usuário (ex.: App)
+    agg.user_targets.each do |t|
+      t.build_configurations.each do |config|
+        config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
+      end
+    end
+
+    # Garante persistência das alterações no user project
+    agg.user_project.save
+  end
+
+  # Salva alterações no projeto dos Pods
+  installer.pods_project.save
+  # ------------------------------------------------------------
 end
