@@ -1,26 +1,14 @@
 import { IonContent, IonPage } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import Footer from "../../components/Footer";
 import Header from "../../components/Header";
-import type { Restaurant } from "../../components/Map";
 import Map from "../../components/Map";
-import { useAuthContext } from "../../contexts/AuthContext";
-import { BottomSheet } from "../../components/BottomSheet";
-import { ColapseButtonsContainer, CollapsedButton } from "./home.style";
 import { HomeBottomSheet } from "./components/home-bottom-sheet";
 
 const Home: React.FC = () => {
   const history = useHistory();
-  const { user } = useAuthContext();
-
-  const [selectedAffiliate, setSelectedAffiliate] = useState<Restaurant | null>(
-    null
-  );
 
   const [searchValue, setSearchValue] = useState("");
-
-  const [showSuccess, setShowSuccess] = useState(false);
 
   /* ─── remove aria-hidden que o Google Maps injeta ──────────────── */
   useEffect(() => {

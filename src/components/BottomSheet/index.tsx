@@ -56,7 +56,6 @@ export const BottomSheet: React.FC<Props> = ({
           c.style.transform = `translateY(${CLOSED_Y}px)`;
           c.dataset.open = "false";
         }
-        // console.log(e);
       },
     });
 
