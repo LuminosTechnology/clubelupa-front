@@ -25,8 +25,8 @@ import {
 } from "./footer.style";
 
 import footerClose from "../../assets/footer-close.svg";
-import homeConquistas from "../../assets/home-conquistas.svg";
 import homeHome from "../../assets/home-home.svg";
+import homeConquistas from "../../assets/home-conquistas.svg";
 import homeLugares from "../../assets/home-lugares.svg";
 import homeLupa from "../../assets/home-lupa.svg";
 import homeNivel from "../../assets/moeda_vazia.png";

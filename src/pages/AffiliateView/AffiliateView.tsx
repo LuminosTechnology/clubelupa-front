@@ -1,16 +1,27 @@
-import { IonContent, IonPage, IonSpinner, IonToast } from "@ionic/react";
+import { Browser } from "@capacitor/browser";
+import { Geolocation } from "@capacitor/geolocation";
+import {
+  IonAlert,
+  IonContent,
+  IonModal,
+  IonPage,
+  IonSpinner,
+  IonToast,
+} from "@ionic/react";
+import { AxiosError } from "axios";
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import backButtonVerde from "../../assets/arrow-left.svg";
 import HeartIcon from "../../assets/like.svg?react";
-import CheckinSuccessFooter from "../../components/CheckinSuccessFooter";
 import InstaIcon from "../../components/icons/InstaIcon";
+import { useGamificationContext } from "../../contexts/GamificationContext";
 import {
   doCheckIn,
   fetchSingleEstablishmentData,
   toggleFavorite,
 } from "../../services/affiliateService";
 import { Establishment } from "../../types/api/api";
+import { haversine } from "../../utils/haversine";
 import {
   BackButton,
   BackButtonWrapper,
@@ -34,11 +45,6 @@ import {
   Title,
   TitleWrapper,
 } from "./AffiliateView.style";
-import { haversine } from "../../utils/haversine";
-import { Geolocation } from "@capacitor/geolocation";
-import { AxiosError } from "axios";
-import { useGamificationContext } from "../../contexts/GamificationContext";
-import { Browser } from "@capacitor/browser";
 
 interface Params {
   id: string;
@@ -147,6 +153,13 @@ const AffiliateView: React.FC = () => {
 
   return (
     <IonPage>
+      <IonAlert
+        isOpen={showCheckIn}
+        header="Check-in realizado"
+        message={`Você realizou check-in em ${data?.name}`}
+        buttons={["OK"]}
+        onDidDismiss={() => setShowCheckIn(false)}
+      />
       <IonContent fullscreen style={{ "--background": "#ffffff" } as any}>
         {!data ? (
           <SpinnerContainer>
@@ -260,13 +273,6 @@ const AffiliateView: React.FC = () => {
               </ButtonsContainer>
             </InfoContainer>
           </ScrollArea>
-        )}
-
-        {showCheckIn && (
-          <CheckinSuccessFooter
-            isOpen={showCheckIn}
-            onClose={() => setShowCheckIn(false)}
-          />
         )}
 
         <IonToast

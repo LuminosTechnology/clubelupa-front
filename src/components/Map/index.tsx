@@ -1,11 +1,9 @@
 import { Geolocation } from "@capacitor/geolocation";
 import { GoogleMap } from "@capacitor/google-maps";
-import { IonIcon, IonSpinner } from "@ionic/react";
+import { IonIcon } from "@ionic/react";
 import { close } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  CheckInButton,
-  CheckInMessage,
   CloseButton,
   MapWrapper,
   RestaurantCard,
@@ -15,49 +13,16 @@ import {
   ViewMoreButton,
 } from "./map.style";
 
-import { affiliates } from "../../contexts/mock";
+import { Capacitor } from "@capacitor/core";
+import { useHistory } from "react-router";
+import { useDebounce } from "../../hooks/useDebounce";
+import { getAllEstablishments } from "../../services/affiliateService";
 import { AffiliateData } from "../../services/interfaces/Affiliate";
 import { Establishment } from "../../types/api/api";
-import { getAllEstablishments } from "../../services/affiliateService";
-import { useDebounce } from "../../hooks/useDebounce";
-import { useHistory } from "react-router";
 import { haversine } from "../../utils/haversine";
-import { Capacitor } from "@capacitor/core";
 
-/* ---------------- extras específicos do mapa ------------------- */
-interface ExtraFields {
-  address: string;
-  distance: string;
-  hours: string;
-  image: string;
-  location: { lat: number; lng: number };
-  value: number;
-}
-
-const extraById: Record<number, ExtraFields> = {
-  1: {
-    address: "Rua Exemplo, 123",
-    distance: "2.5 km",
-    hours: "Aberto agora • Fecha às 23:00",
-    image:
-      "https://img.freepik.com/premium-photo/journey-flavors_762785-327522.jpg?w=1060",
-    location: { lat: -25.4415, lng: -49.291 },
-    value: 150,
-  },
-};
-
-/* ---------------- tipagens finais ----------------------------------------*/
-export interface Restaurant extends AffiliateData, ExtraFields {
-  checkedIn?: boolean;
-  iconType: "green" | "terracotta" | "yellow";
-  category?: string[];
-  description?: string;
-  structure?: "Física" | "Online";
-}
-
-/* -------------------------------------------------------------------------*/
 interface MapProps {
-  onViewMore: (r: Restaurant) => void;
+  onViewMore: (r: AffiliateData) => void;
   searchValue: string;
 }
 
@@ -67,24 +32,32 @@ const HTTP_API_KEY = "AIzaSyCADmNNz3iLtqV7UX-mY83WJnL6m3gpdkU";
 
 const Map: React.FC<MapProps> = ({ searchValue }) => {
   const history = useHistory();
+  const [gMap, setGMap] = useState<GoogleMap | null>(null);
   const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(
     null
   );
   const mapRef = useRef<HTMLDivElement>(null);
-  const [selected, setSelected] = useState<Establishment | undefined>();
+  const markerMapRef = useRef<Record<string, Establishment>>({});
 
+  const [selected, setSelected] = useState<Establishment | undefined>();
   const [establishments, setEstablishments] = useState<Establishment[]>([]);
 
   const DEFAULT_LOCATION = { lat: -25.4415, lng: -49.291 };
-  const CHECKIN_RADIUS = 5000000; // m
 
-  // const apiKey =
-  //   Capacitor.getPlatform() === "ios" ? IOS_API_KEY : ANDROID_API_KEY;
-  const apiKey = HTTP_API_KEY;
+  const apiKey = () => {
+    switch (Capacitor.getPlatform()) {
+      case "ios":
+        return IOS_API_KEY;
+      case "android":
+        return ANDROID_API_KEY;
+      default:
+        return HTTP_API_KEY;
+    }
+  };
 
   /* ─── localização do usuário ─────────────────────────────────────────── */
   useEffect(() => {
-    (async () => {
+    const fetchUserLocation = async () => {
       try {
         const { coords } = await Geolocation.getCurrentPosition({
           enableHighAccuracy: true,
@@ -93,8 +66,10 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
       } catch {
         setUserLoc(DEFAULT_LOCATION);
       }
-    })();
+    };
+    fetchUserLocation();
   }, []);
+
   const debouncedSearchValue = useDebounce(searchValue, 300);
 
   useEffect(() => {
@@ -105,31 +80,21 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
     fetchEstablishments();
   }, [debouncedSearchValue]);
 
-  /* ─── inicia o mapa e marcadores ─────────────────────────────────────── */
+  /* ─── Inicialização do Mapa (nova lógica) ───────────────────────────── */
   useEffect(() => {
+    if (!userLoc || gMap) return;
+
     const initMap = async () => {
-      if (!userLoc) return;
+      if (!mapRef.current) return;
+      console.log("Inicializando mapa...");
 
-      const el = mapRef.current;
-      if (!el) return;
-
-      if (establishments.length <= 0) return;
-
-      console.log("mapRef.current", mapRef.current);
-      console.log("typeof mapRef.current", typeof mapRef.current);
-      console.log(
-        "instanceof HTMLElement?",
-        mapRef.current instanceof HTMLElement
-      );
-
-      const gMap = await GoogleMap.create({
-        apiKey: apiKey,
+      const newMap = await GoogleMap.create({
+        apiKey: apiKey(),
         id: "affiliates-map",
-        element: el,
+        element: mapRef.current,
         config: {
           androidLiteMode: false,
           center: userLoc,
-
           zoom: 11,
           disableDefaultUI: true,
           clickableIcons: false,
@@ -147,18 +112,44 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
         },
       });
 
-      await gMap.enableCurrentLocation(true);
+      await newMap.enableCurrentLocation(true);
 
-      let markerMap: Record<number, number> = {};
+      await newMap.setOnMarkerClickListener((m) => {
+        console.log("marker clicked", m);
+        const establishment = markerMapRef.current[m.markerId];
+        if (establishment) setSelected(establishment);
+      });
 
+      setGMap(newMap);
+    };
+
+    initMap();
+  }, [userLoc, gMap]);
+
+  /* ─── Adicionar/Remover Marcadores (nova lógica) ────────────────────── */
+  useEffect(() => {
+    if (!gMap || establishments.length === 0) return;
+
+    const updateMarkers = async () => {
+      console.log("Atualizando marcadores...");
+      // Remova os marcadores existentes
+      const markersIds = Object.keys(markerMapRef.current);
+      if (markersIds.length > 0) {
+        await gMap.removeMarkers(markersIds);
+      }
+      // Limpe o objeto de referência
+      markerMapRef.current = {};
+
+      // Adicione os novos marcadores
       for (const e of establishments) {
-        if (e.addresses.length <= 0) continue;
-        const address = e.addresses[0];
+        if (!e.addresses.length) continue;
+
         const location = {
-          lat: Number(address.latitude),
-          lng: Number(address.longitude),
+          lat: Number(e.addresses[0].latitude),
+          lng: Number(e.addresses[0].longitude),
         };
-        if (address) {
+
+        try {
           const markerId = await gMap.addMarker({
             coordinate: location,
             iconUrl: "assets/affiliate_pin.png",
@@ -166,30 +157,16 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
             iconAnchor: { x: 20, y: 55 },
           });
 
-          markerMap[Number(markerId)] = Number(e.id);
+          // Armazene a referência para o estabelecimento
+          markerMapRef.current[markerId] = e;
+        } catch (error) {
+          console.error("Erro ao adicionar marcador:", error);
         }
       }
-
-      await gMap.setOnMarkerClickListener(async (m) => {
-        const establishmentId = markerMap[Number(m.markerId)];
-        const hit = establishments.find((e) => e.id == establishmentId);
-        if (hit) {
-          setSelected(hit);
-          await gMap.setCamera({
-            coordinate: {
-              lat: hit.addresses[0].latitude,
-              lng: hit.addresses[0].longitude,
-            },
-            animate: true,
-          });
-        }
-      });
     };
 
-    const timeout = setTimeout(initMap, 300);
-
-    return () => clearTimeout(timeout);
-  }, [userLoc, mapRef, establishments, debouncedSearchValue]);
+    updateMarkers();
+  }, [establishments, gMap]);
 
   const handleViewMore = (id: number) => {
     history.push(`/affiliate-view/${id}`);
@@ -198,7 +175,6 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
   /* ─── UI ─────────────────────────────────────────────────────────────── */
   return (
     <MapWrapper>
-      <IonSpinner />
       <capacitor-google-map
         ref={mapRef}
         id="map"
@@ -246,14 +222,15 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
                     Km
                   </p>
                 )}
-                {/* <p>Horário de funcionamento: </p> */}
               </>
             )}
-            {/* <p>
-              <strong>Vale alguns pontos</strong>
-            </p> */}
             {selected && (
-              <ViewMoreButton onClick={() => handleViewMore(selected.id)}>
+              <ViewMoreButton
+                onClick={() => {
+                  handleViewMore(selected.id);
+                  setSelected(undefined);
+                }}
+              >
                 Ver mais sobre
               </ViewMoreButton>
             )}
