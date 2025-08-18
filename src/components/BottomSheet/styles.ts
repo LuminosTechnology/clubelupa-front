@@ -21,10 +21,10 @@ export const CustomCard = styled.div`
 
   .swipe-helper {
     position: absolute;
-    top: 0;
+    top: -55px;
     left: 0;
     width: 100%;
-    height: 80px;
+    height: 135px;
     z-index: 10;
   }
 
@@ -51,11 +51,18 @@ export const CustomCard = styled.div`
   }
 `;
 
+export const AvatarContainer = styled.div`
+  position: absolute;
+  top: -55px;
+  z-index: 10;
+`;
+
 export const AvatarProgressBorder = styled.div<{ $progress: number }>`
   border-radius: 100%;
   aspect-ratio: 1;
   width: 110px;
 
+  padding: 5px;
   background: ${({ $progress }) =>
     `conic-gradient(#D7A07D ${$progress}%, #bfc1c2 ${$progress}% 100%)`};
 
@@ -64,17 +71,34 @@ export const AvatarProgressBorder = styled.div<{ $progress: number }>`
   justify-content: center;
   overflow: hidden;
 
-  position: absolute;
-  top: -55px;
-  z-index: 10;
-  padding: 5px;
-
   img {
     background-color: red;
     object-fit: cover;
     width: 100%;
     height: 100%;
     border-radius: 50%;
+  }
+`;
+
+export const LevelBadge = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  bottom: 0;
+  left: -10px;
+
+  img {
+    width: 40px;
+  }
+
+  span {
+    position: absolute;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0e0e0e;
+    z-index: 10;
+    transform: translateX(-2px) translateY(-2px) rotate(5deg);
   }
 `;
 

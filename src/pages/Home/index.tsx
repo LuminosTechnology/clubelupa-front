@@ -46,7 +46,6 @@ const Home: React.FC = () => {
             history.push(`/affiliate-view/${affiliate.id}`);
           }}
         />
-        {/* <Footer /> */}
         <HomeBottomSheet />
       </IonContent>
     </IonPage>

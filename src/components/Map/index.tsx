@@ -69,6 +69,7 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
     };
     fetchUserLocation();
   }, []);
+
   const debouncedSearchValue = useDebounce(searchValue, 300);
 
   useEffect(() => {
@@ -79,13 +80,15 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
     fetchEstablishments();
   }, [debouncedSearchValue]);
 
+  /* ─── Inicialização do Mapa (nova lógica) ───────────────────────────── */
   useEffect(() => {
     if (!userLoc || gMap) return;
 
     const initMap = async () => {
       if (!mapRef.current) return;
+      console.log("Inicializando mapa...");
 
-      const gMap = await GoogleMap.create({
+      const newMap = await GoogleMap.create({
         apiKey: apiKey(),
         id: "affiliates-map",
         element: mapRef.current,
@@ -109,51 +112,57 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
         },
       });
 
-      await gMap.enableCurrentLocation(true);
+      await newMap.enableCurrentLocation(true);
 
-      await gMap.setOnMarkerClickListener((m) => {
+      await newMap.setOnMarkerClickListener((m) => {
         console.log("marker clicked", m);
         const establishment = markerMapRef.current[m.markerId];
         if (establishment) setSelected(establishment);
       });
 
-      setGMap(gMap);
+      setGMap(newMap);
     };
 
     initMap();
-  }, [userLoc]);
+  }, [userLoc, gMap]);
 
-  const clearMarkers = async (gMap: GoogleMap) => {
-    await gMap.removeMarkers(Object.keys(markerMapRef.current));
-  };
-
-  const setMarkers = async (gMap: GoogleMap) => {
-    markerMapRef.current = {};
-
-    for (const e of establishments) {
-      if (!e.addresses.length) continue;
-
-      const location = {
-        lat: Number(e.addresses[0].latitude),
-        lng: Number(e.addresses[0].longitude),
-      };
-
-      const markerId = await gMap.addMarker({
-        coordinate: location,
-        iconUrl: "assets/affiliate_pin.png",
-        iconSize: { width: 40, height: 55 },
-        iconAnchor: { x: 20, y: 55 },
-      });
-
-      markerMapRef.current[markerId] = e;
-    }
-  };
-
+  /* ─── Adicionar/Remover Marcadores (nova lógica) ────────────────────── */
   useEffect(() => {
-    if (!gMap || establishments.length <= 0) return;
+    if (!gMap || establishments.length === 0) return;
+
     const updateMarkers = async () => {
-      await clearMarkers(gMap);
-      await setMarkers(gMap);
+      console.log("Atualizando marcadores...");
+      // Remova os marcadores existentes
+      const markersIds = Object.keys(markerMapRef.current);
+      if (markersIds.length > 0) {
+        await gMap.removeMarkers(markersIds);
+      }
+      // Limpe o objeto de referência
+      markerMapRef.current = {};
+
+      // Adicione os novos marcadores
+      for (const e of establishments) {
+        if (!e.addresses.length) continue;
+
+        const location = {
+          lat: Number(e.addresses[0].latitude),
+          lng: Number(e.addresses[0].longitude),
+        };
+
+        try {
+          const markerId = await gMap.addMarker({
+            coordinate: location,
+            iconUrl: "assets/affiliate_pin.png",
+            iconSize: { width: 40, height: 55 },
+            iconAnchor: { x: 20, y: 55 },
+          });
+
+          // Armazene a referência para o estabelecimento
+          markerMapRef.current[markerId] = e;
+        } catch (error) {
+          console.error("Erro ao adicionar marcador:", error);
+        }
+      }
     };
 
     updateMarkers();
@@ -209,16 +218,12 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
                         selected!.addresses[0].latitude,
                         selected!.addresses[0].longitude
                       ) / 1000
-                    )}
+                    )}{" "}
                     Km
                   </p>
                 )}
-                {/* <p>Horário de funcionamento: </p> */}
               </>
             )}
-            {/* <p>
-              <strong>Vale alguns pontos</strong>
-            </p> */}
             {selected && (
               <ViewMoreButton
                 onClick={() => {

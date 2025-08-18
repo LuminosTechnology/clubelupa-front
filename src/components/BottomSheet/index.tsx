@@ -1,8 +1,16 @@
 import { createGesture } from "@ionic/react";
 import { ReactNode, useEffect, useRef } from "react";
 import { useAuthContext } from "../../contexts/AuthContext";
-import { AvatarProgressBorder, CloseButton, CustomCard } from "./styles";
+import {
+  AvatarContainer,
+  AvatarProgressBorder,
+  CloseButton,
+  CustomCard,
+  LevelBadge,
+} from "./styles";
+import CoinLevel from "../../assets/moeda_vazia.png";
 import XIcon from "../../assets/x.svg?react";
+import { useGamificationContext } from "../../contexts/GamificationContext";
 
 type Props = {
   openContent: ReactNode;
@@ -19,6 +27,7 @@ export const BottomSheet: React.FC<Props> = ({
 }) => {
   const drawerRef = useRef<HTMLDivElement>(null);
   const { user } = useAuthContext();
+  const { gamificationSummary } = useGamificationContext();
 
   const OPEN_Y = -window.innerHeight * 0.8;
   const CLOSED_Y = -80;
@@ -32,7 +41,7 @@ export const BottomSheet: React.FC<Props> = ({
 
     const gesture = createGesture({
       el: c.querySelector(".swipe-helper") as HTMLDivElement,
-      gestureName: "swipe-up",
+      gestureName: "swipe-drawer",
       direction: "y",
 
       onMove: (e) => {
@@ -47,14 +56,23 @@ export const BottomSheet: React.FC<Props> = ({
       },
 
       onEnd: (e) => {
-        c.style.transition = "200ms ease-out";
+        c.style.transition = "200ms linear";
 
-        if (e.deltaY < -50) {
+        const shouldOpen = e.deltaY < -20 || e.velocityY < -0.3;
+        const shouldClose = e.deltaY > 20 || e.velocityY > 0.3;
+
+        if (shouldOpen) {
           c.style.transform = `translateY(${OPEN_Y}px)`;
           c.dataset.open = "true";
-        } else {
+        } else if (shouldClose) {
           c.style.transform = `translateY(${CLOSED_Y}px)`;
           c.dataset.open = "false";
+        } else {
+          if (c.dataset.open === "true") {
+            c.style.transform = `translateY(${OPEN_Y}px)`;
+          } else {
+            c.style.transform = `translateY(${CLOSED_Y}px)`;
+          }
         }
       },
     });
@@ -75,9 +93,15 @@ export const BottomSheet: React.FC<Props> = ({
   return (
     <CustomCard ref={drawerRef}>
       {displayAvatar && (
-        <AvatarProgressBorder $progress={40}>
-          <img src={user?.avatar_url || "/assets/default-photo.png"} alt="" />
-        </AvatarProgressBorder>
+        <AvatarContainer>
+          <AvatarProgressBorder $progress={40}>
+            <img src={user?.avatar_url || "/assets/default-photo.png"} alt="" />
+          </AvatarProgressBorder>
+          <LevelBadge>
+            <img src={CoinLevel} alt="Moeda de nível" />
+            <span>{gamificationSummary?.current_level.number || "0"}</span>
+          </LevelBadge>
+        </AvatarContainer>
       )}
       <div className="swipe-helper" />
       <div className="content-wrapper">
