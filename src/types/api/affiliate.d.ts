@@ -42,7 +42,7 @@ export interface UpdateAffiliateEstablishmentRequest {
 
   category_id?: number;
 
-  address: Partial<CreateAddress>;
+  address?: Partial<CreateAddress>;
 
   shop_photo?: File;
   product_photo?: File;
@@ -63,4 +63,22 @@ export interface AdvertisementData {
   created_at: FormattedDate;
   updated_at: FormattedDate;
   deleted_at?: FormattedDate;
+}
+
+export interface BecomeAnAffiliateRequest {
+  name: string;
+  site: string;
+  instagram: string;
+  categories: string[];
+  address?: Partial<{
+    zip_code: string;
+    street: string;
+    number: string;
+    neighborhood: string;
+    city: string;
+    state: string;
+    complement: string;
+    latitude: number;
+    longitude: number;
+  }>;
 }

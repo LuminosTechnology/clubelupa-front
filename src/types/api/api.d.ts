@@ -22,6 +22,17 @@ export interface User {
   can: string[];
   roles: Role[];
   is_affiliate: boolean;
+
+  subscription?: {
+    created_at: FormattedDate;
+    expires_at: FormattedDate;
+    id: number;
+    product_id: number;
+    provider: string;
+    provider_subscription_id: string;
+    status: "active" | string;
+    user_id: number;
+  };
 }
 
 export type FlashMessage = {

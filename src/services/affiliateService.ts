@@ -3,7 +3,10 @@ import { Establishment, PaginatedResponse } from "../types/api/api";
 import api from "../config/api";
 import { getToken } from "./auth-service";
 import { AffiliateData } from "./interfaces/Affiliate";
-import { AdvertisementData } from "../types/api/affiliate";
+import {
+  AdvertisementData,
+  BecomeAnAffiliateRequest,
+} from "../types/api/affiliate";
 
 /** Retorna o primeiro afiliado associado ao token ou null. */
 export const getMyFirstAffiliate = async (): Promise<AffiliateData | null> => {
@@ -106,5 +109,10 @@ export const doCheckIn = async (id: number) => {
 
 export const getAdvertisingProducts = async () => {
   const response = await api.get<{ data: AdvertisementData[] }>(`/products`);
+  return response.data;
+};
+
+export const becomeAnAffiliate = async (data: BecomeAnAffiliateRequest) => {
+  const response = await api.post("/establishments", data);
   return response.data;
 };

@@ -51,10 +51,11 @@ import {
 } from "@revenuecat/purchases-capacitor";
 import { Redirect } from "react-router";
 import { GlobalFonts } from "./styles/GlobalFonts";
-import BecomeAnAffiliatePage from "./pages/BecomeAnAffiliate/BecomeAnAffiliate";
 import ProfileChangePasswordPage from "./pages/ChangePassword/ChangePassword";
 import { AffiliateAdsPage } from "./pages/AffiliateAds/AffiliateAds";
 import { Capacitor } from "@capacitor/core";
+import AffiliateBecome from "./pages/AffiliateBecome/AffiliateBecome";
+import AffiliatePaywall from "./pages/AffiliatePaywall/AffiliatePaywall";
 
 declare global {
   interface Window {
@@ -154,8 +155,13 @@ const App: React.FC = () => {
           />
           <PrivateRoute
             exact
+            path="/affiliate/become"
+            component={AffiliateBecome}
+          />
+          <PrivateRoute
+            exact
             path="/affiliate/paywall"
-            component={BecomeAnAffiliatePage}
+            component={AffiliatePaywall}
           />
           <PrivateRoute
             exact

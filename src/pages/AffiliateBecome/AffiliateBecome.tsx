@@ -2,6 +2,7 @@
  * Edição do primeiro afiliado vinculado ao token
  * ────────────────────────────────────────────────────────────── */
 import {
+  IonAlert,
   IonContent,
   IonPage,
   IonRadio,
@@ -16,12 +17,13 @@ import AppHeader from "../../components/SimpleHeader";
 import InputMask from "react-input-mask";
 import { useHistory } from "react-router";
 import { useAuthContext } from "../../contexts/AuthContext";
-import { fetchMyEstablishmentData } from "../../services/affiliateService";
-import { updateEstablishment } from "../../services/auth-service";
 import { CategoryService } from "../../services/category-service";
 import { GeocodeService } from "../../services/geocode-service";
 import { fetchCep } from "../../services/viacepService";
-import { UpdateAffiliateEstablishmentRequest } from "../../types/api/affiliate";
+import {
+  BecomeAnAffiliateRequest,
+  UpdateAffiliateEstablishmentRequest,
+} from "../../types/api/affiliate";
 import { Category } from "../../types/api/category";
 import {
   AffiliateUpdateRadioContainer,
@@ -42,146 +44,42 @@ import {
   UploadImageButton,
   UploadLogoColumn,
   UploadPersonPhotoButton,
-} from "./AffiliateEdit.style";
+} from "./AffiliateBecome.style";
+import { becomeAnAffiliate } from "../../services/affiliateService";
 
 /* ---------- estado (todos campos opcionais) ------------------- */
 
-const AffiliateEdit: React.FC = () => {
+const AffiliateBecome: React.FC = () => {
   const history = useHistory();
-  const [scrolled, setScrolled] = useState(false);
-
-  const [shopPhotoFile, setShopPhotoFile] = useState<File | undefined>(
-    undefined
-  );
-  const shopPhotoFileRef = useRef<HTMLInputElement>(null);
-  const [shopPhotoUrl, setShopPhotoUrl] = useState<string>();
-
-  const [productPhotoFile, setProductPhotoFile] = useState<File | undefined>(
-    undefined
-  );
-  const productPhotoFileRef = useRef<HTMLInputElement>(null);
-  const [productPhotoUrl, setProductPhotoUrl] = useState<string>();
-
-  const [behindTheScenesPhotoFile, setBehindTheScenesPhotoFile] = useState<
-    File | undefined
-  >(undefined);
-  const behindTheScenesFileRef = useRef<HTMLInputElement>(null);
-  const [behindTheScenesPhotoUrl, setBehindTheScenesPhotoUrl] =
-    useState<string>();
 
   const [hasPhysicalAddress, setHasPhysicalAddress] = useState(true);
   const [categories, setCategories] = useState<Category[]>([]);
-  const { user } = useAuthContext();
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  const establishment = user?.establishments[0];
-  const initialForm: UpdateAffiliateEstablishmentRequest = {
-    name: establishment?.name,
-    legal_name: establishment?.legal_name || "",
-    description: "",
-    document_number: "",
-    company_age: "",
-    business_model: "",
-    email: "",
-    phone_number: "",
-    whatsapp_number: "",
-    category_id: undefined,
+  const initialForm: BecomeAnAffiliateRequest = {
+    name: "",
+    categories: [],
     instagram: "",
     site: "",
   };
 
-  const [form, setForm] =
-    useState<UpdateAffiliateEstablishmentRequest>(initialForm);
+  const [form, setForm] = useState<BecomeAnAffiliateRequest>(initialForm);
 
   const fetchCategories = async () => {
     const response = await CategoryService.getCategories();
     setCategories(response.data);
   };
 
-  const fetchEstablishment = async () => {
-    if (!user?.establishments[0]) return;
-
-    const establishment = await fetchMyEstablishmentData(
-      user?.establishments[0].id
-    );
-
-    const address = establishment?.addresses[0];
-
-    setForm((prev) => ({
-      ...prev,
-      name: establishment?.name,
-      legal_name: establishment?.legal_name,
-      description: establishment.description,
-      document_number: establishment.document_number,
-      company_age: establishment.company_age,
-      business_model: establishment.business_model,
-      email: establishment.email,
-      phone_number: establishment.phone_number,
-      whatsapp_number: establishment.whatsapp_number,
-      category_id:
-        establishment.categories.length > 0
-          ? establishment.categories[0].id
-          : undefined,
-      address: {
-        ...form.address,
-        type: "main",
-        city: address.city,
-        state: address.state,
-        complement: address.complement,
-        zip_code: address.zip_code,
-        street: address.street,
-        number: address.number,
-        neighborhood: address.neighborhood,
-      },
-      instagram: establishment.social_links?.instagram || "",
-      site: establishment.social_links?.site || "",
-    }));
-
-    // if (establishment?.addresses && establishment.addresses.length > 0) {
-    //   setHasPhysicalAddress(true);
-    // }
-
-    setShopPhotoUrl(establishment.shop_photo_url);
-    setProductPhotoUrl(establishment.product_photo_url);
-    setBehindTheScenesPhotoUrl(establishment.behind_the_scenes_photo_url);
-  };
   useEffect(() => {
     const load = async () => {
       await fetchCategories();
-      await fetchEstablishment();
     };
 
     load();
   }, []);
-
-  const onLogoClick = () => shopPhotoFileRef.current?.click();
-  const onCoverPhotoClick = () => productPhotoFileRef.current?.click();
-  const onGalleryClick = () => behindTheScenesFileRef.current?.click();
-
-  const onLogoChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setShopPhotoFile(file);
-    setShopPhotoUrl(URL.createObjectURL(file));
-  };
-
-  const onCoverPhotoChange: React.ChangeEventHandler<HTMLInputElement> = (
-    e
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setProductPhotoFile(file);
-    setProductPhotoUrl(URL.createObjectURL(file));
-  };
-
-  const onGalleryChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setBehindTheScenesPhotoFile(file);
-    setBehindTheScenesPhotoUrl(URL.createObjectURL(file));
-  };
 
   const handleFetchCep = async () => {
     const zip_code = form.address?.zip_code;
@@ -192,7 +90,7 @@ const AffiliateEdit: React.FC = () => {
         setForm((prev) => ({
           ...prev,
           address: {
-            ...form.address,
+            ...prev?.address,
             zip_code: res.cep,
             street: res.logradouro,
             complement: res.complemento,
@@ -232,6 +130,11 @@ const AffiliateEdit: React.FC = () => {
   const validateForm = async () => {
     const newErrors: { [key: string]: string } = {};
 
+    if (!form.name) newErrors.name = "Nome é obrigatório";
+
+    if (!form.categories.length)
+      newErrors.categories = "Categoria é obrigatória";
+
     let address = form.address;
     if (hasPhysicalAddress) {
       if (!form.address?.street) newErrors.street = "Endereço é obrigatório";
@@ -250,13 +153,12 @@ const AffiliateEdit: React.FC = () => {
       }
     }
 
-    let newData: UpdateAffiliateEstablishmentRequest = {
-      ...form,
-      address: { ...address, type: "main" },
-      shop_photo: shopPhotoFile,
-      product_photo: productPhotoFile,
-      behind_the_scenes_photo: behindTheScenesPhotoFile,
-    };
+    let newData: BecomeAnAffiliateRequest = hasPhysicalAddress
+      ? {
+          ...form,
+          address,
+        }
+      : form;
 
     if (newData.site && newData.site?.trim().length > 0) {
       try {
@@ -288,7 +190,6 @@ const AffiliateEdit: React.FC = () => {
     return newData;
   };
 
-  console.log(errors);
   const formatWebsite = (value: string) => {
     let trimmed = value.trim();
 
@@ -307,16 +208,13 @@ const AffiliateEdit: React.FC = () => {
 
   const handleSave = async () => {
     setIsLoading(true);
-    if (!establishment?.id) return;
     const validatedForm = await validateForm();
     if (!validatedForm) return;
 
     try {
-      await updateEstablishment({ data: validatedForm, id: establishment.id });
-
-      history.goBack();
+      await becomeAnAffiliate(validatedForm);
+      setIsSuccess(true);
     } catch (error: any) {
-      console.error(error);
       // Se o backend retornou algum erro, tratamos aqui
       const backendErrors = error.response?.data?.errors || {};
       const transformedErrors = Object.keys(backendErrors).reduce(
@@ -335,27 +233,29 @@ const AffiliateEdit: React.FC = () => {
     }
   };
 
-  /* ─── UI ────────────────────────────────────────────────────── */
   return (
     <IonPage>
+      <IonAlert
+        isOpen={isSuccess}
+        title="Sucesso"
+        message="Perfil atualizado com sucesso!"
+        buttons={["OK"]}
+        onDidDismiss={() => history.replace("/affiliate/paywall")}
+      />
       <IonContent fullscreen style={{ "--background": "#ffffff" } as any}>
-        {/* HEADER FIXO */}
         <AppHeader
           title="Editar Perfil Comercial"
           backgroundColor="#868950"
           textColor="#FFFFFF"
         />
-
-        {/* ÁREA ROLÁVEL */}
-        <ScrollArea
-          onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 0)}
-        >
-          {/* FORMULÁRIO */}
+        <ScrollArea>
           <Content>
             <GreenLabelTheme>
               <InputTextTheme>
                 <EditContainer>
-                  <TitleSection>Editar Perfil Comercial</TitleSection>
+                  <TitleSection>
+                    Torne-se um Afiliado do Clube Lupa
+                  </TitleSection>
 
                   {/* ---- campos ---- */}
                   <FieldWrapper>
@@ -366,34 +266,8 @@ const AffiliateEdit: React.FC = () => {
                         setForm({ ...form, name: e.target.value })
                       }
                     />
+                    {errors.name && <ErrorMessage>{errors.name}</ErrorMessage>}
                   </FieldWrapper>
-                  <FieldWrapper>
-                    <label>Celular | WhatsApp</label>
-                    <InputMask
-                      mask="(99)99999-9999"
-                      maskChar={null}
-                      value={form.whatsapp_number ?? ""}
-                      onChange={(e) =>
-                        setForm({ ...form, whatsapp_number: e.target.value })
-                      }
-                    />
-                  </FieldWrapper>
-
-                  <FieldWrapper>
-                    <label>E-mail</label>
-                    <input
-                      type="email"
-                      value={form.email ?? ""}
-                      onChange={(e) =>
-                        setForm({ ...form, email: e.target.value })
-                      }
-                    />
-                  </FieldWrapper>
-                  {/* 
-                  <FieldWrapper>
-                    <label>Horário de Funcionamento</label>
-                    <input />
-                  </FieldWrapper> */}
 
                   <FieldWrapper>
                     <label>Possui endereço físico?</label>
@@ -553,10 +427,10 @@ const AffiliateEdit: React.FC = () => {
                     <label>Categoria Principal</label>
                     <CustomSelect
                       placeholder="Categoria"
-                      value={form.category_id}
+                      value={form.categories[0]}
                       fill="solid"
                       onIonChange={(e) => {
-                        setForm({ ...form, category_id: e.detail.value });
+                        setForm({ ...form, categories: [e.detail.value] });
                       }}
                     >
                       {categories.map((category) => (
@@ -565,6 +439,9 @@ const AffiliateEdit: React.FC = () => {
                         </IonSelectOption>
                       ))}
                     </CustomSelect>
+                    {errors.categories && (
+                      <ErrorMessage>{errors.categories}</ErrorMessage>
+                    )}
                   </FieldWrapper>
 
                   <FieldWrapper>
@@ -602,114 +479,6 @@ const AffiliateEdit: React.FC = () => {
                     {errors.site && <ErrorMessage>{errors.site}</ErrorMessage>}
                   </FieldWrapper>
 
-                  <TextAreaWrapper>
-                    <label>Descrição</label>
-                    <textarea
-                      rows={6}
-                      value={form.description ?? ""}
-                      onChange={(e) =>
-                        setForm({ ...form, description: e.target.value })
-                      }
-                    />
-                  </TextAreaWrapper>
-
-                  <FieldWrapper>
-                    <label>Razão Social</label>
-                    <input
-                      value={form.legal_name}
-                      onChange={(e) =>
-                        setForm({ ...form, legal_name: e.target.value })
-                      }
-                    />
-                  </FieldWrapper>
-
-                  <FieldWrapper>
-                    <label>CNPJ</label>
-                    <InputMask
-                      mask="99.999.999/9999-99"
-                      value={form.document_number}
-                      onChange={(e) =>
-                        setForm({ ...form, document_number: e.target.value })
-                      }
-                    />
-                  </FieldWrapper>
-
-                  <FieldWrapper>
-                    <label>Tempo de Empresa</label>
-                    <input
-                      value={form.company_age}
-                      onChange={(e) =>
-                        setForm({ ...form, company_age: e.target.value })
-                      }
-                    />
-                  </FieldWrapper>
-
-                  <FieldWrapper>
-                    <label>Foto do Estabelecimento</label>
-                    <UploadLogoColumn>
-                      <input
-                        type="file"
-                        ref={productPhotoFileRef}
-                        style={{ display: "none" }}
-                        onChange={onCoverPhotoChange}
-                      />
-                      <p>
-                        Anexe aqui uma foto que de sua loja ou estabeleciemento:
-                      </p>
-                      <UploadImageButton onClick={onCoverPhotoClick}>
-                        <img
-                          src={productPhotoUrl || "/assets/default-photo.png"}
-                          alt="Foto da marca"
-                        />
-                      </UploadImageButton>
-                    </UploadLogoColumn>
-                  </FieldWrapper>
-
-                  <FieldWrapper>
-                    <label>Foto do Produto</label>
-                    <UploadLogoColumn>
-                      <input
-                        type="file"
-                        ref={shopPhotoFileRef}
-                        style={{ display: "none" }}
-                        onChange={onLogoChange}
-                      />
-                      <p>
-                        Anexe aqui uma foto que de sua loja ou estabeleciemento:
-                      </p>
-                      <UploadImageButton onClick={onLogoClick}>
-                        <img
-                          src={shopPhotoUrl || "/assets/default-photo.png"}
-                          alt="Foto da marca"
-                        />
-                      </UploadImageButton>
-                    </UploadLogoColumn>
-                  </FieldWrapper>
-
-                  <FieldWrapper>
-                    <label>Foto dos Bastidores</label>
-                    <UploadLogoColumn>
-                      <input
-                        type="file"
-                        ref={behindTheScenesFileRef}
-                        style={{ display: "none" }}
-                        onChange={onGalleryChange}
-                      />
-                      <p>
-                        Anexe aqui uma foto de quem criou e fez a marca
-                        acontecer! Adoramos ver os bastidores:
-                      </p>
-                      <UploadPersonPhotoButton onClick={onGalleryClick}>
-                        <img
-                          src={
-                            behindTheScenesPhotoUrl ||
-                            "/assets/default-photo.png"
-                          }
-                          alt="Foto da marca"
-                        />
-                      </UploadPersonPhotoButton>
-                    </UploadLogoColumn>
-                  </FieldWrapper>
                   {Object.keys(errors).length > 0 && (
                     <ErrorMessage style={{ marginBottom: "16px" }}>
                       Por favor, corrija os campos acima para continuar.
@@ -731,4 +500,4 @@ const AffiliateEdit: React.FC = () => {
   );
 };
 
-export default AffiliateEdit;
+export default AffiliateBecome;

@@ -24,7 +24,14 @@ const MyPlan: React.FC = () => {
   const [hasPremium, setHasPremium] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { user } = useAuthContext();
+  const { user, refetchUser } = useAuthContext();
+
+  useEffect(() => {
+    refetchUser();
+    if (user?.subscription && user.subscription.status === "active") {
+      setHasPremium(true);
+    }
+  }, []);
 
   const handlePurchase = async () => {
     if (!premiumPackage) return;
@@ -79,6 +86,7 @@ const MyPlan: React.FC = () => {
       const offerings = await window.Purchases.getOfferings();
       if (offerings.current && offerings.current.availablePackages.length > 0) {
         console.log(offerings.current.availablePackages);
+
         const foundPremium = offerings.current.availablePackages.find(
           (p) => p.identifier === "$rc_socio_premium_monthly"
         );
@@ -127,28 +135,28 @@ const MyPlan: React.FC = () => {
           <UserName>{user?.name}</UserName>
           <UserSubInfo>{user?.email}</UserSubInfo>
 
-          <InfoText>
-            Você faz parte do programa
-            <br />
-            Clube Lupa
-          </InfoText>
+          <InfoText>Você faz parte do programa Clube Lupa</InfoText>
           <PlanValue>
             MEU PLANO: {hasPremium ? "PREMIUM" : "GRATUITO"}
           </PlanValue>
 
-          {error && <IonText color="danger">{error}</IonText>}
-
           {!hasPremium && (
-            <ButtonWrapper>
-              <PremiumButton onClick={handlePurchase} disabled={isLoading}>
-                {isLoading ? "PROCESSANDO" : "ME TORNAR PREMIUM"}
-                <br />
-                POR{" "}
-                {premiumPackage
-                  ? `${premiumPackage.product.priceString}/MÊS`
-                  : "..."}
-              </PremiumButton>
-            </ButtonWrapper>
+            <>
+              {error ? (
+                <IonText color="danger">{error}</IonText>
+              ) : (
+                <ButtonWrapper>
+                  <PremiumButton onClick={handlePurchase} disabled={isLoading}>
+                    {isLoading ? "PROCESSANDO" : "ME TORNAR PREMIUM"}
+                    <br />
+                    POR{" "}
+                    {premiumPackage
+                      ? `${premiumPackage.product.priceString}/MÊS`
+                      : "..."}
+                  </PremiumButton>
+                </ButtonWrapper>
+              )}
+            </>
           )}
         </ProfileContainer>
       </IonContent>
