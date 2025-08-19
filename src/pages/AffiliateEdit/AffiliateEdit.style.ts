@@ -169,12 +169,16 @@ export const AffiliateUpdateRadioContainer = styled.div`
 `;
 
 export const CustomSelect = styled(IonSelect)`
-  --highlight-color: white;
-  --background: rgb(0 0 0 / 0.33);
+  --placeholder-color: rgb(0 0 0 /0.5);
+  --background: rgb(0 0 0 / 0.2);
 
   &::part(icon) {
     margin-left: 1rem;
     color: white;
+  }
+
+  &::part(text) {
+    color: black;
   }
 `;
 

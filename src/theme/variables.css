@@ -97,3 +97,24 @@ body.dark {
 #splash-logo {
   animation: color-change 1s infinite alternate;
 }
+
+.custom-select-interface {
+  --background: white;
+  --max-width: 90%;
+  --width: 100%;
+
+  --ion-color-base: white;
+  --checkmark-color: white;
+  color: black;
+}
+
+.custom-select-interface .alert-title,
+.custom-select-interface .alert-radio-label,
+.custom-select-interface .alert-radio-icon,
+.custom-select-interface .alert-checkbox-label {
+  color: black;
+}
+
+.custom-select-interface::part(content) {
+  color: black;
+}

@@ -78,6 +78,16 @@ export const updateEstablishment = async ({
     formData.append("category_id", data.category_id.toString());
   if (data.instagram) formData.append("instagram", data.instagram);
   if (data.site) formData.append("site", data.site);
+  if (data.categories) {
+    data.categories.forEach((category) =>
+      formData.append("categories[]", category.toString())
+    );
+  }
+  if (data.attributes) {
+    data.attributes.forEach((attribute) =>
+      formData.append("attributes[]", attribute.toString())
+    );
+  }
 
   if (data.address) {
     for (const [key, value] of Object.entries(data.address)) {

@@ -20,6 +20,9 @@ import {
   ProfilePhoto,
   ProfileWrapper,
   SubInfo,
+  WarningButton,
+  WarningText,
+  WarningTitle,
 } from "./AffiliateArea.style";
 
 import { logout } from "../../services/auth-service";
@@ -59,9 +62,11 @@ const AffiliateArea: React.FC = () => {
     history.push("/affiliate/advertising");
   };
 
-  const establishment = user?.establishments[0];
+  const establishment = user?.establishments?.[0] || null;
   const displayName = establishment?.name;
   const profilePhoto = user?.avatar_url;
+
+  if (!establishment) return null;
 
   return (
     <IonPage>
@@ -82,6 +87,18 @@ const AffiliateArea: React.FC = () => {
         <AreaContainer>
           <Name>{displayName}</Name>
           <SubInfo>{establishment?.email}</SubInfo>
+          {!user?.is_payed && (
+            <>
+              <WarningTitle>ATENÇÃO!</WarningTitle>
+              <WarningText>
+                Ainda não detectamos sua assinatura. Sua marca não será exibida
+                no mapa.
+              </WarningText>
+              <WarningButton onClick={() => history.push("/affiliate/paywall")}>
+                Assinar agora
+              </WarningButton>
+            </>
+          )}
 
           <Option primary onClick={goToEdit}>
             <OptionIcon src={editIcon} alt="Ícone Editar Perfil" />

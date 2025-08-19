@@ -1,17 +1,35 @@
-import styled from 'styled-components';
+import styled from "styled-components";
+
+export const WarningText = styled.p`
+  color: var(--ion-color-danger);
+`;
+
+export const WarningTitle = styled.h2`
+  color: var(--ion-color-danger);
+`;
+
+export const WarningButton = styled.button`
+  background-color: var(--ion-color-primary);
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 0.5rem 2rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+`;
 
 /* ------ Foto de perfil sobreposta ------ */
 export const ProfileWrapper = styled.div`
   position: relative;
   width: 100%;
-  height: 48px;      /* metade da altura do círculo (96px) */
+  height: 48px; /* metade da altura do círculo (96px) */
   z-index: 3;
 `;
 
 export const ProfilePhoto = styled.img`
   position: absolute;
-  top: -20px;        /* sobrepõe o header */
-  left: 20px;        /* respeita padding lateral */
+  top: -20px; /* sobrepõe o header */
+  left: 20px; /* respeita padding lateral */
   width: 96px;
   height: 96px;
   border-radius: 50%;
@@ -21,7 +39,7 @@ export const ProfilePhoto = styled.img`
 /* ------ Conteúdo principal ------ */
 export const AreaContainer = styled.div`
   position: relative;
-  padding: 54px 20px 20px;   /* espaço p/ header + metade da foto */
+  padding: 54px 20px 20px; /* espaço p/ header + metade da foto */
   width: 100%;
   box-sizing: border-box;
 `;
@@ -45,7 +63,7 @@ export const Option = styled.p<{ primary?: boolean }>`
   align-items: center;
   font-size: 16px;
   color: #868950;
-  margin: ${({ primary }) => (primary ? '58px 0 0 0' : '12px 0 0 0')};
+  margin: ${({ primary }) => (primary ? "58px 0 0 0" : "12px 0 0 0")};
   cursor: pointer;
 `;
 

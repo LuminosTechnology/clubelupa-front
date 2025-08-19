@@ -22,7 +22,7 @@ import { CategoryService } from "../../services/category-service";
 import { GeocodeService } from "../../services/geocode-service";
 import { fetchCep } from "../../services/viacepService";
 import { UpdateAffiliateEstablishmentRequest } from "../../types/api/affiliate";
-import { Category } from "../../types/api/category";
+import { Attribute, CategoryTreeNode } from "../../types/api/category";
 import {
   AffiliateUpdateRadioContainer,
   BuscarButton,
@@ -48,7 +48,6 @@ import {
 
 const AffiliateEdit: React.FC = () => {
   const history = useHistory();
-  const [scrolled, setScrolled] = useState(false);
 
   const [shopPhotoFile, setShopPhotoFile] = useState<File | undefined>(
     undefined
@@ -70,13 +69,16 @@ const AffiliateEdit: React.FC = () => {
     useState<string>();
 
   const [hasPhysicalAddress, setHasPhysicalAddress] = useState(true);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [attributes, setAttributes] = useState<Attribute[]>([]);
+  const [categories, setCategories] = useState<CategoryTreeNode[]>([]);
+  const [selectedCategory, setSelectedCategory] =
+    useState<CategoryTreeNode | null>(null);
   const { user } = useAuthContext();
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
 
-  const establishment = user?.establishments[0];
+  const establishment = user?.establishments?.[0] || null;
   const initialForm: UpdateAffiliateEstablishmentRequest = {
     name: establishment?.name,
     legal_name: establishment?.legal_name || "",
@@ -90,24 +92,44 @@ const AffiliateEdit: React.FC = () => {
     category_id: undefined,
     instagram: "",
     site: "",
+    categories: [],
   };
 
   const [form, setForm] =
     useState<UpdateAffiliateEstablishmentRequest>(initialForm);
 
   const fetchCategories = async () => {
-    const response = await CategoryService.getCategories();
+    const response = await CategoryService.getCategoriesTree();
     setCategories(response.data);
   };
 
   const fetchEstablishment = async () => {
-    if (!user?.establishments[0]) return;
+    if (!user?.establishments?.[0]) return;
 
     const establishment = await fetchMyEstablishmentData(
       user?.establishments[0].id
     );
+    console.log({ establishment });
 
     const address = establishment?.addresses[0];
+
+    const subcategories = establishment.categories.filter(
+      (category) => category.parent_id
+    );
+
+    const mainCategory = establishment.categories.find(
+      (category) => !category.parent_id
+    );
+
+    const mainCategoryNode: CategoryTreeNode | undefined = categories.find(
+      (category) => category.id === mainCategory?.id
+    );
+
+    console.log({ mainCategoryNode, mainCategory, categories });
+
+    if (mainCategoryNode) {
+      setSelectedCategory(mainCategoryNode);
+    }
 
     setForm((prev) => ({
       ...prev,
@@ -120,10 +142,9 @@ const AffiliateEdit: React.FC = () => {
       email: establishment.email,
       phone_number: establishment.phone_number,
       whatsapp_number: establishment.whatsapp_number,
-      category_id:
-        establishment.categories.length > 0
-          ? establishment.categories[0].id
-          : undefined,
+      categories: subcategories.map((category) => category.id),
+      category_id: mainCategory?.id || undefined,
+      attributes: establishment?.attributes.map((attribute) => attribute.id),
       address: {
         ...form.address,
         type: "main",
@@ -148,13 +169,18 @@ const AffiliateEdit: React.FC = () => {
     setBehindTheScenesPhotoUrl(establishment.behind_the_scenes_photo_url);
   };
   useEffect(() => {
-    const load = async () => {
-      await fetchCategories();
-      await fetchEstablishment();
-    };
-
-    load();
+    fetchCategories();
   }, []);
+
+  useEffect(() => {
+    if (categories.length > 0) {
+      fetchEstablishment();
+    }
+  }, [categories]);
+
+  useEffect(() => {
+    setAttributes(selectedCategory?.attributes || []);
+  }, [selectedCategory]);
 
   const onLogoClick = () => shopPhotoFileRef.current?.click();
   const onCoverPhotoClick = () => productPhotoFileRef.current?.click();
@@ -250,8 +276,21 @@ const AffiliateEdit: React.FC = () => {
       }
     }
 
+    let mergedCategories: number[] = [];
+    if (form.category_id) {
+      mergedCategories.push(form.category_id);
+    }
+
+    if (form.categories && form.categories.length > 0) {
+      const filteredCategories = form.categories.filter(
+        (id) => id !== undefined
+      );
+      mergedCategories = [...mergedCategories, ...filteredCategories];
+    }
+
     let newData: UpdateAffiliateEstablishmentRequest = {
       ...form,
+      categories: mergedCategories,
       address: { ...address, type: "main" },
       shop_photo: shopPhotoFile,
       product_photo: productPhotoFile,
@@ -288,7 +327,6 @@ const AffiliateEdit: React.FC = () => {
     return newData;
   };
 
-  console.log(errors);
   const formatWebsite = (value: string) => {
     let trimmed = value.trim();
 
@@ -336,6 +374,7 @@ const AffiliateEdit: React.FC = () => {
   };
 
   /* ─── UI ────────────────────────────────────────────────────── */
+  if (!establishment) return <div>Establishment not found</div>;
   return (
     <IonPage>
       <IonContent fullscreen style={{ "--background": "#ffffff" } as any}>
@@ -347,9 +386,7 @@ const AffiliateEdit: React.FC = () => {
         />
 
         {/* ÁREA ROLÁVEL */}
-        <ScrollArea
-          onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 0)}
-        >
+        <ScrollArea>
           {/* FORMULÁRIO */}
           <Content>
             <GreenLabelTheme>
@@ -555,7 +592,17 @@ const AffiliateEdit: React.FC = () => {
                       placeholder="Categoria"
                       value={form.category_id}
                       fill="solid"
+                      interfaceOptions={{
+                        header: "Escolha uma categoria",
+                        cssClass: "custom-select-interface",
+                      }}
                       onIonChange={(e) => {
+                        const category = categories.find(
+                          (c) => c.id === e.detail.value
+                        );
+                        if (category) {
+                          setSelectedCategory(category);
+                        }
                         setForm({ ...form, category_id: e.detail.value });
                       }}
                     >
@@ -564,6 +611,64 @@ const AffiliateEdit: React.FC = () => {
                           {category.name}
                         </IonSelectOption>
                       ))}
+                    </CustomSelect>
+                  </FieldWrapper>
+
+                  {selectedCategory && selectedCategory.children.length > 0 && (
+                    <FieldWrapper>
+                      <label>Categorias Secundárias</label>
+                      <CustomSelect
+                        placeholder="Sub-categoria"
+                        value={form.categories}
+                        multiple
+                        fill="solid"
+                        interfaceOptions={{
+                          header: "Escolha as sub-categorias",
+                          cssClass: "custom-select-interface",
+                        }}
+                        onIonChange={(event) =>
+                          setForm({ ...form, categories: event.detail.value })
+                        }
+                      >
+                        {selectedCategory.children.map((category) => (
+                          <IonSelectOption
+                            key={category.id}
+                            value={category.id}
+                          >
+                            {category.name}
+                          </IonSelectOption>
+                        ))}
+                      </CustomSelect>
+                    </FieldWrapper>
+                  )}
+
+                  <FieldWrapper>
+                    <label>Atributos</label>
+                    <CustomSelect
+                      placeholder="Atributos"
+                      value={form.attributes}
+                      multiple
+                      fill="solid"
+                      interfaceOptions={{
+                        header: "Escolha os atributos",
+                        cssClass: "custom-select-interface",
+                      }}
+                      onIonChange={(event) =>
+                        setForm({
+                          ...form,
+                          attributes: event.detail.value,
+                        })
+                      }
+                    >
+                      {selectedCategory?.attributes?.length &&
+                        selectedCategory.attributes.map((attribute) => (
+                          <IonSelectOption
+                            key={attribute.id}
+                            value={attribute.id}
+                          >
+                            {attribute.name}
+                          </IonSelectOption>
+                        ))}
                     </CustomSelect>
                   </FieldWrapper>
 

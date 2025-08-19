@@ -16,3 +16,15 @@ export interface Category {
   updated_at: FormattedDate;
   deleted_at: string | null;
 }
+
+export interface Attribute {
+  id: number;
+  name: string;
+  created_at: FormattedDate;
+  updated_at: FormattedDate;
+  deleted_at: FormattedDate | null;
+}
+export interface CategoryTreeNode extends Category {
+  children: CategoryTreeNode[];
+  attributes: Attribute[];
+}

@@ -1,3 +1,5 @@
+import { CategoryTreeNode } from "./category";
+
 export interface User {
   id: number;
   name: string;
@@ -17,11 +19,12 @@ export interface User {
   is_active_text: string;
 
   addresses: Address[];
-  establishments: Establishment[];
+  establishments?: Establishment[];
 
   can: string[];
   roles: Role[];
   is_affiliate: boolean;
+  is_payed: boolean;
 
   subscription?: {
     created_at: FormattedDate;
@@ -151,29 +154,40 @@ export interface Establishment {
   email?: string;
   phone_number?: string;
   whatsapp_number?: string;
-  social_links: Record<string?, string>;
+
+  social_links: {
+    site?: string;
+    instagram?: string;
+  };
+
   opening_hours: Record<string?, string>;
+
   is_active: boolean;
   is_favorited_by_me: boolean;
   is_checked_in_by_me_last_hour: boolean;
-  has_ever_been_checked_in_by_me: boolean;
   is_checked_in_by_me_last_hour: boolean;
+  has_ever_been_checked_in_by_me: boolean;
+
   checkins_count: number;
+
   approved_status: string;
   approved_status_text: string;
-  created_at?: FormattedDate;
+
   // Relações
   owner: User;
   addresses: Address[];
-  categories: EstablishmentCategory[];
-  subscription?: any;
+  categories: CategoryTreeNode[];
+  attributes: Atributes[];
+
   social_links: {
     site: string;
     instagram: string;
   };
+
   shop_photo_url?: string;
   product_photo_url?: string;
   behind_the_scenes_photo_url?: string;
+  created_at?: FormattedDate;
 }
 
 export interface QueryParams {

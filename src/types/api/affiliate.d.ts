@@ -41,6 +41,9 @@ export interface UpdateAffiliateEstablishmentRequest {
   whatsapp_number?: string;
 
   category_id?: number;
+  categories?: number[];
+
+  attributes?: number[];
 
   address?: Partial<CreateAddress>;
 
