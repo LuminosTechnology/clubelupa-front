@@ -12,8 +12,9 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@capacitor/android": "7.0.1",
+    "@capacitor/android": "^7.4.2",
     "@capacitor/app": "7.0.0",
+    "@capacitor/barcode-scanner": "^2.0.3",
     "@capacitor/browser": "^7.0.2",
     "@capacitor/core": "^7.4.2",
     "@capacitor/geolocation": "^7.1.1",

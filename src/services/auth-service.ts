@@ -132,7 +132,10 @@ export const getToken = async () => {
 
 export const forgotPassword = async (data: ForgotPasswordRequest) => {
   console.log("[Auth Service] Requesting password reset code with data:", data);
-  const response = await api.post("/forgot-password", data);
+  const response = await api.post<{ message: string }>(
+    "/forgot-password",
+    data
+  );
   console.log("[Auth Service] Password reset code response:", response.data);
   return response.data;
 };

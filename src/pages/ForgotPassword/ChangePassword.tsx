@@ -3,8 +3,8 @@ import { Container, Text, ButtonContainer, ErrorMessage } from "./forgot.style";
 import BackButton from "../../components/BackButton";
 import FloatingInput from "../../components/FloatingInput";
 import Button from "../../components/Button";
-import { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router-dom";
 import { resetPassword } from "../../services/auth-service";
 
 const ChangePassword: React.FC = () => {
@@ -12,23 +12,26 @@ const ChangePassword: React.FC = () => {
     email: "",
     code: "",
     password: "",
-    password_confirmation: ""
+    password_confirmation: "",
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [successMessage, setSuccessMessage] = useState<string>('');
+  const [successMessage, setSuccessMessage] = useState<string>("");
   const history = useHistory();
+  const { email } = useParams<{ email: string }>();
+
+  console.log(email);
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
     if (!formData.password) {
-      newErrors.password = 'Nova senha é obrigatória';
+      newErrors.password = "Nova senha é obrigatória";
     }
     if (!formData.password_confirmation) {
-      newErrors.password_confirmation = 'Confirmação de senha é obrigatória';
+      newErrors.password_confirmation = "Confirmação de senha é obrigatória";
     }
     if (formData.password !== formData.password_confirmation) {
-      newErrors.password_confirmation = 'As senhas não coincidem';
+      newErrors.password_confirmation = "As senhas não coincidem";
     }
 
     setErrors(newErrors);
@@ -43,47 +46,52 @@ const ChangePassword: React.FC = () => {
         email: formData.email,
         code: formData.code,
         password: formData.password,
-        password_confirmation: formData.password_confirmation
+        password_confirmation: formData.password_confirmation,
       });
 
       setFormData({
         email: "",
         code: "",
         password: "",
-        password_confirmation: ""
+        password_confirmation: "",
       });
 
       setErrors({});
 
-      setSuccessMessage('Senha alterada com sucesso!');
+      setSuccessMessage("Senha alterada com sucesso!");
       setTimeout(() => {
         history.push("/login");
       }, 3000);
-
     } catch (error: any) {
       const backendErrors = error.response?.data?.errors || {};
       const backendMessage = error.response?.data?.message;
 
       // Transform backend error messages
-      const transformedErrors = Object.keys(backendErrors).reduce((acc, key) => {
-        const errorMessage = Array.isArray(backendErrors[key])
-          ? backendErrors[key][0]
-          : backendErrors[key];
+      const transformedErrors = Object.keys(backendErrors).reduce(
+        (acc, key) => {
+          const errorMessage = Array.isArray(backendErrors[key])
+            ? backendErrors[key][0]
+            : backendErrors[key];
 
-        // Translate backend error messages
-        if (key === 'email' && errorMessage === 'The email field is required.') {
-          acc[key] = 'Email é obrigatório';
-        } else if (key === 'code' && backendMessage === 'Código inválido') {
-          acc[key] = 'Código inválido';
-        } else {
-          acc[key] = errorMessage;
-        }
-        return acc;
-      }, {} as { [key: string]: string });
+          // Translate backend error messages
+          if (
+            key === "email" &&
+            errorMessage === "The email field is required."
+          ) {
+            acc[key] = "Email é obrigatório";
+          } else if (key === "code" && backendMessage === "Código inválido") {
+            acc[key] = "Código inválido";
+          } else {
+            acc[key] = errorMessage;
+          }
+          return acc;
+        },
+        {} as { [key: string]: string }
+      );
 
       setErrors({
         ...transformedErrors,
-        form: error.response?.data?.message || "Erro ao alterar senha"
+        form: error.response?.data?.message || "Erro ao alterar senha",
       });
     }
   };
@@ -124,20 +132,26 @@ const ChangePassword: React.FC = () => {
           <FloatingInput
             label="Confirmar Senha"
             value={formData.password_confirmation}
-            onChange={(value) => setFormData({ ...formData, password_confirmation: value })}
+            onChange={(value) =>
+              setFormData({ ...formData, password_confirmation: value })
+            }
             isPassword
             error={!!errors.password_confirmation}
           />
-          {errors.password_confirmation && <ErrorMessage>{errors.password_confirmation}</ErrorMessage>}
+          {errors.password_confirmation && (
+            <ErrorMessage>{errors.password_confirmation}</ErrorMessage>
+          )}
 
           {successMessage && (
-            <ErrorMessage style={{
-              color: '#000',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              textAlign: 'center',
-              marginBottom: '16px'
-            }}>
+            <ErrorMessage
+              style={{
+                color: "#000",
+                fontSize: "16px",
+                fontWeight: "bold",
+                textAlign: "center",
+                marginBottom: "16px",
+              }}
+            >
               {successMessage}
             </ErrorMessage>
           )}

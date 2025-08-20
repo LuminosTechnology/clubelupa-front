@@ -1,4 +1,4 @@
-import { Address, CreateAddress, FormattedDate } from "./api";
+import { Address, CreateAddress, Establishment, FormattedDate } from "./api";
 
 export interface RegisterAffiliateRequest {
   name: string;
@@ -84,4 +84,27 @@ export interface BecomeAnAffiliateRequest {
     latitude: number;
     longitude: number;
   }>;
+}
+
+export interface ScanPurchaseCodeRequest {
+  qr_code_url: string;
+  establishment_id: number;
+}
+
+export interface NotaFiscal {
+  user_id: number;
+  establishment_id: string;
+  chave_nfe: string;
+  data_emissao: string; // ISO datetime
+  valor_total: number;
+  updated_at: string; // ISO datetime
+  created_at: string; // ISO datetime
+  id: number;
+  establishment: Establishment;
+}
+
+export interface ScanPurchaseCodeResponse {
+  message: string;
+  nota: NotaFiscal;
+  cnpj_emitente: string;
 }
