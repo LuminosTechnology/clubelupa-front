@@ -7,6 +7,15 @@ export const MapWrapper = styled.div`
   background: transparent;
   position: fixed;
   inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const MapLoader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 /* --------- popup / card ---------- */
@@ -43,6 +52,11 @@ export const CloseButton = styled.button`
   font-size: 22px; /* ↓ um pouco menor */
   color: #666;
   z-index: 2;
+  background-color: white;
+  border-radius: 100%;
+  aspect-ratio: 1;
+  width: 20px;
+  height: 20px;
 `;
 
 /* --------- layout interno -------- */

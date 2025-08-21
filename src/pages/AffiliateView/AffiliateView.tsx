@@ -1,16 +1,26 @@
-import { IonContent, IonPage, IonSpinner, IonToast } from "@ionic/react";
+import { CapacitorBarcodeScanner } from "@capacitor/barcode-scanner";
+import { Geolocation } from "@capacitor/geolocation";
+import {
+  IonAlert,
+  IonContent,
+  IonPage,
+  IonSpinner,
+  IonToast,
+} from "@ionic/react";
+import { AxiosError } from "axios";
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import backButtonVerde from "../../assets/arrow-left.svg";
 import HeartIcon from "../../assets/like.svg?react";
-import CheckinSuccessFooter from "../../components/CheckinSuccessFooter";
 import InstaIcon from "../../components/icons/InstaIcon";
+import { useGamificationContext } from "../../contexts/GamificationContext";
 import {
   doCheckIn,
   fetchSingleEstablishmentData,
   toggleFavorite,
 } from "../../services/affiliateService";
 import { Establishment } from "../../types/api/api";
+import { haversine } from "../../utils/haversine";
 import {
   BackButton,
   BackButtonWrapper,
@@ -34,9 +44,7 @@ import {
   Title,
   TitleWrapper,
 } from "./AffiliateView.style";
-import { haversine } from "../../utils/haversine";
-import { Geolocation } from "@capacitor/geolocation";
-import { AxiosError } from "axios";
+import { CodeScannerService } from "../../services/code-scan-service";
 
 interface Params {
   id: string;
@@ -49,19 +57,66 @@ const AffiliateView: React.FC = () => {
   const [favorite, setFavorite] = useState(false);
   const [animating, setAnimating] = useState(false);
   const [showCheckIn, setShowCheckIn] = useState(false);
-  const [canCheckIn, setCanCheckIn] = useState(true);
+  const [canCheckIn, setCanCheckIn] = useState(false);
   const [cantCheckIn, setCantCheckIn] = useState(false);
   const [checkInMessage, setCheckInMessage] = useState<string | undefined>();
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined
   );
 
+  const [showScanSuccess, setShowScanSuccess] = useState(false);
+  const [showScanError, setShowScanError] = useState(false);
+  const [scanMessage, setScanMessage] = useState<string | undefined>(undefined);
+  const [isLoadingScan, setIsLoadingScan] = useState(false);
+
+  const { refetchGamificationSummary } = useGamificationContext();
+
   const color = data?.categories[0]?.color || "#E6C178";
+
+  const handleScan = async () => {
+    setIsLoadingScan(true);
+    try {
+      const result = await CapacitorBarcodeScanner.scanBarcode({ hint: 0 });
+
+      let cleanResult = result.ScanResult || "";
+
+      cleanResult = cleanResult.replace(/^\uFEFF/, "");
+
+      if (cleanResult.startsWith("?")) {
+        cleanResult = cleanResult.slice(1);
+      }
+
+      const encodedUrl = encodeURI(cleanResult);
+
+      const response = await CodeScannerService.scanPurchaseCode({
+        establishment_id: Number(id),
+        qr_code_url: encodedUrl,
+      });
+      setScanMessage(response.message);
+      setShowScanSuccess(true);
+    } catch (error: any) {
+      setScanMessage(error.response.data.message || "Erro ao escanear código");
+      setShowScanError(true);
+      console.error("Erro ao escanear código:", JSON.stringify(error, null, 2));
+
+      if (error instanceof AxiosError) {
+        console.error(
+          "Erro ao escanear código:",
+          JSON.stringify(error.response, null, 2)
+        );
+      }
+    } finally {
+      setIsLoadingScan(false);
+    }
+  };
 
   const handleCheckIn = async () => {
     try {
       await doCheckIn(Number(id));
       setShowCheckIn(true);
+      setTimeout(async () => {
+        await refetchGamificationSummary();
+      }, 1000);
     } catch (e) {
       if (e instanceof AxiosError) {
         if (e.status === 429) {
@@ -136,6 +191,27 @@ const AffiliateView: React.FC = () => {
 
   return (
     <IonPage>
+      <IonAlert
+        isOpen={showScanSuccess}
+        header="Código escaneado"
+        message={scanMessage}
+        buttons={["OK"]}
+        onDidDismiss={() => setShowScanSuccess(false)}
+      />
+      <IonAlert
+        isOpen={showScanError}
+        header="Erro"
+        message={scanMessage}
+        buttons={["OK"]}
+        onDidDismiss={() => setShowScanError(false)}
+      />
+      <IonAlert
+        isOpen={showCheckIn}
+        header="Check-in realizado"
+        message={`Você realizou check-in em ${data?.name}`}
+        buttons={["OK"]}
+        onDidDismiss={() => setShowCheckIn(false)}
+      />
       <IonContent fullscreen style={{ "--background": "#ffffff" } as any}>
         {!data ? (
           <SpinnerContainer>
@@ -143,7 +219,9 @@ const AffiliateView: React.FC = () => {
           </SpinnerContainer>
         ) : (
           <ScrollArea>
-            <PhotoHeader image={data?.product_photo_url || ""}>
+            <PhotoHeader
+              image={data?.product_photo_url || "/assets/default-photo.png"}
+            >
               <BackButtonWrapper color={color} onClick={() => history.goBack()}>
                 <BackButton src={backButtonVerde} alt="Voltar" />
               </BackButtonWrapper>
@@ -206,10 +284,7 @@ const AffiliateView: React.FC = () => {
                     <InstaIcon size={18} />
                   </LinkIcon>
                   <LinkText
-                    href={`https://instagram.com/${
-                      data?.social_links?.instagram || ""
-                    }`}
-                    target="_blank"
+                    href={`https://instagram.com/${data?.social_links?.instagram}`}
                     rel="noopener noreferrer"
                     color={color}
                   >
@@ -218,9 +293,13 @@ const AffiliateView: React.FC = () => {
                 </LinkRow>
               )}
 
-              {data?.social_links?.website && (
+              {data?.social_links?.site && (
                 <PlainLinkRow>
-                  <PlainLink href="#" target="_blank" color={color}>
+                  <PlainLink
+                    href={data?.social_links?.site}
+                    target="_blank"
+                    color={color}
+                  >
                     Acesse o site
                   </PlainLink>
                 </PlainLinkRow>
@@ -236,23 +315,12 @@ const AffiliateView: React.FC = () => {
                 >
                   FAZER CHECK-IN
                 </CTAButton>
-                <CTAButton
-                  disabled
-                  bg={color}
-                  onClick={() => history.push("/affiliate/scanner")}
-                >
+                <CTAButton bg={color} onClick={handleScan}>
                   ESCANEAR NOTA
                 </CTAButton>
               </ButtonsContainer>
             </InfoContainer>
           </ScrollArea>
-        )}
-
-        {showCheckIn && (
-          <CheckinSuccessFooter
-            isOpen={showCheckIn}
-            onClose={() => setShowCheckIn(false)}
-          />
         )}
 
         <IonToast

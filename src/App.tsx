@@ -5,13 +5,13 @@ import React, { useEffect } from "react";
 
 import AffiliateArea from "./pages/AffiliateArea/AffiliateArea";
 import AffiliateEdit from "./pages/AffiliateEdit/AffiliateEdit";
+import AffiliateFavorites from "./pages/AffiliateFavorites/AffiliateFavorites";
 import AffiliateApprovedRegisterSuccess from "./pages/AffiliateRegister/AffiliateApprovedRegisterSuccess";
 import AffiliatePendingApprovalRegisterSuccess from "./pages/AffiliateRegister/AffiliatePendingApprovalRegisterSuccess";
 import AffiliateRegister from "./pages/AffiliateRegister/AffiliateRegister";
 import AffiliateStores from "./pages/AffiliateStores/AffiliateStoresPage";
 import AffiliateView from "./pages/AffiliateView/AffiliateView";
 import Experience from "./pages/Experience/Experience";
-import AffiliateFavorites from "./pages/AffiliateFavorites/AffiliateFavorites";
 import ForgotPassword from "./pages/ForgotPassword";
 import ChangePassword from "./pages/ForgotPassword/ChangePassword";
 import Home from "./pages/Home";
@@ -24,7 +24,6 @@ import ProfilePageEdit from "./pages/ProfileEdit/ProfileEditPage";
 import ReccomendAndWin from "./pages/RecommendAndWin/RecommendAndWin";
 import Register from "./pages/Register";
 import RegisterSuccess from "./pages/Register/RegisterSuccess";
-import ScannerNote from "./pages/ScannerNote/ScannerNote";
 import TalkToUs from "./pages/TalkToUs/TalkToUs";
 import UpgradePlan from "./pages/UpgradePlan/UpgradePlan";
 
@@ -44,16 +43,18 @@ import { useAuthContext } from "./contexts/AuthContext";
 import VerifyEmail from "./pages/VerifyEmail/VerifyEmail";
 import "./theme/variables.css";
 
+import { Capacitor } from "@capacitor/core";
 import {
   LOG_LEVEL,
   Purchases,
   PurchasesPlugin,
 } from "@revenuecat/purchases-capacitor";
 import { Redirect } from "react-router";
-import { GlobalFonts } from "./styles/GlobalFonts";
-import BecomeAnAffiliatePage from "./pages/BecomeAnAffiliate/BecomeAnAffiliate";
-import ProfileChangePasswordPage from "./pages/ChangePassword/ChangePassword";
 import { AffiliateAdsPage } from "./pages/AffiliateAds/AffiliateAds";
+import AffiliateBecome from "./pages/AffiliateBecome/AffiliateBecome";
+import AffiliatePaywall from "./pages/AffiliatePaywall/AffiliatePaywall";
+import ProfileChangePasswordPage from "./pages/ChangePassword/ChangePassword";
+import { GlobalFonts } from "./styles/GlobalFonts";
 
 declare global {
   interface Window {
@@ -81,9 +82,12 @@ const App: React.FC = () => {
       if (!user) return;
 
       await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
+      const iosKey = "appl_dZZzxmzoRnKJwBglWujMEzWEExQ";
+      const androidKey = "goog_KxFoVBiQbkVTqqxwfazoyszXRtq";
+      const apiKey = Capacitor.getPlatform() === "ios" ? iosKey : androidKey;
       await Purchases.configure({
-        apiKey: "goog_KxFoVBiQbkVTqqxwfazoyszXRtq",
-        appUserID: String(user.id),
+        apiKey: apiKey,
+        appUserID: user.id.toString(),
       });
 
       window.Purchases = Purchases;
@@ -150,8 +154,13 @@ const App: React.FC = () => {
           />
           <PrivateRoute
             exact
+            path="/affiliate/become"
+            component={AffiliateBecome}
+          />
+          <PrivateRoute
+            exact
             path="/affiliate/paywall"
-            component={BecomeAnAffiliatePage}
+            component={AffiliatePaywall}
           />
           <PrivateRoute
             exact
@@ -193,11 +202,6 @@ const App: React.FC = () => {
             exact
             path="/favorites"
             component={AffiliateFavorites}
-          />
-          <PrivateRoute
-            exact
-            path="/affiliate/scanner"
-            component={ScannerNote}
           />
           <PrivateRoute exact path="/home" component={Home} />
 

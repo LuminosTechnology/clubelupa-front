@@ -107,14 +107,17 @@ export const LevelBadge = styled.div`
   z-index: 4;
 
   img {
+    position: relative;
+    inset: 0;
     width: 100%;
     height: 100%;
   }
   span {
     position: absolute;
-    font-size: 14px;
+    font-size: 1.5rem;
     font-weight: 800;
     color: #0e0e0e;
+    transform: translateX(-2px) translateY(-3px) rotate(5deg);
   }
 `;
 

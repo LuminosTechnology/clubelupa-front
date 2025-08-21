@@ -11,7 +11,11 @@ import {
   RegisterAffiliateRequest,
   UpdateAffiliateEstablishmentRequest,
 } from "../types/api/affiliate";
-import { RegisterUserRequest, UpdateUserRequest } from "../types/api/user";
+import {
+  GamificationSummaryResponse,
+  RegisterUserRequest,
+  UpdateUserRequest,
+} from "../types/api/user";
 import { LOCAL_STORAGE_KEYS } from "../config/constants";
 import { ChangePasswordRequest } from "../types/api/auth";
 
@@ -74,6 +78,16 @@ export const updateEstablishment = async ({
     formData.append("category_id", data.category_id.toString());
   if (data.instagram) formData.append("instagram", data.instagram);
   if (data.site) formData.append("site", data.site);
+  if (data.categories) {
+    data.categories.forEach((category) =>
+      formData.append("categories[]", category.toString())
+    );
+  }
+  if (data.attributes) {
+    data.attributes.forEach((attribute) =>
+      formData.append("attributes[]", attribute.toString())
+    );
+  }
 
   if (data.address) {
     for (const [key, value] of Object.entries(data.address)) {
@@ -118,7 +132,10 @@ export const getToken = async () => {
 
 export const forgotPassword = async (data: ForgotPasswordRequest) => {
   console.log("[Auth Service] Requesting password reset code with data:", data);
-  const response = await api.post("/forgot-password", data);
+  const response = await api.post<{ message: string }>(
+    "/forgot-password",
+    data
+  );
   console.log("[Auth Service] Password reset code response:", response.data);
   return response.data;
 };
@@ -184,4 +201,11 @@ export const changePassword = async ({
     password_confirmation,
   });
   return response.data;
+};
+
+export const getGamificationSummary = async () => {
+  const response = await api.get<{ data: GamificationSummaryResponse }>(
+    "/user/gamification-summary"
+  );
+  return response.data.data;
 };

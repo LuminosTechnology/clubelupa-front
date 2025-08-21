@@ -1,4 +1,4 @@
-import { Address, CreateAddress, FormattedDate } from "./api";
+import { Address, CreateAddress, Establishment, FormattedDate } from "./api";
 
 export interface RegisterAffiliateRequest {
   name: string;
@@ -41,15 +41,18 @@ export interface UpdateAffiliateEstablishmentRequest {
   whatsapp_number?: string;
 
   category_id?: number;
+  categories?: number[];
 
-  address: Partial<CreateAddress>;
+  attributes?: number[];
 
-  instagram?: string;
-  site?: string;
+  address?: Partial<CreateAddress>;
 
   shop_photo?: File;
   product_photo?: File;
   behind_the_scenes_photo?: File;
+
+  instagram?: string;
+  site?: string;
 }
 
 export interface AdvertisementData {
@@ -63,4 +66,45 @@ export interface AdvertisementData {
   created_at: FormattedDate;
   updated_at: FormattedDate;
   deleted_at?: FormattedDate;
+}
+
+export interface BecomeAnAffiliateRequest {
+  name: string;
+  site: string;
+  instagram: string;
+  categories: string[];
+  address?: Partial<{
+    zip_code: string;
+    street: string;
+    number: string;
+    neighborhood: string;
+    city: string;
+    state: string;
+    complement: string;
+    latitude: number;
+    longitude: number;
+  }>;
+}
+
+export interface ScanPurchaseCodeRequest {
+  qr_code_url: string;
+  establishment_id: number;
+}
+
+export interface NotaFiscal {
+  user_id: number;
+  establishment_id: string;
+  chave_nfe: string;
+  data_emissao: string; // ISO datetime
+  valor_total: number;
+  updated_at: string; // ISO datetime
+  created_at: string; // ISO datetime
+  id: number;
+  establishment: Establishment;
+}
+
+export interface ScanPurchaseCodeResponse {
+  message: string;
+  nota: NotaFiscal;
+  cnpj_emitente: string;
 }

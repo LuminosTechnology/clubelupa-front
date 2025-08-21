@@ -1,10 +1,9 @@
-import { useState, createContext, useContext, useEffect } from "react";
+import { Preferences } from "@capacitor/preferences";
+import { AxiosError } from "axios";
+import { createContext, useContext, useEffect, useState } from "react";
+import { LOCAL_STORAGE_KEYS } from "../config/constants";
 import { getToken, getUserByToken } from "../services/auth-service";
 import { User } from "../types/api/api";
-import { AxiosError } from "axios";
-import { useHistory } from "react-router";
-import { Preferences } from "@capacitor/preferences";
-import { LOCAL_STORAGE_KEYS } from "../config/constants";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -13,6 +12,7 @@ interface AuthContextType {
   user?: User;
   setUser: (value?: User) => void;
   logout: () => void;
+  refetchUser: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType>(
@@ -24,7 +24,6 @@ type Props = {
 };
 
 export const AuthContextProvider: React.FC<Props> = ({ children }) => {
-  const history = useHistory();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | undefined>();
@@ -67,6 +66,10 @@ export const AuthContextProvider: React.FC<Props> = ({ children }) => {
     }
   }, [user]);
 
+  const refetchUser = async () => {
+    fetchToken();
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -76,6 +79,7 @@ export const AuthContextProvider: React.FC<Props> = ({ children }) => {
         user,
         setUser,
         logout,
+        refetchUser,
       }}
     >
       {children}

@@ -1,23 +1,17 @@
-import { IonContent, IonPage } from "@ionic/react";
-import React, { useEffect, useMemo, useState } from "react";
+import { IonAlert, IonContent, IonPage } from "@ionic/react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
-import Footer from "../../components/Footer";
 import Header from "../../components/Header";
-import type { Restaurant } from "../../components/Map";
 import Map from "../../components/Map";
+import { HomeBottomSheet } from "./components/home-bottom-sheet";
 import { useAuthContext } from "../../contexts/AuthContext";
 
 const Home: React.FC = () => {
   const history = useHistory();
   const { user } = useAuthContext();
-
-  const [selectedAffiliate, setSelectedAffiliate] = useState<Restaurant | null>(
-    null
-  );
+  const [displayPaymentWarning, setDisplayPaymentWarning] = useState(false);
 
   const [searchValue, setSearchValue] = useState("");
-
-  const [showSuccess, setShowSuccess] = useState(false);
 
   /* ─── remove aria-hidden que o Google Maps injeta ──────────────── */
   useEffect(() => {
@@ -45,63 +39,37 @@ const Home: React.FC = () => {
     return () => observer.disconnect();
   }, []);
 
-  /* ─── nome pronto para o footer de sucesso ─────────────────────── */
-  const affiliateDisplayName = useMemo(() => {
-    if (!selectedAffiliate) return "";
-    return (
-      selectedAffiliate.nome_local ||
-      selectedAffiliate.nome_fantasia ||
-      "Afiliado"
-    );
-  }, [selectedAffiliate]);
-
-  const affiliateForFooter = useMemo(() => {
-    if (!selectedAffiliate) return null;
-    return {
-      ...selectedAffiliate,
-      name: affiliateDisplayName,
-    };
-  }, [selectedAffiliate, affiliateDisplayName]);
+  useEffect(() => {
+    if (user) {
+      if (user.is_affiliate && !user.is_payed) {
+        setDisplayPaymentWarning(true);
+      }
+    }
+  }, []);
 
   return (
     <IonPage>
-      <IonContent>
+      <IonAlert
+        isOpen={displayPaymentWarning}
+        onDidDismiss={() => {
+          setDisplayPaymentWarning(false);
+          history.push("/affiliate/paywall");
+        }}
+        title="Atenção"
+        message={
+          "Detectamos que você afiliado, mas ainda não realizou o pagamento da assinatura. Você pode assinar agora para ter acesso a todos os recursos."
+        }
+        buttons={["OK"]}
+      />
+      <IonContent scrollY={false}>
         <Header onSearchChange={setSearchValue} />
         <Map
           searchValue={searchValue}
           onViewMore={(affiliate) => {
             history.push(`/affiliate-view/${affiliate.id}`);
-            setShowSuccess(false);
           }}
         />
-
-        {/* Footer padrão do usuário */}
-        {user && !affiliateForFooter && !showSuccess && <Footer />}
-        {/* 
-        <AffiliateFooter
-          visible={true}
-          affiliate={affiliateForFooter}
-          onClose={() => setSelectedAffiliate(null)}
-          onAction={() =>
-            history.push(`/affiliate-view/${affiliateForFooter.id}`)
-          }
-        /> */}
-
-        {/* Footer de sucesso de check-in */}
-        {/* {affiliateForFooter && showSuccess && (
-          <CheckinSuccessFooter
-            affiliateName={affiliateDisplayName}
-            coinsEarned={affiliateForFooter.value}
-            onRedeem={() => {
-              setShowSuccess(false);
-              setSelectedAffiliate(null);
-            }}
-            onClose={() => {
-              setShowSuccess(false);
-              setSelectedAffiliate(null);
-            }}
-          />
-        )} */}
+        <HomeBottomSheet />
       </IonContent>
     </IonPage>
   );

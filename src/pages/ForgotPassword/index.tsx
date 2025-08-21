@@ -1,9 +1,9 @@
-import { IonPage, IonContent } from "@ionic/react";
+import { IonPage, IonContent, IonAlert, IonSpinner } from "@ionic/react";
 import { Container, Text, ButtonContainer, ErrorMessage } from "./forgot.style";
 import BackButton from "../../components/BackButton";
 import FloatingInput from "../../components/FloatingInput";
 import Button from "../../components/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "../../components/Link";
 import { useHistory } from "react-router";
 import { forgotPassword } from "../../services/auth-service";
@@ -15,7 +15,10 @@ const ForgotPassword: React.FC = () => {
     data_nascimento: "",
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [displayErrorAlert, setDisplayErrorAlert] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string>("");
+  const [displaySuccessAlert, setDisplaySuccessAlert] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -23,59 +26,72 @@ const ForgotPassword: React.FC = () => {
     if (!formData.email) {
       newErrors.email = "Email é obrigatório";
     }
-    if (!formData.data_nascimento) {
-      newErrors.data_nascimento = "Data de nascimento é obrigatória";
-    }
+    // if (!formData.data_nascimento) {
+    //   newErrors.data_nascimento = "Data de nascimento é obrigatória";
+    // }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async () => {
+    setIsLoading(true);
     if (!validateForm()) return;
 
     try {
-      await forgotPassword({
+      const response = await forgotPassword({
         email: formData.email,
         data_nascimento: formData.data_nascimento,
       });
 
+      setSuccessMessage(response.message);
+      setDisplaySuccessAlert(true);
       setFormData({
         email: "",
         data_nascimento: "",
       });
 
       setErrors({});
-
-      setSuccessMessage("Código solicitado com sucesso!");
-      setTimeout(() => {
-        history.push("/change-password", { email: formData.email });
-      }, 2000);
     } catch (error: any) {
       const backendMessage = error.response?.data?.message;
-
-      if (
-        backendMessage ===
-        "Usuário não encontrado com as credenciais fornecidas!"
-      ) {
-        setErrors({
-          form: "E-mail ou data de nascimento inválidos",
-        });
-      } else {
-        setErrors({
-          form: backendMessage || "Erro ao solicitar código",
-        });
-      }
+      setErrors({
+        form: backendMessage || "Erro ao solicitar código",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  useEffect(() => {
+    if (errors.form) {
+      setDisplayErrorAlert(true);
+    }
+  }, [errors.form]);
+
   return (
     <IonPage>
+      <IonAlert
+        isOpen={displayErrorAlert}
+        onDidDismiss={() => {
+          setErrors((prev) => ({ ...prev, form: "" }));
+          setDisplayErrorAlert(false);
+        }}
+        header="Erro"
+        message={errors.form}
+        buttons={["OK"]}
+      />
+      <IonAlert
+        isOpen={displaySuccessAlert}
+        onDidDismiss={() => setSuccessMessage("")}
+        header="Sucesso"
+        message={successMessage}
+        buttons={["OK"]}
+      />
       <IonContent style={{ "--background": "var(--ion-color-tertiary)" }}>
         <Container>
           <BackButton />
-          <h2>Esqueci minha senha</h2>
           <Text>
+            <h2>Esqueci minha senha</h2>
             Para sua segurança, enviaremos um código para validar a redefinição
             da senha.
           </Text>
@@ -89,7 +105,7 @@ const ForgotPassword: React.FC = () => {
           />
           {errors.email && <ErrorMessage>{errors.email}</ErrorMessage>}
 
-          <FloatingInput
+          {/* <FloatingInput
             label="Data de Nascimento"
             value={formData.data_nascimento}
             onChange={(value) =>
@@ -100,36 +116,24 @@ const ForgotPassword: React.FC = () => {
           />
           {errors.data_nascimento && (
             <ErrorMessage>{errors.data_nascimento}</ErrorMessage>
-          )}
+          )} */}
 
           <ButtonContainer>
-            {successMessage && (
-              <ErrorMessage
-                style={{
-                  color: "#4CAF50",
-                  fontSize: "16px",
-                  fontWeight: "bold",
-                  textAlign: "center",
-                  marginBottom: "16px",
-                }}
-              >
-                {successMessage}
-              </ErrorMessage>
-            )}
             {errors.form && (
               <ErrorMessage style={{ fontSize: "16px", textAlign: "center" }}>
                 {errors.form}
               </ErrorMessage>
             )}
-            <Link onClick={() => history.push("/change/password")}>
+            {/* <Link onClick={() => history.push("/change/password")}>
               Já tenho o código de redefinição
-            </Link>
+            </Link> */}
             <Button
+              disabled={isLoading}
               onClick={handleSubmit}
               variant="secondary"
               style={{ marginTop: "32px" }}
             >
-              SOLICITAR CÓDIGO
+              {isLoading ? <IonSpinner color="primary" /> : "ALTERAR SENHA"}
             </Button>
           </ButtonContainer>
         </Container>

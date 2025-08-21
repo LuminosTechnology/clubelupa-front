@@ -74,7 +74,7 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
     } else {
       base.push({
         label: "Seja um Afiliado",
-        path: "/affiliate/paywall",
+        path: "/affiliate/become",
         enabled: true,
       });
     }

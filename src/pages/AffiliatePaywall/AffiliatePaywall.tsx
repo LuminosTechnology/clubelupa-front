@@ -1,30 +1,24 @@
 // src/pages/MyPlan/MyPlan.tsx
 import { IonContent, IonPage, IonText } from "@ionic/react";
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
 import AppHeader from "../../components/SimpleHeader";
 
 import {
-  Avatar,
-  AvatarWrapper,
   Benefit,
   BenefitsContainer,
   ButtonWrapper,
-  InfoText,
   Paragraph,
   PremiumButton,
   Price,
   ProfileContainer,
   Title,
-  UserName,
-  UserSubInfo,
-} from "./BecomeAnAffiliate.style";
+} from "./AffiliatePaywall.style";
 
 import { Capacitor } from "@capacitor/core";
-import { useAuthContext } from "../../contexts/AuthContext";
+import { PurchasesPackage } from "@revenuecat/purchases-capacitor";
 
-const BecomeAnAffiliatePage: React.FC = () => {
-  const [affiliatePackage, setAffiliatePackage] = useState<any>();
+const AffiliatePaywall: React.FC = () => {
+  const [affiliatePackage, setAffiliatePackage] = useState<PurchasesPackage>();
   const [isLoading, setIsLoading] = useState(false);
   const [hasAffiliate, setHasAffiliate] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -146,8 +140,9 @@ const BecomeAnAffiliatePage: React.FC = () => {
             </Benefit>
           </BenefitsContainer>
           <Paragraph>
-            Tudo isso por <Price>R$ 10,00</Price> por mês. Cancele quando
-            quiser.
+            Tudo isso por{" "}
+            <Price>R$ {affiliatePackage?.product.priceString}</Price>
+            por mês. Cancele quando quiser.
           </Paragraph>
 
           {error && <IonText color="danger">{error}</IonText>}
@@ -165,4 +160,4 @@ const BecomeAnAffiliatePage: React.FC = () => {
   );
 };
 
-export default BecomeAnAffiliatePage;
+export default AffiliatePaywall;

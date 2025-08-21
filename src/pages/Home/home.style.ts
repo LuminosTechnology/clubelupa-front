@@ -12,7 +12,26 @@ export const Container = styled.div`
   }
 `;
 
-export const ContainerSucess = styled.div`
+export const ColapseButtonsContainer = styled.div`
+  display: flex;
+  flex: 1;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 3rem;
+  z-index: 20;
+`;
+
+export const CollapsedButton = styled.button`
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+`;
+
+export const ContainerSuccess = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -22,7 +41,7 @@ export const ContainerSucess = styled.div`
 `;
 
 export const Title = styled.h1`
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 25px;
   font-weight: 700;
   margin-top: 0;
@@ -30,7 +49,7 @@ export const Title = styled.h1`
 `;
 
 export const Subtitle = styled.p`
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 18px;
   text-align: center;
   margin-top: 0;

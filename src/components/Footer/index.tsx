@@ -25,14 +25,16 @@ import {
 } from "./footer.style";
 
 import footerClose from "../../assets/footer-close.svg";
-import homeConquistas from "../../assets/home-conquistas.svg";
 import homeHome from "../../assets/home-home.svg";
+import homeConquistas from "../../assets/home-conquistas.svg";
 import homeLugares from "../../assets/home-lugares.svg";
 import homeLupa from "../../assets/home-lupa.svg";
 import homeNivel from "../../assets/moeda_vazia.png";
 
 import { useAuthContext } from "../../contexts/AuthContext";
+import { GamificationSummaryResponse } from "../../types/api/user";
 import FooterAchievements from "../Footer-Achievements/FooterAchievements";
+import { useGamificationContext } from "../../contexts/GamificationContext";
 
 interface FooterProps {
   userData?: {
@@ -50,6 +52,7 @@ const Footer: React.FC<FooterProps> = ({
 
   /* ─────────── usuário logado ─────────── */
   const { user } = useAuthContext();
+  const { gamificationSummary } = useGamificationContext();
 
   /* ─────────── drawer principal ───────── */
   const minHeight = 80;
@@ -111,15 +114,6 @@ const Footer: React.FC<FooterProps> = ({
     100,
     (userData.experiencia! / userData.proximo_nivel!) * 100 // → saturado em 100
   );
-
-  const daysUsing = () => {
-    if (!user?.created_at) return 0;
-    return Math.ceil(
-      Math.abs(Date.now() - new Date(user.created_at.default).getTime()) /
-        (1000 * 60 * 60 * 24)
-    );
-  };
-
   /* ─────────── blur / parabéns + confete ─ */
   const [congratsScreen, setCongratsScreen] = useState(false);
 
@@ -176,12 +170,17 @@ const Footer: React.FC<FooterProps> = ({
         style={{ height, transition: isDragging ? "none" : "height 0.3s ease" }}
       >
         {/* foto + anel de nível + moedinha */}
-        <UserImageContainer $progress={progressPct}>
+        <UserImageContainer
+          $progress={
+            gamificationSummary?.current_level.progress_percentage || 0
+          }
+        >
           <UserImage
             src={user?.avatar_url || "/assets/default-profile-photo.png"}
           />
           <LevelBadge>
             <img src={homeNivel} alt="Moeda de nível" />
+            <span>{gamificationSummary?.current_level.number}</span>
           </LevelBadge>
         </UserImageContainer>
 
@@ -229,10 +228,14 @@ const Footer: React.FC<FooterProps> = ({
             </QuickActions>
 
             <InfoList>
-              <li>Lugares visitados com Lupa: 10</li>
-              <li>Benefícios já utilizados: 20</li>
-              <li>Moedas Lupa acumuladas: 30</li>
-              <li>Dias usando o Lupa: {daysUsing()}</li>
+              <li>
+                Lugares visitados com Lupa:{" "}
+                {gamificationSummary?.visited_establishments_count}
+              </li>
+              <li>
+                Moedas Lupa acumuladas: {gamificationSummary?.coins_balance}
+              </li>
+              <li>Dias usando o Lupa: {gamificationSummary?.days_as_member}</li>
             </InfoList>
 
             <CloseFooterBtn onClick={collapseFooter}>

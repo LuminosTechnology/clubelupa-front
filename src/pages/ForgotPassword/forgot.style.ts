@@ -23,6 +23,10 @@ export const Text = styled.p`
   color: white;
   font-size: 16px;
   margin-bottom: 32px;
+  padding-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 `;
 
 export const ButtonContainer = styled.div`
