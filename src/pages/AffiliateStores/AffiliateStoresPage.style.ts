@@ -2,6 +2,7 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
 `;
@@ -14,7 +15,7 @@ export const ListWrapper = styled.div`
 
 export const AlphabetContainer = styled.div`
   position: fixed;
-  top: 250px;
+  top: 140px;
   right: 0;
   display: flex;
   flex-direction: column;
@@ -46,11 +47,13 @@ export const StoreListContainer = styled.div`
   flex-direction: column;
   gap: 28px;
   flex: 1;
+  margin-right: 2rem;
 `;
 
 export const StoreCard = styled.div`
   display: flex;
   width: 100%;
+  scroll-margin-top: 145px;
 `;
 
 export const StoreImage = styled.img`

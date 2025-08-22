@@ -39,6 +39,8 @@ export const BottomSheet: React.FC<Props> = ({
     c.style.transform = `translateY(${CLOSED_Y}px)`;
     c.dataset.open = "false";
 
+    let target: "open" | "close" | null = null;
+
     const gesture = createGesture({
       el: c.querySelector(".swipe-helper") as HTMLDivElement,
       gestureName: "swipe-drawer",
@@ -53,27 +55,29 @@ export const BottomSheet: React.FC<Props> = ({
 
         c.style.transition = "none";
         c.style.transform = `translateY(${currentY}px)`;
+
+        if (e.deltaY < -50) target = "open";
+        if (e.deltaY > 50) target = "close";
       },
 
       onEnd: (e) => {
-        c.style.transition = "200ms linear";
+        c.style.transition = "200ms ease-out";
 
-        const shouldOpen = e.deltaY < -20 || e.velocityY < -0.3;
-        const shouldClose = e.deltaY > 20 || e.velocityY > 0.3;
-
-        if (shouldOpen) {
+        if (target === "open") {
           c.style.transform = `translateY(${OPEN_Y}px)`;
           c.dataset.open = "true";
-        } else if (shouldClose) {
+        } else if (target === "close") {
           c.style.transform = `translateY(${CLOSED_Y}px)`;
           c.dataset.open = "false";
         } else {
-          if (c.dataset.open === "true") {
-            c.style.transform = `translateY(${OPEN_Y}px)`;
-          } else {
-            c.style.transform = `translateY(${CLOSED_Y}px)`;
-          }
+          // fallback se não passou do threshold
+          c.style.transform =
+            c.dataset.open === "true"
+              ? `translateY(${OPEN_Y}px)`
+              : `translateY(${CLOSED_Y}px)`;
         }
+
+        target = null;
       },
     });
 

@@ -9,6 +9,7 @@ export const SearchBarWrapper = styled.div`
   gap: 12px;
   padding: 0.5rem 1rem;
   margin: 2rem 1.25rem;
+  margin-right: 2rem;
 `;
 
 export const SearchIcon = styled.img`
@@ -28,4 +29,14 @@ export const SearchInput = styled.input`
   &::placeholder {
     color: #cbccce;
   }
+`;
+
+export const FilterButton = styled.button`
+  background-color: transparent;
+  color: var(--ion-color-primary);
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 0;
 `;
