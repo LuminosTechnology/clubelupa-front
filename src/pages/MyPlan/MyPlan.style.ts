@@ -1,6 +1,6 @@
 // src/pages/MyPlan/MyPlan.style.ts
-import styled from 'styled-components';
-import Button from '../../components/Button';   // ← import direto do seu components/Button
+import styled from "styled-components";
+import Button from "../../components/Button"; // ← import direto do seu components/Button
 
 export const AvatarWrapper = styled.div`
   position: relative;
@@ -33,6 +33,34 @@ export const UserName = styled.h2`
   color: #868950;
 `;
 
+export const Title = styled.h1`
+  font-size: 1.5rem;
+  color: #868950;
+  line-height: 1.4;
+`;
+
+export const Paragraph = styled.p`
+  color: black;
+  line-height: 1.2;
+`;
+
+export const BenefitsContainer = styled.ul`
+  color: black;
+  padding-left: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+export const Benefit = styled.li`
+  line-height: 1.2;
+`;
+
+export const Price = styled.span`
+  color: var(--ion-color-primary);
+  font-weight: bold;
+  font-size: 1.2rem;
+`;
 export const UserSubInfo = styled.p`
   margin: 0 0 4px 0;
   font-size: 16px;
@@ -40,7 +68,6 @@ export const UserSubInfo = styled.p`
 `;
 
 export const InfoText = styled.p`
-  margin: 50px 0 0;
   font-size: 16px;
   color: #868950;
   line-height: 1.4;
@@ -74,7 +101,7 @@ export const PremiumButton = styled(Button)`
   text-align: center !important;
 
   margin-top: 20px;
-  background-color: #8E9455 !important;
+  background-color: #8e9455 !important;
   color: #ffffff !important;
   font-weight: 700;
 `;

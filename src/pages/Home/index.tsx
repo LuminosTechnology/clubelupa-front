@@ -56,9 +56,7 @@ const Home: React.FC = () => {
           history.push("/affiliate/paywall");
         }}
         title="Atenção"
-        message={
-          "Detectamos que você afiliado, mas ainda não realizou o pagamento da assinatura. Você pode assinar agora para ter acesso a todos os recursos."
-        }
+        message={`Detectamos que você é Afiliado, mas ainda não realizou o pagamento da assinatura. Você pode assinar agora para ter acesso a todos os recursos.`}
         buttons={["OK"]}
       />
       <IonContent scrollY={false}>

@@ -29,6 +29,7 @@ import AppHeader from "../../components/SimpleHeader";
 import { useDebounce } from "../../hooks/useDebounce";
 import { Establishment } from "../../types/api/api";
 import Button from "../../components/Button";
+import { CategoryFilter } from "../AffiliateStores/components/filters";
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -41,6 +42,8 @@ const AffiliateFavoritesPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const debouncedSearchValue = useDebounce(query, 300);
+  const [categoriesFilter, setCategoriesFilter] = useState<number[]>([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
 
@@ -76,12 +79,15 @@ const AffiliateFavoritesPage: React.FC = () => {
 
   /* ─── carrega da API ───────────────────────────────────────────── */
   const fetchEstablishments = async () => {
-    const response = await fetchFavorites({ query: debouncedSearchValue });
+    const response = await fetchFavorites({
+      query: debouncedSearchValue,
+      categories: categoriesFilter,
+    });
     setEstablishments(response.data);
   };
   useEffect(() => {
     fetchEstablishments();
-  }, [debouncedSearchValue]);
+  }, [debouncedSearchValue, categoriesFilter]);
   useIonViewWillEnter(() => {
     fetchEstablishments();
   });
@@ -99,6 +105,13 @@ const AffiliateFavoritesPage: React.FC = () => {
 
   return (
     <IonPage style={{ "--background": "#ffffff" }}>
+      <CategoryFilter
+        isOpen={isFilterOpen}
+        onFilter={(ids) => {
+          setCategoriesFilter(ids);
+          setIsFilterOpen(false);
+        }}
+      />
       <AppHeader
         title="Meus Favoritos"
         backgroundColor="#E6C178"
@@ -118,7 +131,14 @@ const AffiliateFavoritesPage: React.FC = () => {
           onDidDismiss={() => setError(undefined)}
         />
 
-        <SearchBar value={query} onChange={setQuery} placeholder="Procurar" />
+        <SearchBar
+          value={query}
+          onChange={setQuery}
+          placeholder="Procurar"
+          onFilterClick={() => {
+            setIsFilterOpen(true);
+          }}
+        />
         <RowContainer>
           <StoreListContainer>
             {establishments.length === 0 && (

@@ -41,9 +41,9 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
   const handleLogout = async () => {
     try {
       await logout();
-      history.replace("/login");
       setIsAuthenticated(false);
       setUser(undefined);
+      history.replace("/login");
     } catch (e) {
       console.error("Logout error:", e);
     } finally {

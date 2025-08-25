@@ -25,7 +25,7 @@ const AffiliatePendingApprovalRegisterSuccess: React.FC = () => {
           <AffiliateButtonContainer>
             <Button
               variant="secondary"
-              onClick={() => history.push("/login", { refresh: true })}
+              onClick={() => history.replace("/login")}
             >
               VOLTAR PARA O INÍCIO
             </Button>

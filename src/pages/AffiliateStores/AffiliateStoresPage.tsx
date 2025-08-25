@@ -7,6 +7,7 @@ import SearchBar from "../../components/SearchButton/SearchBar";
 import {
   AlphabetContainer,
   AlphabetLetter,
+  Container,
   RowContainer,
   StoreCard,
   StoreImage,
@@ -20,6 +21,7 @@ import { getAllEstablishments } from "../../services/affiliateService";
 import AppHeader from "../../components/SimpleHeader";
 import { useDebounce } from "../../hooks/useDebounce";
 import { Establishment } from "../../types/api/api";
+import { CategoryFilter } from "./components/filters";
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -34,6 +36,8 @@ const AffiliateStoresPage: React.FC = () => {
   const debouncedSearchValue = useDebounce(query, 300);
 
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [categoriesFilter, setCategoriesFilter] = useState<number[]>([]);
 
   const handleSelectLetter = (clientY: number) => {
     const container = document.getElementById("alphabet-scroll");
@@ -68,22 +72,33 @@ const AffiliateStoresPage: React.FC = () => {
   /* ─── carrega da API ───────────────────────────────────────────── */
   useEffect(() => {
     const fetchEstablishments = async () => {
-      const response = await getAllEstablishments(debouncedSearchValue);
+      const response = await getAllEstablishments(
+        debouncedSearchValue,
+        categoriesFilter
+      );
       setEstablishments(response.data);
     };
 
     fetchEstablishments();
-  }, [debouncedSearchValue]);
+  }, [debouncedSearchValue, categoriesFilter]);
 
   const scrollToLetter = (letter: string) => {
     const element = document.getElementById(letter);
     if (element) element.scrollIntoView({ behavior: "smooth" });
   };
+  console.log({ categoriesFilter });
 
   const containerRef = useRef<HTMLIonContentElement>(null);
 
   return (
     <IonPage style={{ "--background": "#ffffff" }}>
+      <CategoryFilter
+        isOpen={isFilterOpen}
+        onFilter={(ids) => {
+          setCategoriesFilter(ids);
+          setIsFilterOpen(false);
+        }}
+      />
       <AppHeader
         title="Afiliados"
         backgroundColor="#E6C178"
@@ -92,11 +107,9 @@ const AffiliateStoresPage: React.FC = () => {
       <IonContent
         ref={containerRef}
         fullscreen
-        style={{
-          "--background": "#ffffff",
-          "--offset-bottom": "400px",
-          "--offset-top": "-1px",
-        }}
+        style={{ "--background": "#ffffff" }}
+        scrollEvents={true}
+        onIonScroll={() => setSelectedLetter(null)}
       >
         <IonLoading isOpen={loading} message="Carregando afiliados…" />
         <IonToast
@@ -106,9 +119,14 @@ const AffiliateStoresPage: React.FC = () => {
           duration={4000}
           onDidDismiss={() => setError(undefined)}
         />
+        <Container>
+          <SearchBar
+            value={query}
+            onChange={setQuery}
+            placeholder="Procurar"
+            onFilterClick={() => setIsFilterOpen(true)}
+          />
 
-        <SearchBar value={query} onChange={setQuery} placeholder="Procurar" />
-        <RowContainer>
           <StoreListContainer>
             {establishments.map((establishment) => {
               const firstLetter = establishment.name.charAt(0).toUpperCase();
@@ -171,7 +189,7 @@ const AffiliateStoresPage: React.FC = () => {
               </AlphabetLetter>
             ))}
           </AlphabetContainer>
-        </RowContainer>
+        </Container>
       </IonContent>
     </IonPage>
   );

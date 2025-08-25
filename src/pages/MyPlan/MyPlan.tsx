@@ -1,16 +1,21 @@
 // src/pages/MyPlan/MyPlan.tsx
-import { IonContent, IonPage, IonText } from "@ionic/react";
+import { IonContent, IonPage, IonSpinner, IonText } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import AppHeader from "../../components/SimpleHeader";
 
 import {
   Avatar,
   AvatarWrapper,
+  Benefit,
+  BenefitsContainer,
   ButtonWrapper,
   InfoText,
+  Paragraph,
   PlanValue,
   PremiumButton,
+  Price,
   ProfileContainer,
+  Title,
   UserName,
   UserSubInfo,
 } from "./MyPlan.style";
@@ -135,27 +140,55 @@ const MyPlan: React.FC = () => {
           <UserName>{user?.name}</UserName>
           <UserSubInfo>{user?.email}</UserSubInfo>
 
-          <InfoText>Você faz parte do programa Clube Lupa</InfoText>
           <PlanValue>
             MEU PLANO: {hasPremium ? "PREMIUM" : "GRATUITO"}
           </PlanValue>
 
-          {!hasPremium && (
+          {hasPremium ? (
             <>
-              {error ? (
-                <IonText color="danger">{error}</IonText>
-              ) : (
-                <ButtonWrapper>
-                  <PremiumButton onClick={handlePurchase} disabled={isLoading}>
-                    {isLoading ? "PROCESSANDO" : "ME TORNAR PREMIUM"}
-                    <br />
-                    POR{" "}
-                    {premiumPackage
-                      ? `${premiumPackage.product.priceString}/MÊS`
-                      : "..."}
-                  </PremiumButton>
-                </ButtonWrapper>
-              )}
+              <Title>Seus benefícios</Title>
+
+              <BenefitsContainer>
+                <Benefit>Acúmulo de moedas Lupa - ilimitado</Benefit>
+                <Benefit>Pontos ilimitados e níveis exclusivos</Benefit>
+                <Benefit>Medalhas inéditas</Benefit>
+                <Benefit>Troca de moedas Lupa por experiências</Benefit>
+              </BenefitsContainer>
+            </>
+          ) : (
+            <>
+              <Title>Torne-se um Sócio Premium do Clube Lupa</Title>
+              <Paragraph>
+                Ao se tornar um Sócio Premium, aproveite as seguintes vantagens:
+              </Paragraph>
+              <BenefitsContainer>
+                <Benefit>
+                  Acumule ainda mais moedas sem limite para aproveitar todo o
+                  seu progresso.
+                </Benefit>
+                <Benefit>
+                  Desbloqueie níveis exclusivos e continue evoluindo.
+                </Benefit>
+                <Benefit>
+                  Ganhe medalhas inéditas e mostre suas conquistas únicas.
+                </Benefit>
+                <Benefit>
+                  Troque suas moedas por experiências incríveis dentro do app.
+                </Benefit>
+              </BenefitsContainer>
+              <Paragraph>
+                Tudo isso por{" "}
+                <Price>R$ {premiumPackage?.product.priceString}</Price>
+                por mês. Cancele quando quiser.
+              </Paragraph>
+
+              {error && <IonText color="danger">{error}</IonText>}
+
+              <ButtonWrapper>
+                <PremiumButton onClick={handlePurchase} disabled={isLoading}>
+                  TORNAR-SE PREMIUM
+                </PremiumButton>
+              </ButtonWrapper>
             </>
           )}
         </ProfileContainer>
