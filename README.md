@@ -80,6 +80,7 @@ npx cap open ios
 ### Passo 2: Alterar a linguagem nativa do app
 - Ainda no target App, selecione a aba "Info"
 - Troque a Key "Default localization" para "pt-br"
+- Troque a Key "Bundle Display Name" para "Clube Lupa"
 
 ### Passo 3: Conecte um dispositivo compatível com a Build
 - Você pode tanto conectar um dispositivo por cabo no computador, quanto selecionar a opção "Any iOS Device"
