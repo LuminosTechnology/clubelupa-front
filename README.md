@@ -66,3 +66,29 @@ npx ionic build
 npx cap sync ios
 npx cap open ios
 ```
+
+## 🚀 Passo a passo para build no iOS e envio para AppStore
+
+### Passo 1: Adicionar Capability + Setup da Conta
+- Ao abrir o projeto no Xcode, no target App, vá até a aba Signing & Capabilities
+- Selecione o box "Automatically manage signing"
+- Selecione a conta Fernanda L. Paludo
+- No canto superior esquerdo, acima de "Signing", clique no botão "+ Capability"
+- Busque na lista por In-App Purchase
+- Ele irá aparecer logo abaixo do Signing Certificate
+
+### Passo 2: Alterar a linguagem nativa do app
+- Ainda no target App, selecione a aba "Info"
+- Troque a Key "Default localization" para "pt-br"
+
+### Passo 3: Conecte um dispositivo compatível com a Build
+- Você pode tanto conectar um dispositivo por cabo no computador, quanto selecionar a opção "Any iOS Device"
+
+### Passo 4: Arquivar o projeto
+- Na barra de tarefas, clique em "Product"
+- Na lista que abre em seguida, selecione "Archive" e aguarde o Xcode finalizar a build
+
+### Passo 5: Selecionar a distribuição
+- Na janela que abrir assim que o Xcode terminar de arquivar o projeto, você deve selecionar "Distribute App"
+- Em seguida, selecione "App Store Connect" (dessa maneira a versão irá tanto para loja, quanto para o testflight
+- Aguarde a operação finalizar.
