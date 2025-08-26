@@ -178,7 +178,7 @@ const MyPlan: React.FC = () => {
               </BenefitsContainer>
               <Paragraph>
                 Tudo isso por{" "}
-                <Price>R$ {premiumPackage?.product.priceString}</Price>
+                <Price>{premiumPackage?.product.priceString}</Price>
                 por mês. Cancele quando quiser.
               </Paragraph>
 

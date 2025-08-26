@@ -140,8 +140,7 @@ const AffiliatePaywall: React.FC = () => {
             </Benefit>
           </BenefitsContainer>
           <Paragraph>
-            Tudo isso por{" "}
-            <Price>R$ {affiliatePackage?.product.priceString}</Price>
+            Tudo isso por <Price>{affiliatePackage?.product.priceString}</Price>
             por mês. Cancele quando quiser.
           </Paragraph>
 

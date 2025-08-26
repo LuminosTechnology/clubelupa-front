@@ -140,29 +140,22 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
       // Limpe o objeto de referência
       markerMapRef.current = {};
 
-      // Adicione os novos marcadores
-      for (const e of establishments) {
-        if (!e.addresses.length) continue;
-
-        const location = {
-          lat: Number(e.addresses[0].latitude),
-          lng: Number(e.addresses[0].longitude),
-        };
-
-        try {
+      await Promise.all(
+        establishments.map(async (e) => {
+          if (!e.addresses.length) return;
+          const location = {
+            lat: Number(e.addresses[0].latitude),
+            lng: Number(e.addresses[0].longitude),
+          };
           const markerId = await gMap.addMarker({
             coordinate: location,
             iconUrl: "assets/affiliate_pin.png",
             iconSize: { width: 40, height: 55 },
             iconAnchor: { x: 20, y: 55 },
           });
-
-          // Armazene a referência para o estabelecimento
           markerMapRef.current[markerId] = e;
-        } catch (error) {
-          console.error("Erro ao adicionar marcador:", error);
-        }
-      }
+        })
+      );
     };
 
     updateMarkers();

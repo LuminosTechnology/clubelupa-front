@@ -1,8 +1,8 @@
 // src/pages/Vouncher/Vouncher.tsx
-import React, { useState } from "react";
-import { IonPage, IonContent } from "@ionic/react";
-import AppHeader from "../../components/SimpleHeader";
+import { IonAlert, IonContent, IonPage } from "@ionic/react";
+import React, { useEffect, useState } from "react";
 import FooterVoucher from "../../components/Footer-LupaCoins/FooterLupaCoins";
+import AppHeader from "../../components/SimpleHeader";
 
 import {
   Container,
@@ -10,33 +10,57 @@ import {
 } from "../AffiliateStores/AffiliateStoresPage.style";
 
 import {
-  ScrollArea,
+  BalanceAmount,
   BalanceContainer,
   BalanceLabel,
-  BalanceAmount,
-  VouncherWrapper,
-  IconContainer,
   ContentContainer,
-  VouncherTitle,
+  IconContainer,
+  ScrollArea,
+  ViewMore,
   VouncherCategory,
   VouncherQuantity,
-  ViewMore,
+  VouncherTitle,
+  VouncherWrapper,
 } from "./LupoCoins.style";
 
-import voucherIcon from "../../assets/moeda.svg";
+import { useHistory } from "react-router";
+import { useAuthContext } from "../../contexts/AuthContext";
+import { useGamificationContext } from "../../contexts/GamificationContext";
 import { experiencias } from "../../contexts/mock";
 
 const LupoCoins: React.FC = () => {
+  const history = useHistory();
   const [showFooter, setShowFooter] = useState(false);
   const [expandTrigger, setExpandTrigger] = useState(0);
+  const [displayPaymentWarning, setDisplayPaymentWarning] = useState(false);
+  const { gamificationSummary } = useGamificationContext();
+  const { user } = useAuthContext();
 
   const handleViewMore = () => {
     if (!showFooter) setShowFooter(true);
     setExpandTrigger((prev) => prev + 1);
   };
 
+  useEffect(() => {
+    if (user?.subscription && user.subscription.status === "active") {
+      //do nothing
+    } else {
+      setDisplayPaymentWarning(true);
+    }
+  }, []);
+
   return (
     <IonPage>
+      <IonAlert
+        isOpen={displayPaymentWarning}
+        onDidDismiss={() => {
+          setDisplayPaymentWarning(false);
+          history.replace("/myplan");
+        }}
+        title="Atenção"
+        message={`Ainda não detectamos o seu pagamento. Você pode comprar agora para ter acesso a todos os recursos.`}
+        buttons={["OK"]}
+      />
       <AppHeader
         title="Minhas Moedas Lupa"
         backgroundColor="#E0A075"
@@ -48,7 +72,9 @@ const LupoCoins: React.FC = () => {
           <Container>
             <BalanceContainer>
               <BalanceLabel>Você tem:</BalanceLabel>
-              <BalanceAmount>155&nbsp;Moedas Lupa</BalanceAmount>
+              <BalanceAmount>
+                {gamificationSummary?.coins_balance} Moedas Lupa
+              </BalanceAmount>
             </BalanceContainer>
 
             <ListWrapper>

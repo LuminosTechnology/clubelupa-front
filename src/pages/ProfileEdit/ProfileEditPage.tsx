@@ -124,7 +124,7 @@ const ProfileEditPage: React.FC = () => {
           ...form.address,
           zip_code: response.cep,
           street: response.logradouro,
-          complement: response.complemento,
+          // complement: response.complemento,
           neighborhood: response.bairro,
           city: response.localidade,
           state: response.uf,

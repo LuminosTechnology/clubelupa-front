@@ -36,6 +36,7 @@ import { RegisterAffiliateRequest } from "../../types/api/affiliate";
 import { Category } from "../../types/api/category";
 import { CategoryService } from "../../services/category-service";
 import { GeocodeService } from "../../services/geocode-service";
+import { validateBirthDate } from "../../utils/validate-birth-date";
 
 const AffiliateRegister: React.FC = () => {
   const history = useHistory();
@@ -70,6 +71,9 @@ const AffiliateRegister: React.FC = () => {
     if (!affiliate.birth_date) {
       newErrors.birth_date = "Data de nascimento é obrigatória";
     }
+
+    const birthDateError = validateBirthDate(affiliate.birth_date);
+    if (birthDateError) newErrors.birth_date = birthDateError;
 
     const birthDate = new Date(affiliate.birth_date);
     const today = new Date();
@@ -144,7 +148,7 @@ const AffiliateRegister: React.FC = () => {
           ...affiliate.address,
           zip_code: response.cep,
           street: response.logradouro,
-          complement: response.complemento,
+          // complement: response.complemento,
           neighborhood: response.bairro,
           city: response.localidade,
           state: response.uf,
@@ -310,7 +314,8 @@ const AffiliateRegister: React.FC = () => {
                 label="Data de Nascimento"
                 value={affiliate.birth_date}
                 onChange={(v) => setAffiliate({ ...affiliate, birth_date: v })}
-                type="date"
+                type="number"
+                mask="99/99/9999"
                 error={!!errors.birth_date}
               />
               {errors.birth_date && (

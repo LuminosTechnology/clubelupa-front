@@ -17,6 +17,7 @@ export const PhotoContainer = styled.div`
   width: 100%;
   height: 100%;
   position: relative;
+  z-index: 100;
 `;
 
 export const ProfilePhoto = styled.img`

@@ -221,7 +221,7 @@ const AffiliateEdit: React.FC = () => {
             ...form.address,
             zip_code: res.cep,
             street: res.logradouro,
-            complement: res.complemento,
+            // complement: res.complemento,
             neighborhood: res.bairro,
             city: res.localidade,
             state: res.uf,

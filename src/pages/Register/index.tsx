@@ -22,6 +22,7 @@ import Link from "../../components/Link";
 
 import { register } from "../../services/auth-service";
 import { RegisterUserRequest } from "../../types/api/user";
+import { validateBirthDate } from "../../utils/validate-birth-date";
 
 const Register: React.FC = () => {
   const [form, setForm] = useState<RegisterUserRequest>({
@@ -42,7 +43,12 @@ const Register: React.FC = () => {
 
     if (!form.name) newErrors.name = "Nome é obrigatório";
     if (!form.birth_date)
-      newErrors.birth_date = "Data de nascimento é obrigatória";
+      newErrors.data_nascimento = "Data de nascimento é obrigatória";
+
+    const birthDateError = validateBirthDate(form.birth_date);
+    console.log({ birthDateError });
+    if (birthDateError) newErrors.data_nascimento = birthDateError;
+
     if (!form.phone_number) newErrors.phone_number = "Telefone é obrigatório";
     if (!form.email) newErrors.email = "Email é obrigatório";
     if (!form.password) newErrors.password = "Senha é obrigatória";
@@ -63,12 +69,13 @@ const Register: React.FC = () => {
     const finalAge = hadBirthdayThisYear ? age - 1 : age;
 
     if (finalAge < 18)
-      newErrors.birth_date = "Você precisa ter 18 anos para se cadastrar";
+      newErrors.data_nascimento = "Você precisa ter 18 anos para se cadastrar";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  console.log(errors);
   const resetForm = () => {
     setForm({
       name: "",
@@ -132,7 +139,8 @@ const Register: React.FC = () => {
             label="Data de Nascimento"
             value={form.birth_date}
             onChange={(v) => setForm({ ...form, birth_date: v })}
-            type="date"
+            type="number"
+            mask="99/99/9999"
             error={!!errors.data_nascimento}
           />
           {errors.data_nascimento && (

@@ -96,8 +96,10 @@ const VerifyEmail: React.FC = () => {
             {inputRefs.map((ref, index) => (
               <Input
                 key={index}
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={code[index]}
-                type="text"
+                type="number"
                 maxLength={1}
                 ref={ref}
                 onKeyDown={(e) => onKeyDown(e, index)}
