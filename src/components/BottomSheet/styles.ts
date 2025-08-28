@@ -72,7 +72,6 @@ export const AvatarProgressBorder = styled.div<{ $progress: number }>`
   overflow: hidden;
 
   img {
-    background-color: red;
     object-fit: cover;
     width: 100%;
     height: 100%;

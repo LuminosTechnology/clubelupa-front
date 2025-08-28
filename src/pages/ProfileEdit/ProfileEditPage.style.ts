@@ -8,7 +8,7 @@ export const ProfileWrapper = styled.div<{ scrolled: boolean }>`
   height: 96px;
   border-radius: 50%;
   overflow: hidden;
-  z-index: 3;
+  z-index: 20;
   opacity: ${({ scrolled }) => (scrolled ? 0 : 1)};
   transition: opacity 0.3s ease-in-out;
 `;
@@ -17,7 +17,7 @@ export const PhotoContainer = styled.div`
   width: 100%;
   height: 100%;
   position: relative;
-  z-index: 100;
+  z-index: 20;
 `;
 
 export const ProfilePhoto = styled.img`

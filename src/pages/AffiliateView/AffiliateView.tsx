@@ -240,13 +240,17 @@ const AffiliateView: React.FC = () => {
                 </LikeButton>
               </TitleWrapper>
 
-              {data?.categories.length > 0 &&
-                data?.categories.map((c, i) => (
-                  <Section key={i}>
-                    <SectionTitle color={color}>Categoria</SectionTitle>
-                    <SectionText>{c.name}</SectionText>
-                  </Section>
-                ))}
+              {data?.categories.length > 0 && (
+                <Section>
+                  <SectionTitle color={color}>Categoria</SectionTitle>
+                  <SectionText>
+                    {data.categories
+                      .map((category) => category.name)
+                      .join(", ")}
+                  </SectionText>
+                </Section>
+              )}
+
               {/* 
               <Section>
                 <SectionTitle color={color}>Estrutura</SectionTitle>

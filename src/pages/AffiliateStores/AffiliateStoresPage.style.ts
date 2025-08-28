@@ -48,6 +48,7 @@ export const StoreListContainer = styled.div`
   gap: 28px;
   flex: 1;
   margin-right: 2rem;
+  padding-bottom: 2rem;
 `;
 
 export const StoreCard = styled.div`
