@@ -56,7 +56,6 @@ export const EditContainer = styled.div`
 `;
 
 export const TitleSection = styled.h2`
-  margin: 0 0 30px;
   font-size: 22px;
   font-weight: 800;
   color: #868950;

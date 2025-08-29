@@ -13,7 +13,7 @@ export const GeocodeService = {
   }) => {
     const { street, number, city, state } = address;
     const response = await axios.get(
-      `${URL}&address=${street}, ${number}, ${city}, ${state}`
+      `${URL}&address=${street} ${number} ${city} ${state}`
     );
 
     if (response.data.status !== "OK") {

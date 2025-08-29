@@ -72,11 +72,13 @@ const AffiliateStoresPage: React.FC = () => {
   /* ─── carrega da API ───────────────────────────────────────────── */
   useEffect(() => {
     const fetchEstablishments = async () => {
+      setLoading(true);
       const response = await getAllEstablishments(
         debouncedSearchValue,
         categoriesFilter
       );
       setEstablishments(response.data);
+      setLoading(false);
     };
 
     fetchEstablishments();
@@ -147,7 +149,7 @@ const AffiliateStoresPage: React.FC = () => {
                 >
                   <StoreImage
                     src={
-                      establishment.product_photo_url ??
+                      establishment.shop_photo_url ??
                       "/assets/default-photo.png"
                     }
                     alt={establishment.name}

@@ -65,10 +65,16 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
       { label: "Indique e Ganhe", path: "/recommendandwin", enabled: false },
     ];
 
-    if (user?.is_affiliate) {
+    if (user?.is_affiliate && user.is_payed) {
       base.push({
         label: "Área do Afiliado",
         path: "/affiliate/area",
+        enabled: true,
+      });
+    } else if (user?.is_affiliate && !user.is_payed) {
+      base.push({
+        label: "Ativar Assinatura",
+        path: "/affiliate/paywall",
         enabled: true,
       });
     } else {

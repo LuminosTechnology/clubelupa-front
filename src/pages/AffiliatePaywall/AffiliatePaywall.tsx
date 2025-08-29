@@ -16,12 +16,14 @@ import {
 
 import { Capacitor } from "@capacitor/core";
 import { PurchasesPackage } from "@revenuecat/purchases-capacitor";
+import { useAuthContext } from "../../contexts/AuthContext";
 
 const AffiliatePaywall: React.FC = () => {
   const [affiliatePackage, setAffiliatePackage] = useState<PurchasesPackage>();
   const [isLoading, setIsLoading] = useState(false);
   const [hasAffiliate, setHasAffiliate] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { refetchUser } = useAuthContext();
 
   const handlePurchase = async () => {
     if (!affiliatePackage) return;
@@ -35,6 +37,7 @@ const AffiliatePaywall: React.FC = () => {
         aPackage: affiliatePackage,
       });
       alert("Parabéns! Você tem o Afiliado do Clube Lupa ativo!");
+      refetchUser();
     } catch (error: any) {
       if (error.code === "PURCHASE_CANCELLED") {
       } else {
@@ -107,14 +110,14 @@ const AffiliatePaywall: React.FC = () => {
   return (
     <IonPage>
       <AppHeader
-        title="Torne-se um Afiliado"
+        title="Ativar Assinatura"
         backgroundColor="#868950"
         textColor="#FFFFFF"
       />
 
       <IonContent fullscreen style={{ "--background": "#FFFFFF" } as any}>
         <ProfileContainer>
-          <Title>Torne-se um Afiliado do Clube Lupa</Title>
+          <Title>Ative sua assinatura de Afiliado do Clube Lupa</Title>
           <Paragraph>
             Com a assinatura Afiliado do Clube Lupa, você impulsiona sua marca e
             se conecta diretamente com nossos membros.
@@ -140,7 +143,7 @@ const AffiliatePaywall: React.FC = () => {
             </Benefit>
           </BenefitsContainer>
           <Paragraph>
-            Tudo isso por <Price>{affiliatePackage?.product.priceString}</Price>
+            Tudo isso por <Price>{affiliatePackage?.product.priceString}</Price>{" "}
             por mês. Cancele quando quiser.
           </Paragraph>
 

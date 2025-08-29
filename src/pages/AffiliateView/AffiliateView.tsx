@@ -24,6 +24,7 @@ import { haversine } from "../../utils/haversine";
 import {
   BackButton,
   BackButtonWrapper,
+  BehindScenesPhoto,
   ButtonsContainer,
   CTAButton,
   Description,
@@ -33,9 +34,11 @@ import {
   LinkIcon,
   LinkRow,
   LinkText,
+  MainCategory,
   PhotoHeader,
   PlainLink,
   PlainLinkRow,
+  ProductPhoto,
   ScrollArea,
   Section,
   SectionText,
@@ -220,7 +223,7 @@ const AffiliateView: React.FC = () => {
         ) : (
           <ScrollArea>
             <PhotoHeader
-              image={data?.product_photo_url || "/assets/default-photo.png"}
+              image={data?.shop_photo_url || "/assets/default-photo.png"}
             >
               <BackButtonWrapper color={color} onClick={() => history.goBack()}>
                 <BackButton src={backButtonVerde} alt="Voltar" />
@@ -240,21 +243,27 @@ const AffiliateView: React.FC = () => {
                 </LikeButton>
               </TitleWrapper>
 
-              {data?.categories.length > 0 && (
-                <Section>
-                  <SectionTitle color={color}>Categoria</SectionTitle>
+              <Section>
+                {data.categories.length > 0 && (
+                  <MainCategory color={color}>
+                    {data.categories[0].name}
+                  </MainCategory>
+                )}
+
+                {data?.categories.length > 0 && (
                   <SectionText>
                     {data.categories
+                      .slice(1)
                       .map((category) => category.name)
                       .join(", ")}
                   </SectionText>
-                </Section>
-              )}
+                )}
+              </Section>
 
               {/* 
               <Section>
-                <SectionTitle color={color}>Estrutura</SectionTitle>
-                <SectionText>Física e online</SectionText>
+              <SectionTitle color={color}>Estrutura</SectionTitle>
+              <SectionText>Física e online</SectionText>
               </Section> */}
 
               {data?.addresses.length > 0 && (
@@ -275,6 +284,10 @@ const AffiliateView: React.FC = () => {
                 </Section>
               )} */}
 
+              {data.product_photo_url && (
+                <ProductPhoto src={data.product_photo_url} />
+              )}
+
               {data?.description && (
                 <Section>
                   <SectionTitle color={color}>Sobre nós</SectionTitle>
@@ -282,6 +295,9 @@ const AffiliateView: React.FC = () => {
                 </Section>
               )}
 
+              {data.behind_the_scenes_photo_url && (
+                <BehindScenesPhoto src={data.behind_the_scenes_photo_url} />
+              )}
               {data?.social_links?.instagram && (
                 <LinkRow>
                   <LinkIcon color={color}>
@@ -309,19 +325,26 @@ const AffiliateView: React.FC = () => {
                 </PlainLinkRow>
               )}
               <ButtonsContainer>
-                {checkInMessage && (
-                  <ErrorMessage>{checkInMessage}</ErrorMessage>
+                {data.can_has_checkin && (
+                  <>
+                    {checkInMessage && (
+                      <ErrorMessage>{checkInMessage}</ErrorMessage>
+                    )}
+                    <CTAButton
+                      bg={color}
+                      onClick={handleCheckIn}
+                      disabled={!canCheckIn}
+                    >
+                      FAZER CHECK-IN
+                    </CTAButton>
+                  </>
                 )}
-                <CTAButton
-                  bg={color}
-                  onClick={handleCheckIn}
-                  disabled={!canCheckIn}
-                >
-                  FAZER CHECK-IN
-                </CTAButton>
-                <CTAButton bg={color} onClick={handleScan}>
-                  ESCANEAR NOTA
-                </CTAButton>
+
+                {data.can_has_purchase && (
+                  <CTAButton bg={color} onClick={handleScan}>
+                    ESCANEAR NOTA
+                  </CTAButton>
+                )}
               </ButtonsContainer>
             </InfoContainer>
           </ScrollArea>

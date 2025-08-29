@@ -46,6 +46,9 @@ export const BackButton = styled.img`
 
 export const InfoContainer = styled.div`
   padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 `;
 
 const bump = keyframes`
@@ -100,7 +103,6 @@ export const Description = styled.p`
   font-size: 16px;
   color: #666;
   line-height: 1.5;
-  margin: 0 0 24px;
 `;
 
 export const ErrorMessage = styled.p`
@@ -137,15 +139,37 @@ export const CTAButton = styled.button<{ bg: string }>`
   }
 `;
 
-export const Section = styled.div`
-  margin-bottom: 20px;
+export const Section = styled.div``;
+
+export const ProductPhoto = styled.img`
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  border-radius: 8px;
 `;
+
+export const BehindScenesPhoto = styled.img`
+  width: 80%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  object-fit: cover;
+  margin: auto;
+`;
+
 export const SectionTitle = styled.h3<{ color: string }>`
   margin: 0 0 4px;
   font-size: 14px;
   font-weight: 700;
   color: ${({ color }) => color};
 `;
+
+export const MainCategory = styled.h3<{ color: string }>`
+  margin: 0 0 4px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: ${({ color }) => color};
+`;
+
 export const SectionText = styled.p`
   margin: 0;
   font-size: 16px;

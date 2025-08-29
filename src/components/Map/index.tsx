@@ -114,12 +114,6 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
 
       await newMap.enableCurrentLocation(true);
 
-      await newMap.setOnMarkerClickListener((m) => {
-        console.log("marker clicked", m);
-        const establishment = markerMapRef.current[m.markerId];
-        if (establishment) setSelected(establishment);
-      });
-
       setGMap(newMap);
     };
 
@@ -137,12 +131,18 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
       if (markersIds.length > 0) {
         await gMap.removeMarkers(markersIds);
       }
+      await gMap.removeAllMapListeners();
       // Limpe o objeto de referência
       markerMapRef.current = {};
 
       await Promise.all(
         establishments.map(async (e) => {
           if (!e.addresses.length) return;
+          if (
+            e.addresses[0].latitude === null ||
+            e.addresses[0].longitude === null
+          )
+            return;
           const location = {
             lat: Number(e.addresses[0].latitude),
             lng: Number(e.addresses[0].longitude),
@@ -153,9 +153,17 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
             iconSize: { width: 40, height: 55 },
             iconAnchor: { x: 20, y: 55 },
           });
-          markerMapRef.current[markerId] = e;
+
+          const id = markerId || e.id;
+          markerMapRef.current[id] = e;
+          console.log(markerMapRef.current);
         })
       );
+
+      await gMap.setOnMarkerClickListener((m) => {
+        const establishment = markerMapRef.current[m.markerId];
+        if (establishment) setSelected(establishment);
+      });
     };
 
     updateMarkers();
@@ -190,7 +198,7 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
 
         <RestaurantInfo>
           <RestaurantImage
-            src={selected?.product_photo_url || "/assets/default-photo.png"}
+            src={selected?.shop_photo_url || "/assets/default-photo.png"}
             alt={selected?.name}
           />
           <RestaurantDetails>

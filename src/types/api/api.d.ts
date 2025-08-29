@@ -35,7 +35,7 @@ export interface User {
     provider_subscription_id: string;
     status: "active" | string;
     user_id: number;
-  };
+  }[];
 }
 
 export type FlashMessage = {
@@ -167,6 +167,9 @@ export interface Establishment {
   is_checked_in_by_me_last_hour: boolean;
   is_checked_in_by_me_last_hour: boolean;
   has_ever_been_checked_in_by_me: boolean;
+
+  can_has_checkin: boolean;
+  can_has_purchase: boolean;
 
   checkins_count: number;
 
