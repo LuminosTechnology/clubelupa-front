@@ -1,25 +1,34 @@
 import { Geolocation } from "@capacitor/geolocation";
 import { GoogleMap } from "@capacitor/google-maps";
-import { IonIcon } from "@ionic/react";
+import { IonAlert, IonIcon } from "@ionic/react";
 import { close } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import {
+  ButtonsContainer,
   CloseButton,
   MapWrapper,
   RestaurantCard,
   RestaurantDetails,
   RestaurantImage,
   RestaurantInfo,
-  ViewMoreButton,
+  CheckInScanButton,
+  SeeMoreLink,
 } from "./map.style";
 
 import { Capacitor } from "@capacitor/core";
 import { useHistory } from "react-router";
 import { useDebounce } from "../../hooks/useDebounce";
-import { getAllEstablishments } from "../../services/affiliateService";
+import {
+  doCheckIn,
+  getAllEstablishments,
+} from "../../services/affiliateService";
 import { AffiliateData } from "../../services/interfaces/Affiliate";
 import { Establishment } from "../../types/api/api";
 import { haversine } from "../../utils/haversine";
+import { CapacitorBarcodeScanner } from "@capacitor/barcode-scanner";
+import { CodeScannerService } from "../../services/code-scan-service";
+import { AxiosError } from "axios";
+import { useGamificationContext } from "../../contexts/GamificationContext";
 
 interface MapProps {
   onViewMore: (r: AffiliateData) => void;
@@ -41,6 +50,22 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
 
   const [selected, setSelected] = useState<Establishment | undefined>();
   const [establishments, setEstablishments] = useState<Establishment[]>([]);
+
+  const [isLoadingScan, setIsLoadingScan] = useState(false);
+  const [showCheckIn, setShowCheckIn] = useState(false);
+
+  const [scanMessage, setScanMessage] = useState<string | undefined>();
+  const [showScanSuccess, setShowScanSuccess] = useState(false);
+  const [showScanError, setShowScanError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(
+    undefined
+  );
+  const [cantCheckIn, setCantCheckIn] = useState(false);
+
+  const { refetchGamificationSummary } = useGamificationContext();
+
+  const [checkinError, setCheckinError] = useState<string | undefined>();
+  const [showCheckinError, setShowCheckinError] = useState(false);
 
   const DEFAULT_LOCATION = { lat: -25.4415, lng: -49.291 };
 
@@ -173,9 +198,93 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
     history.push(`/affiliate-view/${id}`);
   };
 
+  const handleScan = async (id: number) => {
+    setIsLoadingScan(true);
+    try {
+      const result = await CapacitorBarcodeScanner.scanBarcode({ hint: 0 });
+
+      let cleanResult = result.ScanResult || "";
+
+      cleanResult = cleanResult.replace(/^\uFEFF/, "");
+
+      if (cleanResult.startsWith("?")) {
+        cleanResult = cleanResult.slice(1);
+      }
+
+      const encodedUrl = encodeURI(cleanResult);
+
+      const response = await CodeScannerService.scanPurchaseCode({
+        establishment_id: Number(id),
+        qr_code_url: encodedUrl,
+      });
+      setScanMessage(response.message);
+      setShowScanSuccess(true);
+    } catch (error: any) {
+      setScanMessage(error.response.data.message || "Erro ao escanear código");
+      setShowScanError(true);
+      console.error("Erro ao escanear código:", JSON.stringify(error, null, 2));
+
+      if (error instanceof AxiosError) {
+        console.error(
+          "Erro ao escanear código:",
+          JSON.stringify(error.response, null, 2)
+        );
+      }
+    } finally {
+      setIsLoadingScan(false);
+    }
+  };
+
+  const handleCheckIn = async (id: number) => {
+    try {
+      await doCheckIn(Number(id));
+      setShowCheckIn(true);
+      setTimeout(async () => {
+        await refetchGamificationSummary();
+      }, 1000);
+    } catch (e) {
+      if (e instanceof AxiosError) {
+        if (e.status === 429) {
+          const message =
+            e?.response?.data.message || "Erro ao realizar check-in";
+          setCheckinError(message);
+          setShowCheckinError(true);
+        }
+      }
+      console.error("Erro ao fazer check-in:", e);
+    }
+  };
+
   /* ─── UI ─────────────────────────────────────────────────────────────── */
   return (
     <MapWrapper>
+      <IonAlert
+        isOpen={showScanSuccess}
+        header="Código escaneado"
+        message={scanMessage}
+        buttons={["OK"]}
+        onDidDismiss={() => setShowScanSuccess(false)}
+      />
+      <IonAlert
+        isOpen={showScanError}
+        header="Erro"
+        message={scanMessage}
+        buttons={["OK"]}
+        onDidDismiss={() => setShowScanError(false)}
+      />
+      <IonAlert
+        isOpen={showCheckIn}
+        header="Check-in realizado"
+        message={`Você realizou check-in`}
+        buttons={["OK"]}
+        onDidDismiss={() => setShowCheckIn(false)}
+      />
+      <IonAlert
+        isOpen={showCheckinError}
+        header="Erro"
+        message={checkinError}
+        buttons={["OK"]}
+      />
       <capacitor-google-map
         ref={mapRef}
         id="map"
@@ -225,15 +334,28 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
                 )}
               </>
             )}
+            {(selected?.can_has_checkin || selected?.can_has_purchase) && (
+              <ButtonsContainer>
+                <CheckInScanButton
+                  onClick={() => handleCheckIn(selected.id)}
+                  disabled={selected.is_checked_in_by_me_last_hour}
+                >
+                  CHECK-IN
+                </CheckInScanButton>
+                <CheckInScanButton onClick={() => handleScan(selected.id)}>
+                  ESCANEAR NOTA
+                </CheckInScanButton>
+              </ButtonsContainer>
+            )}
             {selected && (
-              <ViewMoreButton
+              <SeeMoreLink
                 onClick={() => {
                   handleViewMore(selected.id);
                   setSelected(undefined);
                 }}
               >
                 Ver mais sobre
-              </ViewMoreButton>
+              </SeeMoreLink>
             )}
           </RestaurantDetails>
         </RestaurantInfo>

@@ -97,6 +97,56 @@ export const RestaurantDetails = styled.div`
   }
 `;
 
+export const ButtonsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+`;
+
+export const SeeMoreLink = styled.button`
+  background: transparent;
+  border: none;
+  color: var(--ion-color-primary);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  padding: 0.5rem;
+  text-transform: uppercase;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+export const CheckInScanButton = styled.button`
+  background: var(--ion-color-primary);
+  flex: 1;
+  border: none;
+  border-radius: 100px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  padding: 0.5rem;
+  text-transform: uppercase;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
 export const ViewMoreButton = styled.button`
   background: var(--ion-color-primary);
   border: none;
