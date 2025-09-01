@@ -14,6 +14,8 @@ import {
   StoreInfo,
   StoreLine,
   StoreListContainer,
+  StoreName,
+  StoreUnderlined,
 } from "./AffiliateStoresPage.style";
 
 import { getAllEstablishments } from "../../services/affiliateService";
@@ -161,10 +163,16 @@ const AffiliateStoresPage: React.FC = () => {
                         establishment.categories[0]?.color ?? "#E6C178",
                     }}
                   >
-                    <StoreLine>{establishment.name}</StoreLine>
+                    <StoreName>{establishment.name}</StoreName>
                     {!!establishment.categories[0] && (
-                      <StoreLine>{establishment.categories[0].name}</StoreLine>
+                      <StoreLine>
+                        Categoria: {establishment.categories[0].name}
+                      </StoreLine>
                     )}
+
+                    <StoreLine>Estrutura: TODO</StoreLine>
+                    <StoreUnderlined>Ver mais</StoreUnderlined>
+
                     {/* {!!s.horario && <StoreLine>{s.schedule}</StoreLine>} */}
                     {/* {!!s.benefits && <StoreLine>{s.benefits}</StoreLine>} */}
                   </StoreInfo>

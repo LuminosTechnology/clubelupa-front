@@ -25,11 +25,13 @@ const ExchangeButton = styled(Button)`
 interface FooterVoucherProps {
   visible: boolean;
   expandTrigger: number;
+  id: number;
 }
 
 const FooterLupaCoins: React.FC<FooterVoucherProps> = ({
   visible,
   expandTrigger,
+  id,
 }) => {
   /* Drawer -------------------------------------------------------- */
   const minHeight = 0;

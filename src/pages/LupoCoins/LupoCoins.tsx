@@ -1,22 +1,37 @@
 // src/pages/Vouncher/Vouncher.tsx
-import { IonAlert, IonContent, IonPage } from "@ionic/react";
+import {
+  IonAlert,
+  IonContent,
+  IonIcon,
+  IonModal,
+  IonPage,
+  IonSpinner,
+} from "@ionic/react";
 import React, { useEffect, useState } from "react";
-import FooterVoucher from "../../components/Footer-LupaCoins/FooterLupaCoins";
 import AppHeader from "../../components/SimpleHeader";
 
-import {
-  Container,
-  ListWrapper,
-} from "../AffiliateStores/AffiliateStoresPage.style";
+import VoucherArt from "../../assets/moeda.svg?react";
 
 import {
   BalanceAmount,
   BalanceContainer,
   BalanceLabel,
+  CloseVoucherButton,
   ContentContainer,
+  CustomModal,
+  CustomModalContent,
+  DescriptionText,
+  DescriptionTitle,
+  EstablishmentName,
   IconContainer,
   ScrollArea,
   ViewMore,
+  VoucherButton,
+  VoucherCategory,
+  VoucherContent,
+  VoucherImage,
+  VoucherSection,
+  VoucherText,
   VouncherCategory,
   VouncherQuantity,
   VouncherTitle,
@@ -26,27 +41,44 @@ import {
 import { useHistory } from "react-router";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { useGamificationContext } from "../../contexts/GamificationContext";
-import { experiencias } from "../../contexts/mock";
+import { ExperienceService } from "../../services/experiencesService";
+import { Experience } from "../../types/api/experiences";
+import {
+  Container,
+  ListWrapper,
+} from "../AffiliateFavorites/AffiliateFavorites.style";
 
 const LupoCoins: React.FC = () => {
   const history = useHistory();
   const [showFooter, setShowFooter] = useState(false);
-  const [expandTrigger, setExpandTrigger] = useState(0);
   const [displayPaymentWarning, setDisplayPaymentWarning] = useState(false);
+
+  const [experiences, setExperiences] = useState<Experience[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [selected, setSelected] = useState<Experience | undefined>();
+
   const { gamificationSummary } = useGamificationContext();
   const { user } = useAuthContext();
 
-  const handleViewMore = () => {
-    if (!showFooter) setShowFooter(true);
-    setExpandTrigger((prev) => prev + 1);
-  };
-
   useEffect(() => {
     if (!user) return;
-
     if (!user.is_payed) {
       setDisplayPaymentWarning(true);
     }
+
+    const fetchExperiences = async () => {
+      setIsLoading(true);
+      try {
+        const response = await ExperienceService.getExperiences();
+        setExperiences(response);
+      } catch (e) {
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchExperiences();
   }, []);
 
   return (
@@ -78,27 +110,88 @@ const LupoCoins: React.FC = () => {
             </BalanceContainer>
 
             <ListWrapper>
-              {experiencias.map((item) => (
+              {isLoading && <IonSpinner color="primary" />}
+              {experiences.map((item) => (
                 <VouncherWrapper key={item.id}>
                   <IconContainer>
-                    <img src={item.image} alt="Voucher" />
+                    {item.image_url ? (
+                      <img src={item.image_url} alt="Voucher" />
+                    ) : (
+                      <VoucherArt />
+                    )}
                   </IconContainer>
                   <ContentContainer>
-                    <VouncherTitle>{item.name}</VouncherTitle>
-                    <VouncherCategory>{item.category}</VouncherCategory>
+                    <VouncherTitle>{item.title}</VouncherTitle>
+                    <VouncherCategory>{item.category?.name}</VouncherCategory>
                     <VouncherQuantity>
-                      {item.price}&nbsp;LupaCoins
+                      {item.cost_in_coins}&nbsp;LupaCoins
                     </VouncherQuantity>
-                    <ViewMore onClick={handleViewMore}>Ver Mais</ViewMore>
+                    <ViewMore
+                      onClick={() => {
+                        setSelected(item);
+                        setShowFooter(true);
+                      }}
+                    >
+                      Ver Mais
+                    </ViewMore>
                   </ContentContainer>
                 </VouncherWrapper>
               ))}
             </ListWrapper>
           </Container>
 
-          {showFooter && (
-            <FooterVoucher visible={showFooter} expandTrigger={expandTrigger} />
-          )}
+          <CustomModal
+            isOpen={showFooter}
+            onDidDismiss={() => {
+              setShowFooter(false);
+              setSelected(undefined);
+            }}
+            breakpoints={[0, 0.8]}
+            initialBreakpoint={0.8}
+            handleBehavior="cycle"
+          >
+            <CustomModalContent>
+              {selected?.image_url && (
+                <VoucherImage src={selected.image_url} alt="Voucher" />
+              )}
+
+              <VoucherContent>
+                <VoucherSection>
+                  {selected?.establishment && (
+                    <EstablishmentName>
+                      {selected.establishment.name}
+                    </EstablishmentName>
+                  )}
+                  {selected?.category && (
+                    <VoucherCategory>{selected.category.name}</VoucherCategory>
+                  )}
+                </VoucherSection>
+
+                <VoucherSection>
+                  <DescriptionTitle>Experiência Lupa</DescriptionTitle>
+                  <DescriptionText>{selected?.description}</DescriptionText>
+                </VoucherSection>
+
+                <VoucherSection>
+                  <VoucherText>
+                    Você quer trocar {selected?.cost_in_coins} Moedas Lupa por
+                    essa experiência?
+                  </VoucherText>
+                </VoucherSection>
+                {selected?.can_redeem ? (
+                  <VoucherButton>quero trocar minhas moedas lupa</VoucherButton>
+                ) : (
+                  <VoucherText>
+                    Você não possui Moedas Lupa o suficiente
+                  </VoucherText>
+                )}
+
+                <CloseVoucherButton onClick={() => setShowFooter(false)}>
+                  <IonIcon icon={"close-outline"} size="large" />
+                </CloseVoucherButton>
+              </VoucherContent>
+            </CustomModalContent>
+          </CustomModal>
         </ScrollArea>
       </IonContent>
     </IonPage>

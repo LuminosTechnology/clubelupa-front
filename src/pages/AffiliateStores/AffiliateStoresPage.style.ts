@@ -1,4 +1,5 @@
 // src/pages/AffiliateStores/AffiliateStoresPage.style.ts
+import { IonContent, IonModal } from "@ionic/react";
 import styled from "styled-components";
 
 export const Container = styled.div`
@@ -11,6 +12,7 @@ export const ListWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 28px;
+  padding-bottom: 28px;
 `;
 
 export const AlphabetContainer = styled.div`
@@ -65,17 +67,30 @@ export const StoreImage = styled.img`
 
 export const StoreInfo = styled.div`
   flex: 1;
-  padding: 12px 16px;
+  padding: 1rem;
   border-left: 3px solid #ffffff;
   border-top-right-radius: 16px;
   border-bottom-right-radius: 16px;
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: space-between;
+`;
+
+export const StoreName = styled.h3`
+  font-size: 1rem;
+  margin: 0;
+  padding: 0;
 `;
 
 export const StoreLine = styled.span`
   color: #ffffff;
   font-size: 13px;
   font-weight: 600;
+`;
+
+export const StoreUnderlined = styled.span`
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
 `;
