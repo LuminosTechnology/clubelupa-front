@@ -23,8 +23,7 @@ export const RestaurantCard = styled.div`
   position: absolute;
   top: 50%;
   left: 50%;
-  max-width: 320px; /* ↓ menor */
-  width: 85%;
+  width: 90%;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
@@ -67,15 +66,15 @@ export const RestaurantInfo = styled.div`
 
 export const RestaurantImage = styled.img`
   width: 100%;
-  aspect-ratio: 16/9;
+  aspect-ratio: 2;
   object-fit: cover;
 `;
 
 export const RestaurantDetails = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
   padding: 0.5rem;
+  gap: 0.25rem;
 
   h3 {
     font-size: 1.2rem;
@@ -99,7 +98,7 @@ export const RestaurantDetails = styled.div`
 
 export const ButtonsContainer = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 0.5rem;
 `;
 
@@ -124,8 +123,8 @@ export const SeeMoreLink = styled.button`
   }
 `;
 
-export const CheckInScanButton = styled.button`
-  background: var(--ion-color-primary);
+export const ScanButton = styled.button`
+  background: var(--ion-color-tertiary);
   flex: 1;
   border: none;
   border-radius: 100px;
@@ -134,7 +133,7 @@ export const CheckInScanButton = styled.button`
   font-weight: 500;
   cursor: pointer;
   transition: opacity 0.2s;
-  padding: 0.5rem;
+  padding: 0.5rem 1rem; /* ↓ */
   text-transform: uppercase;
 
   &:hover {
@@ -156,7 +155,7 @@ export const ViewMoreButton = styled.button`
   font-weight: 500;
   cursor: pointer;
   transition: opacity 0.2s;
-  padding: 0.75rem;
+  padding: 0.5rem 1rem; /* ↓ */
   text-transform: uppercase;
 
   &:hover {
@@ -165,12 +164,11 @@ export const ViewMoreButton = styled.button`
 `;
 
 export const CheckInButton = styled.button`
-  margin: 0 10px 10px;
   background-color: var(--ion-color-secondary);
   color: #fff;
   border: none;
-  border-radius: 5px;
-  padding: 8px 16px; /* ↓ */
+  border-radius: 99px;
+  padding: 0.5rem 1rem; /* ↓ */
   cursor: pointer;
   font-size: 14px; /* ↓ */
   font-weight: bold;

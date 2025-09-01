@@ -36,7 +36,8 @@
     "react-input-mask": "^2.0.4",
     "react-router": "^5.3.4",
     "react-router-dom": "^5.3.4",
-    "styled-components": "^6.1.15"
+    "styled-components": "^6.1.15",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",

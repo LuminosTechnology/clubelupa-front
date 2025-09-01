@@ -5,30 +5,31 @@ import { close } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ButtonsContainer,
+  CheckInButton,
   CloseButton,
   MapWrapper,
   RestaurantCard,
   RestaurantDetails,
   RestaurantImage,
   RestaurantInfo,
-  CheckInScanButton,
-  SeeMoreLink,
+  ScanButton,
+  ViewMoreButton,
 } from "./map.style";
 
+import { CapacitorBarcodeScanner } from "@capacitor/barcode-scanner";
 import { Capacitor } from "@capacitor/core";
+import { AxiosError } from "axios";
 import { useHistory } from "react-router";
+import { useGamificationContext } from "../../contexts/GamificationContext";
 import { useDebounce } from "../../hooks/useDebounce";
 import {
   doCheckIn,
   getAllEstablishments,
 } from "../../services/affiliateService";
+import { CodeScannerService } from "../../services/code-scan-service";
 import { AffiliateData } from "../../services/interfaces/Affiliate";
 import { Establishment } from "../../types/api/api";
 import { haversine } from "../../utils/haversine";
-import { CapacitorBarcodeScanner } from "@capacitor/barcode-scanner";
-import { CodeScannerService } from "../../services/code-scan-service";
-import { AxiosError } from "axios";
-import { useGamificationContext } from "../../contexts/GamificationContext";
 
 interface MapProps {
   onViewMore: (r: AffiliateData) => void;
@@ -67,7 +68,7 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
   const [checkinError, setCheckinError] = useState<string | undefined>();
   const [showCheckinError, setShowCheckinError] = useState(false);
 
-  const DEFAULT_LOCATION = { lat: -25.4415, lng: -49.291 };
+  const DEFAULT_LOCATION = { lat: -25.427806, lng: -49.265102 };
 
   const apiKey = () => {
     switch (Capacitor.getPlatform()) {
@@ -107,11 +108,8 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
 
   /* ─── Inicialização do Mapa (nova lógica) ───────────────────────────── */
   useEffect(() => {
-    if (!userLoc || gMap) return;
-
     const initMap = async () => {
       if (!mapRef.current) return;
-      console.log("Inicializando mapa...");
 
       const newMap = await GoogleMap.create({
         apiKey: apiKey(),
@@ -119,7 +117,7 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
         element: mapRef.current,
         config: {
           androidLiteMode: false,
-          center: userLoc,
+          center: DEFAULT_LOCATION,
           zoom: 11,
           disableDefaultUI: true,
           clickableIcons: false,
@@ -143,6 +141,20 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
     };
 
     initMap();
+  }, []);
+
+  useEffect(() => {
+    const setUserLocation = async () => {
+      if (userLoc && gMap) {
+        await gMap.setCamera({
+          coordinate: userLoc,
+          zoom: 11,
+          animate: true,
+        });
+      }
+    };
+
+    setUserLocation();
   }, [userLoc, gMap]);
 
   /* ─── Adicionar/Remover Marcadores (nova lógica) ────────────────────── */
@@ -150,12 +162,6 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
     if (!gMap || establishments.length === 0) return;
 
     const updateMarkers = async () => {
-      console.log("Atualizando marcadores...");
-      // Remova os marcadores existentes
-      const markersIds = Object.keys(markerMapRef.current);
-      if (markersIds.length > 0) {
-        await gMap.removeMarkers(markersIds);
-      }
       await gMap.removeAllMapListeners();
       // Limpe o objeto de referência
       markerMapRef.current = {};
@@ -172,21 +178,20 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
             lat: Number(e.addresses[0].latitude),
             lng: Number(e.addresses[0].longitude),
           };
-          const markerId = await gMap.addMarker({
+          await gMap.addMarker({
             coordinate: location,
+            title: e.id.toString(),
             iconUrl: "assets/affiliate_pin.png",
             iconSize: { width: 40, height: 55 },
             iconAnchor: { x: 20, y: 55 },
           });
-
-          const id = markerId || e.id;
-          markerMapRef.current[id] = e;
-          console.log(markerMapRef.current);
         })
       );
 
       await gMap.setOnMarkerClickListener((m) => {
-        const establishment = markerMapRef.current[m.markerId];
+        const establishment = establishments.find(
+          (e) => e.id === Number(m.title)
+        );
         if (establishment) setSelected(establishment);
       });
     };
@@ -237,12 +242,37 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
 
   const handleCheckIn = async (id: number) => {
     try {
-      await doCheckIn(Number(id));
+      setEstablishments((prev) =>
+        prev.map((est) =>
+          est.id === id ? { ...est, is_checked_in_by_me_last_hour: true } : est
+        )
+      );
+      if (selected?.id === id) {
+        setSelected((prev) =>
+          prev ? { ...prev, is_checked_in_by_me_last_hour: true } : prev
+        );
+      }
+
+      await doCheckIn(Number(id)); // chamada real pro backend
       setShowCheckIn(true);
+
+      // refetch do gamification (pode ser opcional)
       setTimeout(async () => {
         await refetchGamificationSummary();
       }, 1000);
     } catch (e) {
+      // rollback se der erro
+      setEstablishments((prev) =>
+        prev.map((est) =>
+          est.id === id ? { ...est, is_checked_in_by_me_last_hour: false } : est
+        )
+      );
+      if (selected?.id === id) {
+        setSelected((prev) =>
+          prev ? { ...prev, is_checked_in_by_me_last_hour: false } : prev
+        );
+      }
+
       if (e instanceof AxiosError) {
         if (e.status === 429) {
           const message =
@@ -253,6 +283,22 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
       }
       console.error("Erro ao fazer check-in:", e);
     }
+  };
+
+  const getDistanceAndCheckin = (est: Establishment) => {
+    if (!userLoc || !est.addresses.length)
+      return { distance: -1, canCheckin: false };
+
+    const distance = haversine(
+      userLoc.lat,
+      userLoc.lng,
+      Number(est.addresses[0].latitude),
+      Number(est.addresses[0].longitude)
+    );
+
+    const canCheckin = distance <= 100; // dentro de 100 metros
+
+    return { distance, canCheckin };
   };
 
   /* ─── UI ─────────────────────────────────────────────────────────────── */
@@ -322,41 +368,38 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
                   <p>
                     Distância:{" "}
                     {Math.round(
-                      haversine(
-                        userLoc?.lat,
-                        userLoc?.lng,
-                        selected!.addresses[0].latitude,
-                        selected!.addresses[0].longitude
-                      ) / 1000
+                      getDistanceAndCheckin(selected).distance / 1000
                     )}{" "}
                     Km
                   </p>
                 )}
               </>
             )}
-            {(selected?.can_has_checkin || selected?.can_has_purchase) && (
-              <ButtonsContainer>
-                <CheckInScanButton
-                  onClick={() => handleCheckIn(selected.id)}
-                  disabled={selected.is_checked_in_by_me_last_hour}
+            <ButtonsContainer>
+              {selected && (
+                <ViewMoreButton
+                  onClick={() => {
+                    handleViewMore(selected.id);
+                    setSelected(undefined);
+                  }}
                 >
-                  CHECK-IN
-                </CheckInScanButton>
-                <CheckInScanButton onClick={() => handleScan(selected.id)}>
+                  Ver mais sobre
+                </ViewMoreButton>
+              )}
+              {selected?.can_has_checkin &&
+              selected.is_checked_in_by_me_last_hour ? (
+                <p>Você já realizou check-in!</p>
+              ) : selected?.can_has_checkin ? (
+                <CheckInButton onClick={() => handleCheckIn(selected.id)}>
+                  FAZER CHECK-IN
+                </CheckInButton>
+              ) : null}
+              {selected?.can_has_purchase && (
+                <ScanButton onClick={() => handleScan(selected.id)}>
                   ESCANEAR NOTA
-                </CheckInScanButton>
-              </ButtonsContainer>
-            )}
-            {selected && (
-              <SeeMoreLink
-                onClick={() => {
-                  handleViewMore(selected.id);
-                  setSelected(undefined);
-                }}
-              >
-                Ver mais sobre
-              </SeeMoreLink>
-            )}
+                </ScanButton>
+              )}
+            </ButtonsContainer>
           </RestaurantDetails>
         </RestaurantInfo>
       </RestaurantCard>

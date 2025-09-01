@@ -55,6 +55,7 @@ import AffiliateBecome from "./pages/AffiliateBecome/AffiliateBecome";
 import AffiliatePaywall from "./pages/AffiliatePaywall/AffiliatePaywall";
 import ProfileChangePasswordPage from "./pages/ChangePassword/ChangePassword";
 import { GlobalFonts } from "./styles/GlobalFonts";
+import { SplashScreen } from "./components/SplashScreen";
 
 declare global {
   interface Window {
@@ -96,7 +97,7 @@ const App: React.FC = () => {
     setUpRevenueCat();
   }, [user, loading, isAuthenticated]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <SplashScreen />;
 
   return (
     <IonApp>
