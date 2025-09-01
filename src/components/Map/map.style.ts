@@ -98,12 +98,15 @@ export const RestaurantDetails = styled.div`
 
 export const ButtonsContainer = styled.div`
   display: flex;
+  width: 100%;
   flex-direction: column;
   gap: 0.5rem;
+  align-items: center;
 `;
 
 export const SeeMoreLink = styled.button`
   background: transparent;
+  width: 100%;
   border: none;
   color: var(--ion-color-primary);
   font-size: 1rem;
@@ -128,6 +131,7 @@ export const ScanButton = styled.button`
   flex: 1;
   border: none;
   border-radius: 100px;
+  width: 100%;
   color: #fff;
   font-size: 1rem;
   font-weight: 500;
@@ -152,6 +156,7 @@ export const ViewMoreButton = styled.button`
   border-radius: 100px;
   color: #fff;
   font-size: 1rem;
+  width: 100%;
   font-weight: 500;
   cursor: pointer;
   transition: opacity 0.2s;
@@ -169,6 +174,7 @@ export const CheckInButton = styled.button`
   border: none;
   border-radius: 99px;
   padding: 0.5rem 1rem; /* ↓ */
+  width: 100%;
   cursor: pointer;
   font-size: 14px; /* ↓ */
   font-weight: bold;

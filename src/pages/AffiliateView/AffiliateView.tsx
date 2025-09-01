@@ -3,6 +3,7 @@ import { Geolocation } from "@capacitor/geolocation";
 import {
   IonAlert,
   IonContent,
+  IonIcon,
   IonPage,
   IonSpinner,
   IonToast,
@@ -19,13 +20,16 @@ import {
   fetchSingleEstablishmentData,
   toggleFavorite,
 } from "../../services/affiliateService";
+import { CodeScannerService } from "../../services/code-scan-service";
 import { Establishment } from "../../types/api/api";
 import { haversine } from "../../utils/haversine";
 import {
+  AddressText,
   BackButton,
   BackButtonWrapper,
   BehindScenesPhoto,
   ButtonsContainer,
+  CheckinMessage,
   CTAButton,
   Description,
   ErrorMessage,
@@ -33,11 +37,9 @@ import {
   LikeButton,
   LinkIcon,
   LinkRow,
-  LinkText,
+  LinksContainer,
   MainCategory,
   PhotoHeader,
-  PlainLink,
-  PlainLinkRow,
   ProductPhoto,
   ScrollArea,
   Section,
@@ -47,7 +49,6 @@ import {
   Title,
   TitleWrapper,
 } from "./AffiliateView.style";
-import { CodeScannerService } from "../../services/code-scan-service";
 
 interface Params {
   id: string;
@@ -115,12 +116,21 @@ const AffiliateView: React.FC = () => {
 
   const handleCheckIn = async () => {
     try {
+      setData((prev) => {
+        if (!prev) return undefined;
+        return { ...prev, is_checked_in_by_me_last_hour: true };
+      });
+
       await doCheckIn(Number(id));
       setShowCheckIn(true);
       setTimeout(async () => {
         await refetchGamificationSummary();
       }, 1000);
     } catch (e) {
+      setData((prev) => {
+        if (!prev) return undefined;
+        return { ...prev, is_checked_in_by_me_last_hour: false };
+      });
       if (e instanceof AxiosError) {
         if (e.status === 429) {
           const message =
@@ -192,6 +202,15 @@ const AffiliateView: React.FC = () => {
     }
   };
 
+  const handleGoToAddress = () => {
+    const address = data?.addresses[0];
+    const fullAddressString = `${address?.street}, ${address?.number} ${address?.neighborhood}, ${address?.city}, ${address?.state}`;
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+      fullAddressString
+    )}`;
+    return url;
+  };
+
   return (
     <IonPage>
       <IonAlert
@@ -222,13 +241,12 @@ const AffiliateView: React.FC = () => {
           </SpinnerContainer>
         ) : (
           <ScrollArea>
+            <BackButtonWrapper color={color} onClick={() => history.goBack()}>
+              <BackButton src={backButtonVerde} alt="Voltar" />
+            </BackButtonWrapper>
             <PhotoHeader
               image={data?.shop_photo_url || "/assets/default-photo.png"}
-            >
-              <BackButtonWrapper color={color} onClick={() => history.goBack()}>
-                <BackButton src={backButtonVerde} alt="Voltar" />
-              </BackButtonWrapper>
-            </PhotoHeader>
+            ></PhotoHeader>
 
             <InfoContainer>
               <TitleWrapper>
@@ -269,20 +287,53 @@ const AffiliateView: React.FC = () => {
               {data?.addresses.length > 0 && (
                 <Section>
                   <SectionTitle color={color}>Endereço</SectionTitle>
-                  <SectionText>
+                  <AddressText
+                    href={handleGoToAddress()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     {data?.addresses[0].street}, {data?.addresses[0].number}
-                  </SectionText>
+                  </AddressText>
                 </Section>
               )}
 
-              {/* {!!schedule && (
-                <Section>
-                  <SectionTitle color={color}>
-                    Horário de atendimento
-                  </SectionTitle>
-                  <SectionText>{schedule}</SectionText>
-                </Section>
-              )} */}
+              <LinksContainer>
+                {data?.social_links?.instagram && (
+                  <LinkRow
+                    href={`https://instagram.com/${data?.social_links?.instagram}`}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    color={color}
+                  >
+                    <IonIcon color={color} icon="logo-instagram" size="large" />
+                    Acesse o instagram
+                  </LinkRow>
+                )}
+
+                {data?.social_links?.site && (
+                  <LinkRow
+                    href={`${data?.social_links?.site}`}
+                    target="_blank"
+                    color={color}
+                    rel="noopener noreferrer"
+                  >
+                    <IonIcon color={color} icon="globe-outline" size="large" />
+                    Acessar o site
+                  </LinkRow>
+                )}
+
+                {data.whatsapp_number && (
+                  <LinkRow
+                    href={`https://wa.me/${data.whatsapp_number}`}
+                    target="_blank"
+                    color={color}
+                    rel="noopener noreferrer"
+                  >
+                    <IonIcon color={color} icon="logo-whatsapp" size="large" />
+                    Entrar no Whatsapp
+                  </LinkRow>
+                )}
+              </LinksContainer>
 
               {data.product_photo_url && (
                 <ProductPhoto src={data.product_photo_url} />
@@ -290,7 +341,7 @@ const AffiliateView: React.FC = () => {
 
               {data?.description && (
                 <Section>
-                  <SectionTitle color={color}>Sobre nós</SectionTitle>
+                  <SectionTitle color={color}>Sobre a marca</SectionTitle>
                   <Description>{data?.description}</Description>
                 </Section>
               )}
@@ -298,34 +349,13 @@ const AffiliateView: React.FC = () => {
               {data.behind_the_scenes_photo_url && (
                 <BehindScenesPhoto src={data.behind_the_scenes_photo_url} />
               )}
-              {data?.social_links?.instagram && (
-                <LinkRow>
-                  <LinkIcon color={color}>
-                    <InstaIcon size={18} />
-                  </LinkIcon>
-                  <LinkText
-                    href={`https://instagram.com/${data?.social_links?.instagram}`}
-                    rel="noopener noreferrer"
-                    color={color}
-                  >
-                    Acesse o instagram
-                  </LinkText>
-                </LinkRow>
-              )}
 
-              {data?.social_links?.site && (
-                <PlainLinkRow>
-                  <PlainLink
-                    href={data?.social_links?.site}
-                    target="_blank"
-                    color={color}
-                  >
-                    Acesse o site
-                  </PlainLink>
-                </PlainLinkRow>
-              )}
               <ButtonsContainer>
-                {data.can_has_checkin && (
+                {data.can_has_checkin && data.is_checked_in_by_me_last_hour ? (
+                  <CheckinMessage color={color}>
+                    Você já realizou check-in!
+                  </CheckinMessage>
+                ) : (
                   <>
                     {checkInMessage && (
                       <ErrorMessage>{checkInMessage}</ErrorMessage>

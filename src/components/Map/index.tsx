@@ -58,10 +58,6 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
   const [scanMessage, setScanMessage] = useState<string | undefined>();
   const [showScanSuccess, setShowScanSuccess] = useState(false);
   const [showScanError, setShowScanError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(
-    undefined
-  );
-  const [cantCheckIn, setCantCheckIn] = useState(false);
 
   const { refetchGamificationSummary } = useGamificationContext();
 
@@ -296,7 +292,7 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
       Number(est.addresses[0].longitude)
     );
 
-    const canCheckin = distance <= 100; // dentro de 100 metros
+    const canCheckin = distance <= 10_000; // dentro de 100 metros
 
     return { distance, canCheckin };
   };
@@ -390,9 +386,13 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
               selected.is_checked_in_by_me_last_hour ? (
                 <p>Você já realizou check-in!</p>
               ) : selected?.can_has_checkin ? (
-                <CheckInButton onClick={() => handleCheckIn(selected.id)}>
-                  FAZER CHECK-IN
-                </CheckInButton>
+                getDistanceAndCheckin(selected).canCheckin ? (
+                  <CheckInButton onClick={() => handleCheckIn(selected.id)}>
+                    FAZER CHECK-IN
+                  </CheckInButton>
+                ) : (
+                  <p>Muito longe do local para fazer check-in.</p>
+                )
               ) : null}
               {selected?.can_has_purchase && (
                 <ScanButton onClick={() => handleScan(selected.id)}>

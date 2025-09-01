@@ -42,9 +42,9 @@ const LupoCoins: React.FC = () => {
   };
 
   useEffect(() => {
-    if (user?.subscription && user.subscription.status === "active") {
-      //do nothing
-    } else {
+    if (!user) return;
+
+    if (!user.is_payed) {
       setDisplayPaymentWarning(true);
     }
   }, []);
@@ -58,7 +58,7 @@ const LupoCoins: React.FC = () => {
           history.replace("/myplan");
         }}
         title="Atenção"
-        message={`Ainda não detectamos o seu pagamento. Você pode comprar agora para ter acesso a todos os recursos.`}
+        message={`Área exclusiva para sócios Lupa: aqui você troca suas moedas por experiências únicas em Curitiba. Torne-se sócio e venha desbloquear esse mundo com a gente!`}
         buttons={["OK"]}
       />
       <AppHeader

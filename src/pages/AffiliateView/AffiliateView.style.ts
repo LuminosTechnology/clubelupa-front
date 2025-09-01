@@ -24,9 +24,10 @@ export const PhotoHeader = styled.div<{ image: string }>`
 `;
 
 export const BackButtonWrapper = styled.button<{ color: string }>`
-  position: absolute;
+  position: fixed;
   top: 45px;
-  left: 26px;
+  left: 45px;
+  z-index: 10;
   width: 46px;
   height: 46px;
   border-radius: 50%;
@@ -45,10 +46,10 @@ export const BackButton = styled.img`
 `;
 
 export const InfoContainer = styled.div`
-  padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  padding: 25px 0;
 `;
 
 const bump = keyframes`
@@ -57,11 +58,13 @@ const bump = keyframes`
   100% { transform: scale(1); }
 `;
 
-export const LikeButton = styled.button.attrs({ type: "button" })<{
+type Button = {
   liked: boolean;
   animate: boolean;
   color: string;
-}>`
+};
+
+export const LikeButton = styled.button.attrs({ type: "button" })<Button>`
   background: transparent;
   border: none;
   padding: 0;
@@ -89,6 +92,7 @@ export const TitleWrapper = styled.div`
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
+  padding: 0 25px;
 `;
 export const Title = styled.h1<{ color: string }>`
   margin: 0;
@@ -100,6 +104,7 @@ export const Title = styled.h1<{ color: string }>`
 `;
 
 export const Description = styled.p`
+  margin: 0;
   font-size: 16px;
   color: #666;
   line-height: 1.5;
@@ -115,7 +120,13 @@ export const ButtonsContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  margin-top: 4rem;
+`;
+
+export const CheckinMessage = styled.p<{ color: string }>`
+  font-size: 1rem; /* ↓ */
+  text-align: center;
+  margin: 0 0 10px;
+  color: ${({ color }) => color};
 `;
 
 export const CTAButton = styled.button<{ bg: string }>`
@@ -139,7 +150,11 @@ export const CTAButton = styled.button<{ bg: string }>`
   }
 `;
 
-export const Section = styled.div``;
+export const Section = styled.div`
+  padding: 0 25px;
+  display: flex;
+  flex-direction: column;
+`;
 
 export const ProductPhoto = styled.img`
   width: 100%;
@@ -149,16 +164,15 @@ export const ProductPhoto = styled.img`
 `;
 
 export const BehindScenesPhoto = styled.img`
-  width: 80%;
   aspect-ratio: 1;
+  width: 100%;
   border-radius: 8px;
   object-fit: cover;
-  margin: auto;
 `;
 
 export const SectionTitle = styled.h3<{ color: string }>`
-  margin: 0 0 4px;
-  font-size: 14px;
+  margin: 0;
+  font-size: 1rem;
   font-weight: 700;
   color: ${({ color }) => color};
 `;
@@ -177,11 +191,28 @@ export const SectionText = styled.p`
   line-height: 1.5;
 `;
 
-export const LinkRow = styled.div`
+export const AddressText = styled.a`
+  margin: 0;
+  font-size: 16px;
+  color: #666;
+  line-height: 1.5;
+`;
+
+export const LinksContainer = styled.div`
   display: flex;
+  width: 100%;
+  flex-direction: column;
+`;
+
+export const LinkRow = styled.a<{ color: string }>`
+  display: flex;
+  gap: 0.5rem;
   align-items: center;
   margin-bottom: 12px;
+  padding: 0 25px;
+  color: ${({ color }) => color};
 `;
+
 export const LinkIcon = styled.div<{ color: string }>`
   width: 18px;
   height: 18px;
