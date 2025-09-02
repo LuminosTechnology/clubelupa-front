@@ -182,10 +182,12 @@ export interface Establishment {
   categories: CategoryTreeNode[];
   attributes: Atributes[];
 
-  social_links: {
-    site: string;
-    instagram: string;
-  };
+  social_links:
+    | {
+        site: string;
+        instagram: string;
+      }
+    | [];
 
   shop_photo_url?: string;
   product_photo_url?: string;

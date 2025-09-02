@@ -80,6 +80,7 @@ export const StoreName = styled.h3`
   font-size: 1rem;
   margin: 0;
   padding: 0;
+  color: white;
 `;
 
 export const StoreLine = styled.span`

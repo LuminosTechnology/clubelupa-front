@@ -211,6 +211,10 @@ const AffiliateView: React.FC = () => {
     return url;
   };
 
+  const socialLinks = Array.isArray(data?.social_links)
+    ? {} // transforma array vazio em objeto vazio
+    : data?.social_links || {};
+
   return (
     <IonPage>
       <IonAlert
@@ -298,7 +302,7 @@ const AffiliateView: React.FC = () => {
               )}
 
               <LinksContainer>
-                {data?.social_links?.instagram && (
+                {socialLinks?.instagram && (
                   <LinkRow
                     href={`https://instagram.com/${data?.social_links?.instagram}`}
                     rel="noopener noreferrer"
@@ -310,7 +314,7 @@ const AffiliateView: React.FC = () => {
                   </LinkRow>
                 )}
 
-                {data?.social_links?.site && (
+                {socialLinks?.site && (
                   <LinkRow
                     href={`${data?.social_links?.site}`}
                     target="_blank"

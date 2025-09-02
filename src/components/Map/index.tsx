@@ -1,6 +1,11 @@
 import { Geolocation } from "@capacitor/geolocation";
 import { GoogleMap } from "@capacitor/google-maps";
-import { IonAlert, IonIcon } from "@ionic/react";
+import {
+  IonAlert,
+  IonIcon,
+  useIonViewDidEnter,
+  useIonViewWillEnter,
+} from "@ionic/react";
 import { close } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -34,13 +39,14 @@ import { haversine } from "../../utils/haversine";
 interface MapProps {
   onViewMore: (r: AffiliateData) => void;
   searchValue: string;
+  mapReady: boolean;
 }
 
 const ANDROID_API_KEY = "AIzaSyDoIWw3SXNki0nyFrJGoTjzHO5CkTqU1ms";
 const IOS_API_KEY = "AIzaSyCGAcnhspK_rIozcUIXNX3Pe3DwpHMMaQc";
 const HTTP_API_KEY = "AIzaSyCADmNNz3iLtqV7UX-mY83WJnL6m3gpdkU";
 
-const Map: React.FC<MapProps> = ({ searchValue }) => {
+const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
   const history = useHistory();
   const [gMap, setGMap] = useState<GoogleMap | null>(null);
   const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(
@@ -105,18 +111,25 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
   /* ─── Inicialização do Mapa (nova lógica) ───────────────────────────── */
   useEffect(() => {
     const initMap = async () => {
-      if (!mapRef.current) return;
+      if (gMap) return;
+      if (!mapRef.current || !mapReady) return;
 
       const newMap = await GoogleMap.create({
         apiKey: apiKey(),
         id: "affiliates-map",
         element: mapRef.current,
         config: {
-          androidLiteMode: false,
           center: DEFAULT_LOCATION,
           zoom: 11,
+
+          androidLiteMode: false,
           disableDefaultUI: true,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+          rotateControl: false,
           clickableIcons: false,
+
           styles: [
             {
               featureType: "poi",
@@ -131,13 +144,18 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
         },
       });
 
+      await newMap.disableClustering();
       await newMap.enableCurrentLocation(true);
 
       setGMap(newMap);
     };
 
     initMap();
-  }, []);
+  }, [mapReady]);
+
+  useIonViewWillEnter(() => {
+    console.log({ gMap });
+  });
 
   useEffect(() => {
     const setUserLocation = async () => {
@@ -158,8 +176,16 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
     if (!gMap || establishments.length === 0) return;
 
     const updateMarkers = async () => {
-      await gMap.removeAllMapListeners();
       // Limpe o objeto de referência
+
+      console.log("Atualizando marcadores...");
+      // Remova os marcadores existentes
+      const markersIds = Object.keys(markerMapRef.current);
+      if (markersIds.length > 0) {
+        await gMap.removeMarkers(markersIds);
+      }
+      await gMap.removeAllMapListeners();
+
       markerMapRef.current = {};
 
       await Promise.all(
@@ -174,21 +200,27 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
             lat: Number(e.addresses[0].latitude),
             lng: Number(e.addresses[0].longitude),
           };
-          await gMap.addMarker({
+          const markerId = await gMap.addMarker({
             coordinate: location,
-            title: e.id.toString(),
             iconUrl: "assets/affiliate_pin.png",
             iconSize: { width: 40, height: 55 },
             iconAnchor: { x: 20, y: 55 },
           });
+
+          const id = markerId || e.id;
+          markerMapRef.current[id] = e;
         })
       );
 
       await gMap.setOnMarkerClickListener((m) => {
-        const establishment = establishments.find(
-          (e) => e.id === Number(m.title)
-        );
+        const establishment = markerMapRef.current[m.markerId];
         if (establishment) setSelected(establishment);
+      });
+
+      await gMap.setCamera({
+        coordinate: DEFAULT_LOCATION,
+        zoom: 11,
+        animate: true,
       });
     };
 
@@ -331,8 +363,8 @@ const Map: React.FC<MapProps> = ({ searchValue }) => {
         ref={mapRef}
         id="map"
         style={{
-          position: "absolute",
-          inset: 0,
+          display: "block",
+          // position: "absolute",
           width: "100%",
           height: "100%",
         }}
