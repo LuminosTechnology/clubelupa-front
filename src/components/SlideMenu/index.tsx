@@ -106,13 +106,8 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
               enabled={item.enabled}
               key={item.path}
               onClick={() => {
-                const isHome = history.location.pathname === "/home";
                 if (item.enabled) {
-                  if (isHome) {
-                    history.push(item.path);
-                  } else {
-                    history.replace(item.path);
-                  }
+                  history.push(item.path);
                   onClose();
                 }
               }}

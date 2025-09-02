@@ -377,13 +377,13 @@ const AffiliateEdit: React.FC = () => {
   if (!establishment) return <div>Establishment not found</div>;
   return (
     <IonPage>
+      <AppHeader
+        title="Editar Perfil Comercial"
+        backgroundColor="#868950"
+        textColor="#FFFFFF"
+      />
       <IonContent fullscreen style={{ "--background": "#ffffff" } as any}>
         {/* HEADER FIXO */}
-        <AppHeader
-          title="Editar Perfil Comercial"
-          backgroundColor="#868950"
-          textColor="#FFFFFF"
-        />
 
         {/* ÁREA ROLÁVEL */}
         <ScrollArea>

@@ -3,7 +3,6 @@ import {
   IonAlert,
   IonContent,
   IonIcon,
-  IonModal,
   IonPage,
   IonSpinner,
 } from "@ionic/react";
@@ -187,7 +186,7 @@ const LupoCoins: React.FC = () => {
                 )}
 
                 <CloseVoucherButton onClick={() => setShowFooter(false)}>
-                  <IonIcon icon={"close-outline"} size="large" />
+                  <IonIcon icon={"close-outline"} size="large" color="white" />
                 </CloseVoucherButton>
               </VoucherContent>
             </CustomModalContent>

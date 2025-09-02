@@ -33,10 +33,16 @@ const MyPlan: React.FC = () => {
 
   useEffect(() => {
     refetchUser();
-    if (user?.subscription && user.subscription.status === "active") {
+  }, []);
+
+  useEffect(() => {
+    if (
+      user?.subscription &&
+      user.subscription.some((sub) => sub.status === "active")
+    ) {
       setHasPremium(true);
     }
-  }, []);
+  }, [user]);
 
   const handlePurchase = async () => {
     if (!premiumPackage) return;

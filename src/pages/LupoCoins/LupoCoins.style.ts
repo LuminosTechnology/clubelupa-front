@@ -68,12 +68,15 @@ export const IconContainer = styled.div`
 `;
 
 export const CustomModal = styled(IonModal)`
-  --border-radius: 80px 80px 0 0;
-  --background: var(--ion-color-primary);
+  --background: transparent;
 `;
 
-export const CustomModalContent = styled(IonContent)`
-  --padding-top: 40px;
+export const CustomModalContent = styled.div`
+  border-radius: 40px 40px 0 0;
+  background: var(--ion-color-primary);
+  height: 100%;
+  overflow-y: auto;
+  padding-top: 40px;
 `;
 
 export const VoucherImage = styled.img`
@@ -116,16 +119,19 @@ export const CloseVoucherButton = styled.button`
 export const VoucherSection = styled.div`
   display: flex;
   flex-direction: column;
+  color: white;
 `;
 
 export const DescriptionTitle = styled.h3`
   font-size: 1rem;
   margin: 0;
   text-align: center;
+  color: white;
 `;
 
 export const DescriptionText = styled.p`
   font-size: 1rem;
+  color: white;
   margin: 0;
   text-align: center;
 `;
@@ -134,6 +140,7 @@ export const VoucherText = styled.p`
   font-size: 1rem;
   margin: 0;
   text-align: center;
+  color: white;
 `;
 
 export const VoucherButton = styled.button`
