@@ -64,13 +64,25 @@ const Home: React.FC = () => {
     <IonPage>
       <IonAlert
         isOpen={displayPaymentWarning}
-        onDidDismiss={() => {
-          setDisplayPaymentWarning(false);
-          history.push("/affiliate/paywall");
-        }}
         title="Atenção"
-        message={`Detectamos que você é Afiliado, mas ainda não realizou o pagamento da assinatura. Você pode assinar agora para ter acesso a todos os recursos.`}
-        buttons={["OK"]}
+        message={`Seu espaço está quase garantido! Para oficializar e concluir o cadastro, oficialize a sua assinatura como afiliado Lupa!`}
+        buttons={[
+          {
+            text: "DEIXAR PARA DEPOIS",
+            role: "cancel",
+            handler: () => {
+              setDisplayPaymentWarning(false);
+            },
+          },
+          {
+            text: "CONCLUIR AGORA",
+            role: "confirm",
+            handler: () => {
+              setDisplayPaymentWarning(false);
+              history.push("/affiliate/paywall");
+            },
+          },
+        ]}
       />
       <IonContent scrollY={false}>
         <Header onSearchChange={setSearchValue} />

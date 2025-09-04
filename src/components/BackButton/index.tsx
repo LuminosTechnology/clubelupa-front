@@ -1,15 +1,21 @@
 import { IonPage, IonContent } from "@ionic/react";
 import { Container, BackButton } from "./backButton.style";
-import arrowLeft from '../../assets/arrow-left.svg';
+import arrowLeft from "../../assets/arrow-left.svg";
 import { useHistory } from "react-router";
 
-const ForgotPassword: React.FC = () => {
+type BackButtonProps = {
+  onClick?: () => unknown;
+};
+
+const ForgotPassword: React.FC<BackButtonProps> = ({ onClick }) => {
   const history = useHistory();
 
   return (
     <BackButton
       src={arrowLeft}
-      onClick={() => history.goBack()}
+      onClick={() => {
+        onClick ? onClick() : history.goBack();
+      }}
       alt="Voltar"
     />
   );

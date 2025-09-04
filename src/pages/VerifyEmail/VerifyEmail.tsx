@@ -87,7 +87,7 @@ const VerifyEmail: React.FC = () => {
   return (
     <IonPage>
       <CustomContent style={{ "--background": "#E6C178" }}>
-        <BackButton />
+        <BackButton onClick={() => history.push("/login")} />
         <ContentWrapper>
           <Title>Digite o código</Title>
           <Text>recebido no seu e-mail para confirmar a sua conta:</Text>

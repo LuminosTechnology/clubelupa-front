@@ -3,8 +3,8 @@
  * Área privada do Afiliado – busca automaticamente o primeiro
  * afiliado vinculado ao token (não precisa de :id na rota)
  * ────────────────────────────────────────────────────────────── */
-import { IonContent, IonPage, IonSpinner } from "@ionic/react";
-import React, { useState } from "react";
+import { IonContent, IonPage } from "@ionic/react";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 
@@ -17,9 +17,11 @@ import {
   Name,
   Option,
   OptionIcon,
+  Paragraph,
   ProfilePhoto,
   ProfileWrapper,
   SubInfo,
+  Title,
   WarningButton,
   WarningText,
   WarningTitle,
@@ -47,11 +49,12 @@ const LogoutButton = styled(Button)`
 const AffiliateArea: React.FC = () => {
   const history = useHistory();
   const { user } = useAuthContext();
+  const [isApproved, setIsApproved] = useState(false);
 
   /* ─── ações ──────────────────────────────────────────────────── */
   const handleLogout = async () => {
     await logout();
-    history.goBack();
+    history.replace("/login");
   };
 
   const goToEdit = () => {
@@ -67,6 +70,19 @@ const AffiliateArea: React.FC = () => {
   const profilePhoto = user?.avatar_url;
 
   if (!establishment) return null;
+
+  useEffect(() => {
+    const fetchEstablishment = () => {
+      if (!establishment) return;
+      if (establishment.approved_status === "2") {
+        setIsApproved(true);
+      } else {
+        setIsApproved(false);
+      }
+    };
+
+    fetchEstablishment();
+  }, [user, establishment]);
 
   return (
     <IonPage>
@@ -100,36 +116,50 @@ const AffiliateArea: React.FC = () => {
             </>
           )}
 
-          <Option primary onClick={goToEdit}>
-            <OptionIcon src={editIcon} alt="Ícone Editar Perfil" />
-            Editar marca
-          </Option>
-          <Divider />
+          {isApproved ? (
+            <>
+              <Option primary onClick={goToEdit}>
+                <OptionIcon src={editIcon} alt="Ícone Editar Perfil" />
+                Editar marca
+              </Option>
+              <Divider />
 
-          <Option onClick={goToAdvertising}>
-            <OptionIcon src={publicidadeIcon} alt="Ícone Publicidade" />
-            Publicidade
-          </Option>
-          <Divider />
+              <Option onClick={goToAdvertising}>
+                <OptionIcon src={publicidadeIcon} alt="Ícone Publicidade" />
+                Publicidade
+              </Option>
+              <Divider />
 
-          <Option>
-            <OptionIcon src={relatoriosIcon} alt="Ícone Relatórios" />
-            Relatórios
-          </Option>
-          <Divider style={{ marginBottom: "80px" }} />
+              <Option>
+                <OptionIcon src={relatoriosIcon} alt="Ícone Relatórios" />
+                Relatórios
+              </Option>
+              <Divider style={{ marginBottom: "80px" }} />
 
-          {establishment?.social_links?.site && (
-            <Option>
-              <OptionIcon src={emailIcon} alt="Ícone Email" />
-              {establishment?.social_links?.site}
-            </Option>
-          )}
+              {establishment?.social_links?.site && (
+                <Option>
+                  <OptionIcon src={emailIcon} alt="Ícone Email" />
+                  {establishment?.social_links?.site}
+                </Option>
+              )}
 
-          {establishment?.social_links?.instagram && (
-            <Option>
-              <OptionIcon src={instagramIcon} alt="Ícone Instagram" />
-              {establishment?.social_links?.instagram}
-            </Option>
+              {establishment?.social_links?.instagram && (
+                <Option>
+                  <OptionIcon src={instagramIcon} alt="Ícone Instagram" />
+                  {establishment?.social_links?.instagram}
+                </Option>
+              )}
+            </>
+          ) : (
+            <>
+              <Title>Sua conta de afiliado ainda não foi aprovada</Title>
+              <Paragraph>
+                O processo de análise é feito pelo nosso time e pode levar até
+                72 horas. <br />
+                Assim que sua conta for aprovada, você receberá uma notificação
+                e poderá acessar a área de afiliados normalmente.
+              </Paragraph>
+            </>
           )}
 
           <LogoutContainer>

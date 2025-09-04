@@ -131,6 +131,15 @@ const AffiliateEdit: React.FC = () => {
       setSelectedCategory(mainCategoryNode);
     }
 
+    const cleanInstagram =
+      establishment?.social_links?.instagram?.replace(
+        "https://instagram.com/",
+        ""
+      ) || undefined;
+
+    const cleanSite =
+      establishment?.social_links?.site?.replace("https://", "") || undefined;
+
     setForm((prev) => ({
       ...prev,
       name: establishment?.name,
@@ -148,16 +157,16 @@ const AffiliateEdit: React.FC = () => {
       address: {
         ...form.address,
         type: "main",
-        city: address.city,
-        state: address.state,
-        complement: address.complement,
-        zip_code: address.zip_code,
-        street: address.street,
-        number: address.number,
-        neighborhood: address.neighborhood,
+        city: address?.city || "",
+        state: address?.state || "",
+        complement: address?.complement || "",
+        zip_code: address?.zip_code || "",
+        street: address?.street || "",
+        number: address?.number || "",
+        neighborhood: address?.neighborhood || "",
       },
-      instagram: establishment.social_links?.instagram || "",
-      site: establishment.social_links?.site || "",
+      instagram: cleanInstagram,
+      site: cleanSite,
     }));
 
     // if (establishment?.addresses && establishment.addresses.length > 0) {
@@ -207,6 +216,14 @@ const AffiliateEdit: React.FC = () => {
     if (!file) return;
     setBehindTheScenesPhotoFile(file);
     setBehindTheScenesPhotoUrl(URL.createObjectURL(file));
+  };
+
+  const formatSite = (value: string) => {
+    let clean = value;
+    if (!value.startsWith("https://")) {
+      clean = "https://" + value.replace(/^https?:\/\//, "");
+    }
+    return clean;
   };
 
   const handleFetchCep = async () => {
@@ -700,7 +717,7 @@ const AffiliateEdit: React.FC = () => {
                       onChange={(e) =>
                         setForm({
                           ...form,
-                          site: e.target.value,
+                          site: formatSite(e.target.value),
                         })
                       }
                     />

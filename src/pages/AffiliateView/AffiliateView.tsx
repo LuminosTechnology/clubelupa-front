@@ -304,7 +304,7 @@ const AffiliateView: React.FC = () => {
               <LinksContainer>
                 {socialLinks?.instagram && (
                   <LinkRow
-                    href={`https://instagram.com/${data?.social_links?.instagram}`}
+                    href={`${data?.social_links?.instagram}`}
                     rel="noopener noreferrer"
                     target="_blank"
                     color={color}

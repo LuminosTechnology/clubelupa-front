@@ -36,6 +36,21 @@ export const ProfilePhoto = styled.img`
   object-fit: cover;
 `;
 
+export const Title = styled.h2`
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--ion-color-primary);
+`;
+
+export const Paragraph = styled.p`
+  font-size: 1rem;
+  color: var(--ion-color-primary);
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+`;
+
 /* ------ Conteúdo principal ------ */
 export const AreaContainer = styled.div`
   position: relative;
