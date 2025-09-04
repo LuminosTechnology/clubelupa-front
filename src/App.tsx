@@ -207,6 +207,7 @@ const App: React.FC = () => {
           <PrivateRoute exact path="/home" component={Home} />
 
           <Redirect exact from="/" to={isAuthenticated ? "/home" : "/login"} />
+          {/* <Redirect from="*" to={isAuthenticated ? "/home" : "/login"} /> */}
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>

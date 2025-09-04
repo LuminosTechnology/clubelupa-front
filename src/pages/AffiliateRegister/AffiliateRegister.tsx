@@ -31,11 +31,11 @@ import FloatingInput from "../../components/FloatingInput";
 
 // Importa a função que criamos no auth-service
 import { registerAffiliate } from "../../services/auth-service";
+import { CategoryService } from "../../services/category-service";
+import { GeocodeService } from "../../services/geocode-service";
 import { fetchCep } from "../../services/viacepService";
 import { RegisterAffiliateRequest } from "../../types/api/affiliate";
 import { Category } from "../../types/api/category";
-import { CategoryService } from "../../services/category-service";
-import { GeocodeService } from "../../services/geocode-service";
 import { validateBirthDate } from "../../utils/validate-birth-date";
 
 const AffiliateRegister: React.FC = () => {
@@ -52,7 +52,7 @@ const AffiliateRegister: React.FC = () => {
     establishment_name: "",
     category_id: 0,
     instagram: "",
-    site: "",
+    site: "https://",
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -237,6 +237,14 @@ const AffiliateRegister: React.FC = () => {
     }
   };
 
+  const formatSite = (value: string) => {
+    let clean = value;
+    if (!value.startsWith("https://")) {
+      clean = "https://" + value.replace(/^https?:\/\//, "");
+    }
+    return clean;
+  };
+
   const formatInstagramHandle = (value: string) => {
     // Remove caracteres não-alfanuméricos
     let handle = value.replace(/[^a-zA-Z0-9_.]/g, "");
@@ -266,7 +274,7 @@ const AffiliateRegister: React.FC = () => {
       establishment_name: "",
       category_id: 0,
       instagram: "",
-      site: "",
+      site: "https://",
       birth_date: "",
       address: {
         zip_code: "",
@@ -314,8 +322,8 @@ const AffiliateRegister: React.FC = () => {
                 label="Data de Nascimento"
                 value={affiliate.birth_date}
                 onChange={(v) => setAffiliate({ ...affiliate, birth_date: v })}
-                type="number"
                 mask="99/99/9999"
+                inputMode="numeric"
                 error={!!errors.birth_date}
               />
               {errors.birth_date && (
@@ -327,6 +335,7 @@ const AffiliateRegister: React.FC = () => {
               <FloatingInput
                 label="Telefone"
                 value={affiliate.phone_number}
+                inputMode="numeric"
                 onChange={(v) =>
                   setAffiliate({ ...affiliate, phone_number: v })
                 }
@@ -582,7 +591,7 @@ const AffiliateRegister: React.FC = () => {
                 onChange={(value) =>
                   setAffiliate({
                     ...affiliate,
-                    site: value,
+                    site: formatSite(value),
                   })
                 }
                 error={!!errors.site}

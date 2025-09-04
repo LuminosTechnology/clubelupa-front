@@ -18,6 +18,15 @@ interface FloatingInputProps {
   isPassword?: boolean;
   error?: boolean;
   mask?: string;
+  inputMode?:
+    | "text"
+    | "numeric"
+    | "tel"
+    | "url"
+    | "email"
+    | "decimal"
+    | "search"
+    | undefined;
 }
 
 const FloatingInput: React.FC<FloatingInputProps> = ({
@@ -28,6 +37,7 @@ const FloatingInput: React.FC<FloatingInputProps> = ({
   isPassword = false,
   error = false,
   mask,
+  inputMode,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -67,7 +77,9 @@ const FloatingInput: React.FC<FloatingInputProps> = ({
           <Input
             as={InputMask}
             mask={mask}
+            type={type}
             maskChar={null}
+            inputMode={inputMode}
             value={value}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               onChange(e.target.value)

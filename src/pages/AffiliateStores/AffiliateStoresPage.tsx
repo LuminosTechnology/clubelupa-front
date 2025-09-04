@@ -94,6 +94,21 @@ const AffiliateStoresPage: React.FC = () => {
 
   const containerRef = useRef<HTMLIonContentElement>(null);
 
+  const handleStructure = (establishment: Establishment) => {
+    const hasPhysical =
+      establishment.addresses && establishment.addresses.length > 0;
+    const hasOnline =
+      establishment.social_links && establishment?.social_links?.site;
+
+    if (hasPhysical && hasOnline) {
+      return "Física e Online";
+    } else if (hasPhysical) {
+      return "Física";
+    } else if (hasOnline) {
+      return "Online";
+    }
+  };
+
   return (
     <IonPage style={{ "--background": "#ffffff" }}>
       <CategoryFilter
@@ -110,10 +125,8 @@ const AffiliateStoresPage: React.FC = () => {
       />
       <IonContent
         ref={containerRef}
-        fullscreen
         style={{ "--background": "#ffffff" }}
-        scrollEvents={true}
-        onIonScroll={() => setSelectedLetter(null)}
+        fullscreen
       >
         <IonLoading isOpen={loading} message="Carregando afiliados…" />
         <IonToast
@@ -133,6 +146,8 @@ const AffiliateStoresPage: React.FC = () => {
 
           <StoreListContainer>
             {establishments.map((establishment) => {
+              if (!establishment || !establishment.name || !establishment.id)
+                return null;
               const firstLetter = establishment.name.charAt(0).toUpperCase();
               let sectionId;
 
@@ -160,17 +175,22 @@ const AffiliateStoresPage: React.FC = () => {
                   <StoreInfo
                     style={{
                       background:
-                        establishment.categories[0]?.color ?? "#E6C178",
+                        establishment.categories &&
+                        establishment.categories.length > 0
+                          ? establishment.categories[0]?.color ?? "#E6C178"
+                          : "#E6C178",
                     }}
                   >
                     <StoreName>{establishment.name}</StoreName>
-                    {!!establishment.categories[0] && (
-                      <StoreLine>
-                        Categoria: {establishment.categories[0].name}
-                      </StoreLine>
-                    )}
-
-                    <StoreLine>Estrutura: TODO</StoreLine>
+                    {establishment.categories &&
+                      establishment.categories.length > 0 && (
+                        <StoreLine>
+                          Categoria: {establishment.categories[0].name}
+                        </StoreLine>
+                      )}
+                    <StoreLine>
+                      Estrutura: {handleStructure(establishment)}
+                    </StoreLine>
                     <StoreUnderlined>Ver mais</StoreUnderlined>
 
                     {/* {!!s.horario && <StoreLine>{s.schedule}</StoreLine>} */}

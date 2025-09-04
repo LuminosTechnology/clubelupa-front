@@ -118,3 +118,10 @@ body.dark {
 .custom-select-interface::part(content) {
   color: black;
 }
+
+#map {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute;
+}

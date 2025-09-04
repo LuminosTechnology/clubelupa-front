@@ -128,18 +128,23 @@ const AffiliatePaywall: React.FC = () => {
           <BenefitsContainer>
             <Benefit>
               Exibição da sua marca dentro do app, visível para todos os
-              usuários;
+              usuários
             </Benefit>
             <Benefit>
               Check-in de clientes no seu estabelecimento, com registro
-              automático;
+              automático
             </Benefit>
             <Benefit>
               Escaneamento de notas fiscais de produtos comprados pelos seus
-              clientes;
+              clientes
             </Benefit>
             <Benefit>
               Destaque da sua marca no mapa e no Instagram oficial do Clube.
+            </Benefit>
+            <Benefit>Acesso as inscrições do Quintal do Lupa</Benefit>
+            <Benefit>Acesso à loja de serviços do Lupa</Benefit>
+            <Benefit>
+              Conteúdos mensais exclusivos com profissionais convidados
             </Benefit>
           </BenefitsContainer>
           <Paragraph>
