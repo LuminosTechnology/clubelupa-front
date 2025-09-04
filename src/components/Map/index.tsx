@@ -200,11 +200,20 @@ const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
             lat: Number(e.addresses[0].latitude),
             lng: Number(e.addresses[0].longitude),
           };
+
+          const mainCategory = e.categories.find(
+            (category) => category.parent_id === null
+          );
+
+          const iconUrl = mainCategory
+            ? mainCategory.icon_url
+            : "assets/affiliate_pin.png";
+
           const markerId = await gMap.addMarker({
             coordinate: location,
-            iconUrl: "assets/affiliate_pin.png",
-            iconSize: { width: 40, height: 55 },
-            iconAnchor: { x: 20, y: 55 },
+            iconUrl: iconUrl,
+            iconSize: { width: 50, height: 50 },
+            iconAnchor: { x: 25, y: 50 },
           });
 
           const id = markerId || e.id;

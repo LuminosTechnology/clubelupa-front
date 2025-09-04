@@ -8,6 +8,7 @@ export interface Category {
   slug: string;
   description: string | null;
   color: string;
+  icon_url: string;
   original_locale: string | null;
   is_active: boolean;
   is_active_text: string;
