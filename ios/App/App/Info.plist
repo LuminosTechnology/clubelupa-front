@@ -26,6 +26,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Precisamos da câmera para escanear códigos</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Usamos sua localização para realizar check-in em locais. </string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Usamos sua localização para realizar check-in em locais. </string>
 	<key>UILaunchStoryboardName</key>
