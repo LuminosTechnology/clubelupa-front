@@ -3,6 +3,7 @@ import { User } from "../types/api/api";
 import api from "../config/api";
 import {
   ForgotPasswordRequest,
+  ForgotPasswordVerifyRequest,
   LoginUserRequest,
   LoginUserResponse,
   ResetPasswordRequest,
@@ -137,6 +138,13 @@ export const forgotPassword = async (data: ForgotPasswordRequest) => {
     data
   );
   console.log("[Auth Service] Password reset code response:", response.data);
+  return response.data;
+};
+
+export const forgotPasswordVerify = async (
+  data: ForgotPasswordVerifyRequest
+) => {
+  const response = await api.post("/forgot-password/verify", data);
   return response.data;
 };
 

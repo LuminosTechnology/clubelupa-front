@@ -18,7 +18,13 @@ export interface LoginUserResponse {
 
 export interface ForgotPasswordRequest {
   email: string;
-  data_nascimento: string;
+}
+
+export interface ForgotPasswordVerifyRequest {
+  email: string;
+  code: string;
+  password: string;
+  password_confirmation: string;
 }
 
 export interface ResetPasswordRequest {

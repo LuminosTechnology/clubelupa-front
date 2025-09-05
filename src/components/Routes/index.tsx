@@ -13,14 +13,10 @@ export const PrivateRoute: React.FC<RouteProps> = ({
 }) => {
   const { isAuthenticated } = useAuthContext();
 
-  return (
-    <Route
-      {...rest}
-      render={(props) =>
-        isAuthenticated ? <Component /> : <Redirect to="/login" />
-      }
-    />
-  );
+  if (!isAuthenticated) {
+    return <Redirect to="/login" push exact />;
+  } else
+    return <Route {...rest} render={(props) => <Component {...props} />} />;
 };
 
 export const PublicRoute: React.FC<RouteProps> = ({
@@ -28,12 +24,6 @@ export const PublicRoute: React.FC<RouteProps> = ({
   ...rest
 }) => {
   const { isAuthenticated } = useAuthContext();
-  return (
-    <Route
-      {...rest}
-      render={(props) =>
-        isAuthenticated ? <Redirect to="/home" /> : <Component />
-      }
-    />
-  );
+
+  return <Route {...rest} render={(props) => <Component {...props} />} />;
 };

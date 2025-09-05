@@ -12,7 +12,6 @@ const ForgotPassword: React.FC = () => {
   const history = useHistory();
   const [formData, setFormData] = useState({
     email: "",
-    data_nascimento: "",
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [displayErrorAlert, setDisplayErrorAlert] = useState(false);
@@ -41,17 +40,17 @@ const ForgotPassword: React.FC = () => {
     try {
       const response = await forgotPassword({
         email: formData.email,
-        data_nascimento: formData.data_nascimento,
       });
 
       setSuccessMessage(response.message);
       setDisplaySuccessAlert(true);
       setFormData({
         email: "",
-        data_nascimento: "",
       });
 
       setErrors({});
+
+      history.push("/forgot/password/verify", { email: formData.email });
     } catch (error: any) {
       const backendMessage = error.response?.data?.message;
       setErrors({

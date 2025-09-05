@@ -2,7 +2,7 @@
  * src/components/SlideMenu/SlideMenu.tsx
  * ────────────────────────────────────────────────────────────── */
 import { Preferences } from "@capacitor/preferences";
-import { IonIcon } from "@ionic/react";
+import { IonIcon, useIonRouter } from "@ionic/react";
 import { close, logOut } from "ionicons/icons";
 import React, { useEffect, useMemo, useRef } from "react";
 import { useHistory, useLocation } from "react-router-dom";
@@ -43,11 +43,11 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
       await logout();
       setIsAuthenticated(false);
       setUser(undefined);
-      history.replace("/login");
+
+      await Preferences.remove({ key: LOCAL_STORAGE_KEYS.AUTH_TOKEN });
     } catch (e) {
       console.error("Logout error:", e);
     } finally {
-      await Preferences.remove({ key: LOCAL_STORAGE_KEYS.AUTH_TOKEN });
       onClose();
     }
   };

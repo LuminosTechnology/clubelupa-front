@@ -56,6 +56,7 @@ import AffiliatePaywall from "./pages/AffiliatePaywall/AffiliatePaywall";
 import ProfileChangePasswordPage from "./pages/ChangePassword/ChangePassword";
 import { GlobalFonts } from "./styles/GlobalFonts";
 import { SplashScreen } from "./components/SplashScreen";
+import ForgotPasswordVerify from "./pages/ForgotPasswordVerify/ForgotPasswordVerify";
 
 declare global {
   interface Window {
@@ -138,6 +139,11 @@ const App: React.FC = () => {
           />
           <PublicRoute
             exact
+            path="/forgot/password/verify"
+            component={ForgotPasswordVerify}
+          />
+          <PublicRoute
+            exact
             path="/change/password"
             component={ChangePassword}
           />
@@ -207,7 +213,6 @@ const App: React.FC = () => {
           <PrivateRoute exact path="/home" component={Home} />
 
           <Redirect exact from="/" to={isAuthenticated ? "/home" : "/login"} />
-          {/* <Redirect from="*" to={isAuthenticated ? "/home" : "/login"} /> */}
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>
