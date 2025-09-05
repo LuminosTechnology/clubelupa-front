@@ -39,6 +39,7 @@ import {
   LinkRow,
   LinksContainer,
   MainCategory,
+  OpenStatus,
   PhotoHeader,
   ProductPhoto,
   ScrollArea,
@@ -47,6 +48,7 @@ import {
   SectionTitle,
   SpinnerContainer,
   Title,
+  TitleOpenStatusContainer,
   TitleWrapper,
 } from "./AffiliateView.style";
 
@@ -254,7 +256,22 @@ const AffiliateView: React.FC = () => {
 
             <InfoContainer>
               <TitleWrapper>
-                <Title color={color}>{data?.name}</Title>
+                <TitleOpenStatusContainer>
+                  <Title color={color}>{data?.name}</Title>
+                  <OpenStatus
+                    status={
+                      data.status_open === "Aberto"
+                        ? "open"
+                        : data.status_open === "Fechado"
+                        ? "closed"
+                        : undefined
+                    }
+                  >
+                    {data.status_open_details.status_open}
+                  </OpenStatus>
+                  <p>{data.status_open_details.message}</p>
+                </TitleOpenStatusContainer>
+
                 <LikeButton
                   color={color}
                   onClick={handleFavorite}

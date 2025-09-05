@@ -126,15 +126,9 @@ const AffiliateArea: React.FC = () => {
 
               <Option onClick={goToAdvertising}>
                 <OptionIcon src={publicidadeIcon} alt="Ícone Publicidade" />
-                Publicidade
+                Loja do Afiliado
               </Option>
               <Divider />
-
-              <Option>
-                <OptionIcon src={relatoriosIcon} alt="Ícone Relatórios" />
-                Relatórios
-              </Option>
-              <Divider style={{ marginBottom: "80px" }} />
 
               {establishment?.social_links?.site && (
                 <Option>

@@ -23,7 +23,5 @@ export const PublicRoute: React.FC<RouteProps> = ({
   component: Component,
   ...rest
 }) => {
-  const { isAuthenticated } = useAuthContext();
-
   return <Route {...rest} render={(props) => <Component {...props} />} />;
 };

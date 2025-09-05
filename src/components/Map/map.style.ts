@@ -70,6 +70,7 @@ export const RestaurantImage = styled.img`
 export const RestaurantDetails = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: start;
   padding: 0.5rem;
   gap: 0.25rem;
 
@@ -91,6 +92,20 @@ export const RestaurantDetails = styled.div`
     overflow: hidden;
     text-overflow: ellipsis;
   }
+`;
+
+export const OpenStatus = styled.span<{ status?: "open" | "closed" }>`
+  background-color: ${({ status }) =>
+    status === "open"
+      ? "var(--green)"
+      : status === "closed"
+      ? "#c06361"
+      : "#666"};
+  border-radius: 99px;
+  font-weight: bold;
+  color: white;
+  padding: 0 1rem;
+  line-height: 100%;
 `;
 
 export const ButtonsContainer = styled.div`

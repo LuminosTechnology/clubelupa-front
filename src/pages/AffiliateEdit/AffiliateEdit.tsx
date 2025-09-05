@@ -41,8 +41,9 @@ import {
   TitleSection,
   UploadImageButton,
   UploadLogoColumn,
-  UploadPersonPhotoButton,
+  UploadPhoto,
 } from "./AffiliateEdit.style";
+import { on } from "events";
 
 /* ---------- estado (todos campos opcionais) ------------------- */
 
@@ -191,18 +192,19 @@ const AffiliateEdit: React.FC = () => {
     setAttributes(selectedCategory?.attributes || []);
   }, [selectedCategory]);
 
-  const onLogoClick = () => shopPhotoFileRef.current?.click();
-  const onCoverPhotoClick = () => productPhotoFileRef.current?.click();
-  const onGalleryClick = () => behindTheScenesFileRef.current?.click();
+  const onShopPhotoClick = () => shopPhotoFileRef.current?.click();
+  const onProductPhotoClick = () => productPhotoFileRef.current?.click();
+  const onBehindTheScenesPhotoClick = () =>
+    behindTheScenesFileRef.current?.click();
 
-  const onLogoChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+  const onShopPhotoChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setShopPhotoFile(file);
     setShopPhotoUrl(URL.createObjectURL(file));
   };
 
-  const onCoverPhotoChange: React.ChangeEventHandler<HTMLInputElement> = (
+  const onProductPhotoChange: React.ChangeEventHandler<HTMLInputElement> = (
     e
   ) => {
     const file = e.target.files?.[0];
@@ -211,7 +213,9 @@ const AffiliateEdit: React.FC = () => {
     setProductPhotoUrl(URL.createObjectURL(file));
   };
 
-  const onGalleryChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+  const onBehindTheScenesPhotoChange: React.ChangeEventHandler<
+    HTMLInputElement
+  > = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setBehindTheScenesPhotoFile(file);
@@ -771,19 +775,20 @@ const AffiliateEdit: React.FC = () => {
                     <UploadLogoColumn>
                       <input
                         type="file"
-                        ref={productPhotoFileRef}
+                        ref={shopPhotoFileRef}
                         style={{ display: "none" }}
-                        onChange={onCoverPhotoChange}
+                        onChange={onShopPhotoChange}
                       />
                       <p>
-                        Anexe aqui uma foto que de sua loja ou estabeleciemento:
+                        Anexe aqui uma foto da sua loja ou espaço para que todos
+                        conheçam o coração do seu negócio.
                       </p>
-                      <UploadImageButton onClick={onCoverPhotoClick}>
+                      <UploadPhoto onClick={onShopPhotoClick}>
                         <img
-                          src={productPhotoUrl || "/assets/default-photo.png"}
+                          src={shopPhotoUrl || "/assets/default-photo.png"}
                           alt="Foto da marca"
                         />
-                      </UploadImageButton>
+                      </UploadPhoto>
                     </UploadLogoColumn>
                   </FieldWrapper>
 
@@ -792,19 +797,20 @@ const AffiliateEdit: React.FC = () => {
                     <UploadLogoColumn>
                       <input
                         type="file"
-                        ref={shopPhotoFileRef}
+                        ref={productPhotoFileRef}
                         style={{ display: "none" }}
-                        onChange={onLogoChange}
+                        onChange={onProductPhotoChange}
                       />
                       <p>
-                        Anexe aqui uma foto que de sua loja ou estabeleciemento:
+                        Queremos ver o que você faz de melhor! Compartilhe aqui
+                        uma foto de algum produto.
                       </p>
-                      <UploadImageButton onClick={onLogoClick}>
+                      <UploadPhoto onClick={onProductPhotoClick}>
                         <img
-                          src={shopPhotoUrl || "/assets/default-photo.png"}
+                          src={productPhotoUrl || "/assets/default-photo.png"}
                           alt="Foto da marca"
                         />
-                      </UploadImageButton>
+                      </UploadPhoto>
                     </UploadLogoColumn>
                   </FieldWrapper>
 
@@ -815,13 +821,14 @@ const AffiliateEdit: React.FC = () => {
                         type="file"
                         ref={behindTheScenesFileRef}
                         style={{ display: "none" }}
-                        onChange={onGalleryChange}
+                        onChange={onBehindTheScenesPhotoChange}
                       />
                       <p>
-                        Anexe aqui uma foto de quem criou e fez a marca
-                        acontecer! Adoramos ver os bastidores:
+                        Anexe aqui uma foto de quem está por trás da marca e faz
+                        tudo acontecer. Bastidores também contam
+                        histórias incríveis!
                       </p>
-                      <UploadPersonPhotoButton onClick={onGalleryClick}>
+                      <UploadPhoto onClick={onBehindTheScenesPhotoClick}>
                         <img
                           src={
                             behindTheScenesPhotoUrl ||
@@ -829,7 +836,7 @@ const AffiliateEdit: React.FC = () => {
                           }
                           alt="Foto da marca"
                         />
-                      </UploadPersonPhotoButton>
+                      </UploadPhoto>
                     </UploadLogoColumn>
                   </FieldWrapper>
                   {Object.keys(errors).length > 0 && (

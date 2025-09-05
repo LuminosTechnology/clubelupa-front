@@ -135,20 +135,19 @@ const ProfileEditPage: React.FC = () => {
 
   return (
     <IonPage>
+      <AppHeader
+        title="Editar Perfil"
+        backgroundColor="#868950"
+        textColor="#FFFFFF"
+      />
       <IonContent
         fullscreen
         style={{ "--background": "#ffffff" } as React.CSSProperties}
       >
-        <AppHeader
-          title="Editar Perfil"
-          backgroundColor="#868950"
-          textColor="#FFFFFF"
-        />
-
         <ScrollArea
           onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 0)}
         >
-          <ProfileWrapper scrolled={scrolled}>
+          <Content>
             <PhotoContainer>
               <ProfilePhoto
                 src={photoUrl || "/assets/default-profile-photo.png"}
@@ -162,9 +161,6 @@ const ProfileEditPage: React.FC = () => {
                 onChange={handlePhotoChange}
               />
             </PhotoContainer>
-          </ProfileWrapper>
-
-          <Content>
             <GreenLabelTheme>
               <InputTextTheme>
                 <EditContainer>

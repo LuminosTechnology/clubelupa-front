@@ -1,23 +1,18 @@
 import styled from "styled-components";
 
 export const ProfileWrapper = styled.div<{ scrolled: boolean }>`
-  position: fixed;
-  top: 120px;
-  left: 20px;
   width: 96px;
   height: 96px;
   border-radius: 50%;
   overflow: hidden;
-  z-index: 20;
-  opacity: ${({ scrolled }) => (scrolled ? 0 : 1)};
-  transition: opacity 0.3s ease-in-out;
 `;
 
 export const PhotoContainer = styled.div`
-  width: 100%;
-  height: 100%;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  overflow: hidden;
   position: relative;
-  z-index: 20;
 `;
 
 export const ProfilePhoto = styled.img`
@@ -45,7 +40,6 @@ export const EditOverlay = styled.button`
 
 export const Content = styled.div`
   background: #ffffff;
-  margin-top: 100px; /* espaço extra para caber a foto fixa + header */
   padding: 20px;
 `;
 

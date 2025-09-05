@@ -103,7 +103,7 @@ const App: React.FC = () => {
   return (
     <IonApp>
       <GlobalFonts />
-      <IonReactRouter>
+      <IonReactRouter key={isAuthenticated ? "auth" : "no-auth"}>
         <IonRouterOutlet>
           <PublicRoute exact path="/login" component={Login} />
           <PublicRoute exact path="/register" component={Register} />

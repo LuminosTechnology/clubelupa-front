@@ -37,6 +37,7 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
     prevPath.current = location.pathname;
   }, [location.pathname, isOpen, onClose]);
 
+  const router = useIonRouter();
   /* ---------- logout ----------------------------------------- */
   const handleLogout = async () => {
     try {
@@ -45,6 +46,8 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
       setUser(undefined);
 
       await Preferences.remove({ key: LOCAL_STORAGE_KEYS.AUTH_TOKEN });
+
+      router.push("/login", "root");
     } catch (e) {
       console.error("Logout error:", e);
     } finally {
@@ -58,7 +61,7 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
       { label: "Home", path: "/home", enabled: true },
       { label: "Perfil", path: "/profile", enabled: true },
       { label: "Afiliados", path: "/affiliates", enabled: true },
-      { label: "Troca de Moedas Lupa", path: "/lupacoins", enabled: false },
+      { label: "Troca de Moedas Lupa", path: "/lupacoins", enabled: true },
       { label: "Meu Plano", path: "/myplan", enabled: true },
       { label: "Meus Favoritos", path: "/favorites", enabled: true },
       { label: "Histórico", path: "/experience", enabled: false },

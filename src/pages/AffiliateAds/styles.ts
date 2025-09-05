@@ -28,11 +28,12 @@ export const ShopItem = styled.div`
   }
 `;
 
-export const ShopItemFooter = styled.div`
+export const ShopItemFooter = styled.button`
   display: flex;
   background-color: var(--ion-color-primary);
   padding: 0.75rem 1rem;
   justify-content: space-between;
+  align-items: center;
 `;
 
 export const ShopItemInfo = styled.div`
@@ -40,13 +41,15 @@ export const ShopItemInfo = styled.div`
   flex-direction: column;
   color: white;
   font-size: 1.2rem;
+  min-width: 70px;
 
   strong {
     font-size: 1.2rem;
-    text-transform: uppercase;
+    text-align: left;
   }
 
-  button {
+  p {
+    margin: 0;
     color: white;
     background-color: transparent;
     border: none;

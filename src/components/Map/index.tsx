@@ -13,6 +13,7 @@ import {
   CheckInButton,
   CloseButton,
   MapWrapper,
+  OpenStatus,
   RestaurantCard,
   RestaurantDetails,
   RestaurantImage,
@@ -35,6 +36,7 @@ import { CodeScannerService } from "../../services/code-scan-service";
 import { AffiliateData } from "../../services/interfaces/Affiliate";
 import { Establishment } from "../../types/api/api";
 import { haversine } from "../../utils/haversine";
+import { useParametersContext } from "../../contexts/ParametersContext";
 
 interface MapProps {
   onViewMore: (r: AffiliateData) => void;
@@ -49,6 +51,7 @@ const HTTP_API_KEY = "AIzaSyCADmNNz3iLtqV7UX-mY83WJnL6m3gpdkU";
 const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
   const history = useHistory();
   const [gMap, setGMap] = useState<GoogleMap | null>(null);
+  const { data } = useParametersContext();
   const [userLoc, setUserLoc] = useState<{ lat: number; lng: number } | null>(
     null
   );
@@ -323,7 +326,7 @@ const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
   };
 
   const getDistanceAndCheckin = (est: Establishment) => {
-    if (!userLoc || !est.addresses.length)
+    if (!userLoc || !est.addresses.length || !data?.max_checkin_distance_meters)
       return { distance: -1, canCheckin: false };
 
     const distance = haversine(
@@ -333,7 +336,7 @@ const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
       Number(est.addresses[0].longitude)
     );
 
-    const canCheckin = distance <= 10_000; // dentro de 100 metros
+    const canCheckin = distance <= data.max_checkin_distance_meters;
 
     return { distance, canCheckin };
   };
@@ -397,6 +400,18 @@ const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
             {selected && (
               <>
                 <h3>{selected?.name}</h3>
+                <OpenStatus
+                  status={
+                    selected.status_open === "Aberto"
+                      ? "open"
+                      : selected.status_open === "Fechado"
+                      ? "closed"
+                      : undefined
+                  }
+                >
+                  {selected.status_open_details.status_open}
+                </OpenStatus>
+                <p>{selected.status_open_details.message}</p>
                 <p>
                   {selected?.addresses[0]?.street},{" "}
                   {selected?.addresses[0]?.number}

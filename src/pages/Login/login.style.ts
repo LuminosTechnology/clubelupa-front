@@ -14,9 +14,8 @@ export const Container = styled.div`
   padding: 0 20px 40px; /* ← padding lateral de 20 px */
 `;
 
-/* logo — 90 px do topo */
 export const LogoWrapper = styled.div`
-  margin-top: 90px;
+  margin-top: 64px;
   display: flex;
   justify-content: center;
 `;

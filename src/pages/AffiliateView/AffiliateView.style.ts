@@ -87,6 +87,19 @@ export const LikeButton = styled.button.attrs({ type: "button" })<Button>`
   }
 `;
 
+export const TitleOpenStatusContainer = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: start;
+  gap: 0.5rem;
+
+  p {
+    color: #888;
+    margin: 0;
+  }
+`;
+
 export const TitleWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -108,6 +121,21 @@ export const Description = styled.p`
   font-size: 16px;
   color: #666;
   line-height: 1.5;
+  white-space: pre-wrap;
+`;
+
+export const OpenStatus = styled.span<{ status?: "open" | "closed" }>`
+  background-color: ${({ status }) =>
+    status === "open"
+      ? "var(--green)"
+      : status === "closed"
+      ? "#c06361"
+      : "#666"};
+  border-radius: 99px;
+  font-weight: bold;
+  color: white;
+  padding: 0 1rem;
+  line-height: 100%;
 `;
 
 export const ErrorMessage = styled.p`
@@ -158,15 +186,13 @@ export const Section = styled.div`
 
 export const ProductPhoto = styled.img`
   width: 100%;
-  aspect-ratio: 16/9;
+  height: 280px;
   object-fit: cover;
-  border-radius: 8px;
 `;
 
 export const BehindScenesPhoto = styled.img`
-  aspect-ratio: 1;
   width: 100%;
-  border-radius: 8px;
+  height: 280px;
   object-fit: cover;
 `;
 

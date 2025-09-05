@@ -161,6 +161,11 @@ export interface Establishment {
   };
 
   opening_hours: Record<string?, string>;
+  status_open: string;
+  status_open_details: {
+    status_open: string;
+    message: string;
+  };
 
   is_active: boolean;
   is_favorited_by_me: boolean;

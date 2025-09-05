@@ -26,7 +26,8 @@ import Link from "../../components/Link";
 import Button from "../../components/Button";
 import { login } from "../../services/auth-service";
 
-import Logo from "../../assets/Logo.svg";
+import Logo from "../../assets/Logo.svg?react";
+
 import { useAuthContext } from "../../contexts/AuthContext";
 import { AxiosError } from "axios";
 
@@ -58,6 +59,7 @@ const Login: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const router = useIonRouter();
   /* ─────────── actions ─────────── */
   const handleLogin = async () => {
     if (!validateForm()) return;
@@ -66,8 +68,8 @@ const Login: React.FC = () => {
       const response = await login({ email, password });
       setUser(response.data.user);
       setIsAuthenticated(true);
+      router.push("/home", "root");
       resetForm();
-      history.push("/home");
     } catch (error: any) {
       if (error instanceof AxiosError) {
         if (error.status === 403) {
@@ -101,7 +103,7 @@ const Login: React.FC = () => {
         <Container>
           {/* logo */}
           <LogoWrapper>
-            <img src={Logo} alt="Logo" style={{ width: 160 }} />
+            <Logo />
           </LogoWrapper>
 
           {/* formulário de login */}

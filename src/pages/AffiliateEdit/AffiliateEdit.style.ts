@@ -96,6 +96,7 @@ export const UploadLogoColumn = styled.div`
   align-items: center;
 
   p {
+    width: 100%;
     color: #666;
     font-size: 1rem;
   }
@@ -117,12 +118,11 @@ export const UploadImageButton = styled.button`
   }
 `;
 
-export const UploadPersonPhotoButton = styled.button`
+export const UploadPhoto = styled.button`
   border: none;
-  aspect-ratio: 1;
-  width: 80%;
+  width: 100%;
+  height: 280px;
   background-color: #c8c8c8;
-  border-radius: 999px;
   overflow: hidden;
   display: flex;
   justify-content: center;
@@ -131,7 +131,7 @@ export const UploadPersonPhotoButton = styled.button`
   img {
     width: 100%;
     height: 100%;
-    object-fit: fill;
+    object-fit: cover;
   }
 `;
 
