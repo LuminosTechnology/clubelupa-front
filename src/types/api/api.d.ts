@@ -167,6 +167,9 @@ export interface Establishment {
     message: string;
   };
 
+  structure_type: number; // 1 = física, 2 = física e online, 3 = online
+  structure_type_text: string;
+
   is_active: boolean;
   is_favorited_by_me: boolean;
   is_checked_in_by_me_last_hour: boolean;

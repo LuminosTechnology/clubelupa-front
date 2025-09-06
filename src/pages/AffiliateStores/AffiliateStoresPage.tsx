@@ -95,17 +95,15 @@ const AffiliateStoresPage: React.FC = () => {
   const containerRef = useRef<HTMLIonContentElement>(null);
 
   const handleStructure = (establishment: Establishment) => {
-    const hasPhysical =
-      establishment.addresses && establishment.addresses.length > 0;
-    const hasOnline =
-      establishment.social_links && establishment?.social_links?.site;
-
-    if (hasPhysical && hasOnline) {
-      return "Física e Online";
-    } else if (hasPhysical) {
-      return "Física";
-    } else if (hasOnline) {
-      return "Online";
+    switch (Number(establishment.structure_type)) {
+      case 1:
+        return "Física";
+      case 2:
+        return "Física e Online";
+      case 3:
+        return "Online";
+      default:
+        return "Desconhecido";
     }
   };
 

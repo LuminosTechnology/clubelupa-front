@@ -213,6 +213,19 @@ const AffiliateView: React.FC = () => {
     return url;
   };
 
+  const handleStructure = (establishment: Establishment) => {
+    switch (Number(establishment.structure_type)) {
+      case 1:
+        return "Física";
+      case 2:
+        return "Física e Online";
+      case 3:
+        return "Online";
+      default:
+        return "Desconhecido";
+    }
+  };
+
   const socialLinks = Array.isArray(data?.social_links)
     ? {} // transforma array vazio em objeto vazio
     : data?.social_links || {};
@@ -317,6 +330,11 @@ const AffiliateView: React.FC = () => {
                   </AddressText>
                 </Section>
               )}
+
+              <Section>
+                <SectionTitle color={color}>Estrutura</SectionTitle>
+                <SectionText>{handleStructure(data)}</SectionText>
+              </Section>
 
               <LinksContainer>
                 {socialLinks?.instagram && (
