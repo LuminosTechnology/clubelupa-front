@@ -71,16 +71,17 @@ npx cap open ios
 
 ### Passo 1: Adicionar Capability + Setup da Conta
 - Ao abrir o projeto no Xcode, no target App, vá até a aba Signing & Capabilities
-- Selecione o box "Automatically manage signing"
-- Selecione a conta Fernanda L. Paludo
-- No canto superior esquerdo, acima de "Signing", clique no botão "+ Capability"
-- Busque na lista por In-App Purchase
-- Ele irá aparecer logo abaixo do Signing Certificate
+- Confira se o box "Automatically manage signing" e a conta Fernanda L.Paludo estão selecionados
+- Confira se abaxo da conta, aparece a Capability "In-App Purchase", caso não esteja habilitado, siga os passos abaixo
+    - No canto superior esquerdo, acima de "Signing", clique no botão "+ Capability"
+    - Busque na lista e selecione a opção In-App Purchase
+    - Ele irá aparecer logo abaixo do Signing Certificate
+- Suba o número da versão e da build em +1 a partir do valor que consta no app.
 
 ### Passo 2: Alterar a linguagem nativa do app
 - Ainda no target App, selecione a aba "Info"
-- Troque a Key "Default localization" para "pt-br"
-- Troque a Key "Bundle Display Name" para "Clube Lupa"
+- Confira se a Key "Default localization" está como "pt-br"
+- Confira se a Key "Bundle Display Name" está como "Clube Lupa"
 
 ### Passo 3: Conecte um dispositivo compatível com a Build
 - Você pode tanto conectar um dispositivo por cabo no computador, quanto selecionar a opção "Any iOS Device"
@@ -91,5 +92,5 @@ npx cap open ios
 
 ### Passo 5: Selecionar a distribuição
 - Na janela que abrir assim que o Xcode terminar de arquivar o projeto, você deve selecionar "Distribute App"
-- Em seguida, selecione "App Store Connect" (dessa maneira a versão irá tanto para loja, quanto para o testflight
+- Em seguida, selecione "App Store Connect" (dessa maneira a versão irá tanto para loja, quanto para o testflight)
 - Aguarde a operação finalizar.
