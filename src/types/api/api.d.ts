@@ -160,7 +160,8 @@ export interface Establishment {
     instagram?: string;
   };
 
-  opening_hours: Record<string?, string>;
+  opening_hours: Record<string, string[]>;
+
   status_open: string;
   status_open_details: {
     status_open: string;

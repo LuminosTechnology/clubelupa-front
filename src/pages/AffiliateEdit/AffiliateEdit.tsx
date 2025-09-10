@@ -14,7 +14,7 @@ import ScrollArea from "../../components/ScrollArea/ScrollArea";
 import AppHeader from "../../components/SimpleHeader";
 
 import InputMask from "react-input-mask";
-import { useHistory } from "react-router";
+import { Redirect, useHistory } from "react-router";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { fetchMyEstablishmentData } from "../../services/affiliateService";
 import { updateEstablishment } from "../../services/auth-service";
@@ -39,11 +39,10 @@ import {
   SiteContainer,
   TextAreaWrapper,
   TitleSection,
-  UploadImageButton,
   UploadLogoColumn,
   UploadPhoto,
 } from "./AffiliateEdit.style";
-import { on } from "events";
+import { OpeningHoursForm } from "./components/OpeningHoursForm";
 
 /* ---------- estado (todos campos opcionais) ------------------- */
 
@@ -110,6 +109,7 @@ const AffiliateEdit: React.FC = () => {
     const establishment = await fetchMyEstablishmentData(
       user?.establishments[0].id
     );
+
     console.log({ establishment });
 
     const address = establishment?.addresses[0];
@@ -168,6 +168,7 @@ const AffiliateEdit: React.FC = () => {
       },
       instagram: cleanInstagram,
       site: cleanSite,
+      opening_hours: establishment?.opening_hours,
     }));
 
     // if (establishment?.addresses && establishment.addresses.length > 0) {
@@ -369,6 +370,7 @@ const AffiliateEdit: React.FC = () => {
     if (!establishment?.id) return;
     const validatedForm = await validateForm();
     if (!validatedForm) return;
+    console.log({ validatedForm });
 
     try {
       await updateEstablishment({ data: validatedForm, id: establishment.id });
@@ -395,7 +397,7 @@ const AffiliateEdit: React.FC = () => {
   };
 
   /* ─── UI ────────────────────────────────────────────────────── */
-  if (!establishment) return <div>Establishment not found</div>;
+  if (!establishment) return <Redirect to="/home" />;
   return (
     <IonPage>
       <AppHeader
@@ -691,6 +693,16 @@ const AffiliateEdit: React.FC = () => {
                           </IonSelectOption>
                         ))}
                     </CustomSelect>
+                  </FieldWrapper>
+
+                  <FieldWrapper>
+                    <label>Horários de funcionamento</label>
+                    <OpeningHoursForm
+                      value={form.opening_hours}
+                      onChange={(value) =>
+                        setForm((prev) => ({ ...prev, opening_hours: value }))
+                      }
+                    />
                   </FieldWrapper>
 
                   <FieldWrapper>

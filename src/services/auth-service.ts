@@ -90,6 +90,16 @@ export const updateEstablishment = async ({
     );
   }
 
+  if (data.opening_hours) {
+    for (const [key, value] of Object.entries(data.opening_hours)) {
+      if (value && Array.isArray(value)) {
+        value.forEach((hour) => {
+          formData.append(`opening_hours[${key}][]`, hour);
+        });
+      }
+    }
+  }
+
   if (data.address) {
     for (const [key, value] of Object.entries(data.address)) {
       if (value !== undefined && value !== null) {

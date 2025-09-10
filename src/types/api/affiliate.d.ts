@@ -1,3 +1,7 @@
+import {
+  DayValue,
+  TimePair,
+} from "../../pages/AffiliateEdit/components/OpeningHoursForm";
 import { Address, CreateAddress, Establishment, FormattedDate } from "./api";
 
 export interface RegisterAffiliateRequest {
@@ -50,6 +54,8 @@ export interface UpdateAffiliateEstablishmentRequest {
   shop_photo?: File;
   product_photo?: File;
   behind_the_scenes_photo?: File;
+
+  opening_hours?: Record<DayValue, string[]>;
 
   instagram?: string;
   site?: string;
