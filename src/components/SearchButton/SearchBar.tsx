@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   FilterButton,
   SearchBarWrapper,
@@ -17,26 +17,37 @@ interface SearchBarProps {
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
-  value,
+  
   onChange,
   placeholder = "O que você procura hoje?",
   iconSrc,
   onFilterClick,
-}) => (
-  <SearchBarWrapper>
-    <SearchIcon src={iconSrc || defaultIcon} alt="Buscar" />
-    <SearchInput
-      placeholder={placeholder}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-    />
-    {onFilterClick && (
-      <FilterButton onClick={onFilterClick}>
-        Filtros
-        <IonIcon icon={"caret-down"} />
-      </FilterButton>
-    )}
-  </SearchBarWrapper>
-);
+}) => {
+  const [inputValue, setInputValue] = useState("");
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      onChange(inputValue);
+    }
+  };
+
+  return (
+    <SearchBarWrapper>
+      <SearchIcon src={iconSrc || defaultIcon} alt="Buscar" />
+      <SearchInput
+        placeholder={placeholder}
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+        onKeyDown={handleKeyDown}
+      />
+      {onFilterClick && (
+        <FilterButton onClick={onFilterClick}>
+          Filtros
+          <IonIcon icon={"caret-down"} />
+        </FilterButton>
+      )}
+    </SearchBarWrapper>
+  );
+};
 
 export default SearchBar;
