@@ -35,7 +35,7 @@ const AffiliateStoresPage: React.FC = () => {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
-  const debouncedSearchValue = useDebounce(query, 300);
+  //const debouncedSearchValue = useDebounce(query, 300);
 
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -76,7 +76,7 @@ const AffiliateStoresPage: React.FC = () => {
     const fetchEstablishments = async () => {
       setLoading(true);
       const response = await getAllEstablishments(
-        debouncedSearchValue,
+        query,
         categoriesFilter
       );
       setEstablishments(response.data);
@@ -84,7 +84,7 @@ const AffiliateStoresPage: React.FC = () => {
     };
 
     fetchEstablishments();
-  }, [debouncedSearchValue, categoriesFilter]);
+  }, [query, categoriesFilter]);
 
   const scrollToLetter = (letter: string) => {
     const element = document.getElementById(letter);

@@ -186,7 +186,7 @@ const AffiliateView: React.FC = () => {
         }
       } catch (error) {
         console.error("Erro ao buscar dados do afiliado:", error);
-        setCheckInMessage("Erro ao buscar dados do afiliado.");
+        //setCheckInMessage("Erro ao buscar dados do afiliado.");
       }
     };
 
