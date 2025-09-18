@@ -110,8 +110,6 @@ const AffiliateEdit: React.FC = () => {
       user?.establishments[0].id
     );
 
-    console.log({ establishment });
-
     const address = establishment?.addresses[0];
 
     const subcategories = establishment.categories.filter(
@@ -125,8 +123,6 @@ const AffiliateEdit: React.FC = () => {
     const mainCategoryNode: CategoryTreeNode | undefined = categories.find(
       (category) => category.id === mainCategory?.id
     );
-
-    console.log({ mainCategoryNode, mainCategory, categories });
 
     if (mainCategoryNode) {
       setSelectedCategory(mainCategoryNode);
