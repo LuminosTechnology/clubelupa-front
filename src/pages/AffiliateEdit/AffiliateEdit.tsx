@@ -43,7 +43,6 @@ import {
   UploadPhoto,
 } from "./AffiliateEdit.style";
 import { OpeningHoursForm } from "./components/OpeningHoursForm";
-import { strIsNullOrEmpty } from "../../utils/utils";
 import { TypeValidations } from "../../utils/utils";
 
 /* ---------- estado (todos campos opcionais) ------------------- */
@@ -70,7 +69,8 @@ const AffiliateEdit: React.FC = () => {
   const [behindTheScenesPhotoUrl, setBehindTheScenesPhotoUrl] =
     useState<string>();
 
-  const [hasPhysicalAddress, setHasPhysicalAddress] = useState(true);
+  const [hasPhysicalAddress, setHasPhysicalAddress] = useState(false);
+    const [hasAppointment, setHasAppointment] = useState(false);
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [categories, setCategories] = useState<CategoryTreeNode[]>([]);
   const [selectedCategory, setSelectedCategory] =
@@ -169,9 +169,9 @@ const AffiliateEdit: React.FC = () => {
       opening_hours: establishment?.opening_hours,
     }));
 
-    // if (establishment?.addresses && establishment.addresses.length > 0) {
-    //   setHasPhysicalAddress(true);
-    // }
+    if (establishment?.addresses && establishment.addresses.length > 0) {
+      setHasPhysicalAddress(true);
+    }
 
     setShopPhotoUrl(establishment.shop_photo_url);
     setProductPhotoUrl(establishment.product_photo_url);
@@ -716,16 +716,38 @@ const AffiliateEdit: React.FC = () => {
                     )}                      
                   </FieldWrapper>
 
-                  { /* Horários de funcionamento */ }
+                  { /* Necessário Agendamento? */ }
                   <FieldWrapper>
-                    <label>Horários de funcionamento</label>
-                    <OpeningHoursForm
-                      value={form.opening_hours}
-                      onChange={(value) =>
-                        setForm((prev) => ({ ...prev, opening_hours: value }))
-                      }
-                    />
+                    <label>Necessário Agendamento?</label>
+                    <IonRadioGroup
+                      value={hasAppointment}
+                      onIonChange={(e) => setHasAppointment(e.detail.value)}
+                    >
+                      <AffiliateUpdateRadioContainer>
+                        <IonRadio value={true} labelPlacement="end">
+                          Sim
+                        </IonRadio>
+                        <IonRadio value={false} labelPlacement="end">
+                          Não
+                        </IonRadio>
+                      </AffiliateUpdateRadioContainer>
+                    </IonRadioGroup>
                   </FieldWrapper>
+
+                  {!hasAppointment && (
+                    <>
+                      { /* Horários de funcionamento */ }
+                      <FieldWrapper>
+                        <label>Horários de funcionamento (Para espaços físicos)</label>
+                        <OpeningHoursForm
+                          value={form.opening_hours}
+                          onChange={(value) =>
+                            setForm((prev) => ({ ...prev, opening_hours: value }))
+                          }
+                        />
+                      </FieldWrapper>                                    
+                    </>
+                  )}
 
                   { /* Instagram */ }
                   <FieldWrapper>
