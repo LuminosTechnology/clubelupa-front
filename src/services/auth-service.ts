@@ -19,6 +19,7 @@ import {
 } from "../types/api/user";
 import { LOCAL_STORAGE_KEYS } from "../config/constants";
 import { ChangePasswordRequest } from "../types/api/auth";
+import { TypeValidations } from "../utils/utils";
 
 export const login = async ({ email, password }: LoginUserRequest) => {
   const data = { email, password, device_name: "react-app" };
@@ -63,6 +64,7 @@ export const updateEstablishment = async ({
 }) => {
   const formData = new FormData();
 
+console.log(data)
 
   if (data.name) formData.append("name", data.name);
   if (data.description) formData.append("description", data.description);
@@ -70,6 +72,7 @@ export const updateEstablishment = async ({
   if (data.category_id !== undefined) formData.append("category_id", data.category_id.toString());
   if (data.instagram) formData.append("instagram", data.instagram);
   if (data.site) formData.append("site", data.site);
+  if (!TypeValidations.boolIsNull(data.has_appointment)) formData.append("has_appointment", data.has_appointment.toString());
 
   formData.append("legal_name", data.legal_name ?? "");
   formData.append("document_number", data.document_number ?? "");
@@ -90,11 +93,9 @@ export const updateEstablishment = async ({
     );
   }//else{ formData.append("attributes[]", ""); }
 
-  //console.log(formData.get("attributes[]"));
-
   let isOpeningHours = false;
 
-  if (data.opening_hours) {    
+  if (data.opening_hours && !data.has_appointment) {    
 
     for (const [key, value] of Object.entries(data.opening_hours)) {
     
@@ -111,7 +112,7 @@ export const updateEstablishment = async ({
     }
   }
 
-  if ( !isOpeningHours ) { formData.append(`opening_hours[][]`, ""); }
+  if ( !isOpeningHours && !data.has_appointment) { formData.append(`opening_hours[][]`, ""); }
 
 
   if (data.address) {

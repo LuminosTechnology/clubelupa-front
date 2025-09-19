@@ -191,6 +191,8 @@ export interface Establishment {
   categories: CategoryTreeNode[];
   attributes: Atributes[];
 
+  has_appointment: boolean;
+
   social_links:
     | {
         site: string;

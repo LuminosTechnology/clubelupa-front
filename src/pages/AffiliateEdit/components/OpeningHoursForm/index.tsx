@@ -37,6 +37,7 @@ interface DayConfig {
 type Props = {
   value?: Record<string, string[]>;
   onChange?: (payload: Record<string, string[]>) => void;
+  disabled?: boolean;
 };
 
 import InputMask from "react-input-mask";
@@ -57,7 +58,7 @@ const initialSchedule: DayConfig[] = [
   { value: "feriados", label: "feriados", enabled: false, times: [] },
 ];
 
-export const OpeningHoursForm: React.FC<Props> = ({ onChange, value }) => {
+export const OpeningHoursForm: React.FC<Props> = ({ onChange, value, disabled = false }) => {
   const [schedule, setSchedule] = useState<DayConfig[]>(() => {
     if (value) {
       return initialSchedule.map((day) => ({
@@ -248,12 +249,13 @@ export const OpeningHoursForm: React.FC<Props> = ({ onChange, value }) => {
             <IonCheckbox
               checked={day.enabled}
               onIonChange={() => toggleCheckboxChange(day.value)}
+              disabled={disabled}
             />
             {day.label}
             {day.enabled && (
               <AddButton
                 onClick={() => handleAddTime(day.value)}
-                disabled={day.times.length === 4}
+                disabled={day.times.length === 4 || disabled}
               >
                 Adicionar Horário
               </AddButton>
@@ -303,6 +305,7 @@ export const OpeningHoursForm: React.FC<Props> = ({ onChange, value }) => {
                     </InputMask>
                     <RemoveButton
                       onClick={() => handleRemoveTime(day.value, index)}
+                      disabled={disabled}
                     >
                       X
                     </RemoveButton>

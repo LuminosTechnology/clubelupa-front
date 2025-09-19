@@ -70,11 +70,10 @@ const AffiliateEdit: React.FC = () => {
     useState<string>();
 
   const [hasPhysicalAddress, setHasPhysicalAddress] = useState(false);
-    const [hasAppointment, setHasAppointment] = useState(false);
+  const [hasAppointment, setHasAppointment] = useState(false);
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [categories, setCategories] = useState<CategoryTreeNode[]>([]);
-  const [selectedCategory, setSelectedCategory] =
-    useState<CategoryTreeNode | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<CategoryTreeNode | null>(null);
   const { user } = useAuthContext();
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -95,6 +94,7 @@ const AffiliateEdit: React.FC = () => {
     instagram: "",
     site: "",
     categories: [],
+    has_appointment: false
   };
 
   const [form, setForm] =
@@ -111,6 +111,8 @@ const AffiliateEdit: React.FC = () => {
     const establishment = await fetchMyEstablishmentData(
       user?.establishments[0].id
     );
+
+    //console.log(establishment)
 
     const address = establishment?.addresses[0];
 
@@ -167,11 +169,14 @@ const AffiliateEdit: React.FC = () => {
       instagram: cleanInstagram,
       site: cleanSite,
       opening_hours: establishment?.opening_hours,
+      has_appointment: establishment.has_appointment,
     }));
 
     if (establishment?.addresses && establishment.addresses.length > 0) {
       setHasPhysicalAddress(true);
     }
+
+    if (!TypeValidations.boolIsNull(establishment.has_appointment)) setHasAppointment(establishment.has_appointment);
 
     setShopPhotoUrl(establishment.shop_photo_url);
     setProductPhotoUrl(establishment.product_photo_url);
@@ -314,6 +319,7 @@ const AffiliateEdit: React.FC = () => {
       shop_photo: shopPhotoFile,
       product_photo: productPhotoFile,
       behind_the_scenes_photo: behindTheScenesPhotoFile,
+      has_appointment: hasAppointment,
     };
 
     if (newData.site && newData.site?.trim().length > 0) {
@@ -734,8 +740,7 @@ const AffiliateEdit: React.FC = () => {
                     </IonRadioGroup>
                   </FieldWrapper>
 
-                  {!hasAppointment && (
-                    <>
+
                       { /* Horários de funcionamento */ }
                       <FieldWrapper>
                         <label>Horários de funcionamento (Para espaços físicos)</label>
@@ -744,10 +749,10 @@ const AffiliateEdit: React.FC = () => {
                           onChange={(value) =>
                             setForm((prev) => ({ ...prev, opening_hours: value }))
                           }
+                          disabled={hasAppointment}
                         />
                       </FieldWrapper>                                    
-                    </>
-                  )}
+
 
                   { /* Instagram */ }
                   <FieldWrapper>
@@ -835,9 +840,9 @@ const AffiliateEdit: React.FC = () => {
                     />
                   </FieldWrapper>
 
-                  { /* Foto do Estabelecimento */ }
+                  { /* Foto da Marca */ }
                   <FieldWrapper>
-                    <label>Foto do Estabelecimento</label>
+                    <label>Foto da Marca</label>
                     <UploadLogoColumn>
                       <input
                         type="file"
@@ -846,8 +851,8 @@ const AffiliateEdit: React.FC = () => {
                         onChange={onShopPhotoChange}
                       />
                       <p>
-                        Anexe aqui uma foto da sua loja ou espaço para que todos
-                        conheçam o coração do seu negócio.
+                        Anexe aqui uma foto da sua marca, loja ou espaço para que todos conheçam o coração do seu negócio. 
+                        <br/> Essa será utilizada como foto de capa nos resultados do aplicativo
                       </p>
                       <UploadPhoto onClick={onShopPhotoClick}>
                         <img

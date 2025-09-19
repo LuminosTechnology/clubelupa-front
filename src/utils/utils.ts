@@ -18,4 +18,13 @@ export class TypeValidations{
     return !value;
   }
 
+    /**
+   * Verifica se uma variável booleana é nula ou indefinida.
+   * @param value A booleana a ser verificada.
+   * @returns Retorna true se a booleana for nula ou indefinida, caso contrário, retorna false.
+   */
+  public static boolIsNull(value: boolean | undefined | null): boolean {
+    return value === null || value === undefined;
+  }
+
 }
