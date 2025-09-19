@@ -43,6 +43,8 @@ import {
   UploadPhoto,
 } from "./AffiliateEdit.style";
 import { OpeningHoursForm } from "./components/OpeningHoursForm";
+import { strIsNullOrEmpty } from "../../utils/utils";
+import { TypeValidations } from "../../utils/utils";
 
 /* ---------- estado (todos campos opcionais) ------------------- */
 
@@ -191,8 +193,7 @@ const AffiliateEdit: React.FC = () => {
 
   const onShopPhotoClick = () => shopPhotoFileRef.current?.click();
   const onProductPhotoClick = () => productPhotoFileRef.current?.click();
-  const onBehindTheScenesPhotoClick = () =>
-    behindTheScenesFileRef.current?.click();
+  const onBehindTheScenesPhotoClick = () => behindTheScenesFileRef.current?.click();
 
   const onShopPhotoChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const file = e.target.files?.[0];
@@ -334,6 +335,15 @@ const AffiliateEdit: React.FC = () => {
       newErrors.site = "Informe o site ou Instagram";
     }
 
+    if (TypeValidations.stringIsNullOrEmpty(newData.name)) newErrors.name = "Nome do Local é obrigatório";
+
+    if (TypeValidations.arrayNumberIsNullOrEmpty(newData.attributes)) newErrors.attributes = "É obrigatório conter ao menos um atributo";
+
+    if (TypeValidations.stringIsNullOrEmpty(newData.description)) newErrors.description = "Descrição é obrigatório";
+
+    if (!newData.shop_photo && TypeValidations.stringIsNullOrEmpty(shopPhotoUrl))
+      newErrors.shop_photo = "A foto do estabeecimento é obrigatória";
+
     setErrors(newErrors);
 
     setForm(newData);
@@ -422,6 +432,9 @@ const AffiliateEdit: React.FC = () => {
                         setForm({ ...form, name: e.target.value })
                       }
                     />
+                    {errors.name && (
+                      <ErrorMessage>{errors.name}</ErrorMessage>
+                    )}                    
                   </FieldWrapper>
                   <FieldWrapper>
                     <label>Celular | WhatsApp</label>
@@ -451,6 +464,7 @@ const AffiliateEdit: React.FC = () => {
                     <input />
                   </FieldWrapper> */}
 
+                  { /* Possui endereço físico? */ }
                   <FieldWrapper>
                     <label>Possui endereço físico?</label>
                     <IonRadioGroup
@@ -510,6 +524,7 @@ const AffiliateEdit: React.FC = () => {
                         />
                       </FieldWrapper>
 
+                      {/* Rua */}
                       <FieldWrapper>
                         <label>Rua</label>
                         <input
@@ -529,6 +544,7 @@ const AffiliateEdit: React.FC = () => {
                         )}
                       </FieldWrapper>
 
+                      {/*Número*/}
                       <FieldWrapper>
                         <label>Número</label>
                         <input
@@ -548,6 +564,7 @@ const AffiliateEdit: React.FC = () => {
                         )}
                       </FieldWrapper>
 
+                        {/*Complemento*/}
                       <FieldWrapper>
                         <label>Complemento</label>
                         <input
@@ -564,6 +581,7 @@ const AffiliateEdit: React.FC = () => {
                         />
                       </FieldWrapper>
 
+                      {/*Cidade*/}
                       <FieldWrapper>
                         <label>Cidade</label>
                         <input
@@ -583,6 +601,7 @@ const AffiliateEdit: React.FC = () => {
                         )}
                       </FieldWrapper>
 
+                      {/*UF*/}
                       <FieldWrapper>
                         <label>UF</label>
                         <input
@@ -605,6 +624,7 @@ const AffiliateEdit: React.FC = () => {
                     </>
                   )}
 
+                  {/*Categoria Principal*/}
                   <FieldWrapper>
                     <label>Categoria Principal</label>
                     <CustomSelect
@@ -633,6 +653,7 @@ const AffiliateEdit: React.FC = () => {
                     </CustomSelect>
                   </FieldWrapper>
 
+                  {/*Categorias Secundárias*/}
                   {selectedCategory && selectedCategory.children.length > 0 && (
                     <FieldWrapper>
                       <label>Categorias Secundárias</label>
@@ -661,6 +682,7 @@ const AffiliateEdit: React.FC = () => {
                     </FieldWrapper>
                   )}
 
+                  { /* Atributos */ }
                   <FieldWrapper>
                     <label>Atributos</label>
                     <CustomSelect
@@ -689,8 +711,12 @@ const AffiliateEdit: React.FC = () => {
                           </IonSelectOption>
                         ))}
                     </CustomSelect>
+                    {errors.attributes && (
+                      <ErrorMessage>{errors.attributes}</ErrorMessage>
+                    )}                      
                   </FieldWrapper>
 
+                  { /* Horários de funcionamento */ }
                   <FieldWrapper>
                     <label>Horários de funcionamento</label>
                     <OpeningHoursForm
@@ -701,6 +727,7 @@ const AffiliateEdit: React.FC = () => {
                     />
                   </FieldWrapper>
 
+                  { /* Instagram */ }
                   <FieldWrapper>
                     <label>Instagram</label>
                     <SiteContainer>
@@ -720,6 +747,7 @@ const AffiliateEdit: React.FC = () => {
                     )}
                   </FieldWrapper>
 
+                  { /* Site */ }
                   <FieldWrapper>
                     <label>Site</label>
                     <input
@@ -736,6 +764,7 @@ const AffiliateEdit: React.FC = () => {
                     {errors.site && <ErrorMessage>{errors.site}</ErrorMessage>}
                   </FieldWrapper>
 
+                  { /* Descrição */ }
                   <TextAreaWrapper>
                     <label>Descrição</label>
                     <textarea
@@ -745,8 +774,12 @@ const AffiliateEdit: React.FC = () => {
                         setForm({ ...form, description: e.target.value })
                       }
                     />
+                      {errors.description && (
+                        <ErrorMessage>{errors.description}</ErrorMessage>
+                      )}                    
                   </TextAreaWrapper>
 
+                  { /* Razão Social */ }
                   <FieldWrapper>
                     <label>Razão Social</label>
                     <input
@@ -757,6 +790,7 @@ const AffiliateEdit: React.FC = () => {
                     />
                   </FieldWrapper>
 
+                  { /* CNPJ */ }
                   <FieldWrapper>
                     <label>CNPJ</label>
                     <InputMask
@@ -768,6 +802,7 @@ const AffiliateEdit: React.FC = () => {
                     />
                   </FieldWrapper>
 
+                  { /* Tempo de Empresa */ }
                   <FieldWrapper>
                     <label>Tempo de Empresa</label>
                     <input
@@ -778,6 +813,7 @@ const AffiliateEdit: React.FC = () => {
                     />
                   </FieldWrapper>
 
+                  { /* Foto do Estabelecimento */ }
                   <FieldWrapper>
                     <label>Foto do Estabelecimento</label>
                     <UploadLogoColumn>
@@ -798,8 +834,12 @@ const AffiliateEdit: React.FC = () => {
                         />
                       </UploadPhoto>
                     </UploadLogoColumn>
+                      {errors.shop_photo && (
+                        <ErrorMessage>{errors.shop_photo}</ErrorMessage>
+                      )}                        
                   </FieldWrapper>
 
+                  { /* Foto do Produto */ }
                   <FieldWrapper>
                     <label>Foto do Produto</label>
                     <UploadLogoColumn>
@@ -822,6 +862,7 @@ const AffiliateEdit: React.FC = () => {
                     </UploadLogoColumn>
                   </FieldWrapper>
 
+                  { /* Foto dos Bastidores */ }
                   <FieldWrapper>
                     <label>Foto dos Bastidores</label>
                     <UploadLogoColumn>
@@ -847,6 +888,7 @@ const AffiliateEdit: React.FC = () => {
                       </UploadPhoto>
                     </UploadLogoColumn>
                   </FieldWrapper>
+
                   {Object.keys(errors).length > 0 && (
                     <ErrorMessage style={{ marginBottom: "16px" }}>
                       Por favor, corrija os campos acima para continuar.
