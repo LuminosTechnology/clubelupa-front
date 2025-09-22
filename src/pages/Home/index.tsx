@@ -54,9 +54,13 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      if (user.is_affiliate && !user.is_payed) {
+      
+      const approvedStatus = user.establishments ? +user.establishments[0].approved_status : 1;
+
+      if (user.is_affiliate && !user.is_payed && ( approvedStatus == 2 ) ) {
         setDisplayPaymentWarning(true);
       }
+
     }
   }, []);
 
