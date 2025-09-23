@@ -5,16 +5,24 @@ import {
   useIonViewWillEnter,
 } from "@ionic/react";
 import React, { useEffect, useRef, useState } from "react";
-import { useHistory } from "react-router";
+import { useHistory } from "react-router-dom";
 import Header from "../../components/Header";
 import Map from "../../components/Map";
 import { useAuthContext } from "../../contexts/AuthContext";
+import { useSubscriptionAlert } from "../../hooks/useSubscriptionAlert";
 import { HomeBottomSheet } from "./components/home-bottom-sheet";
 
 const Home: React.FC = () => {
   const history = useHistory();
   const { user } = useAuthContext();
-  const [displayPaymentWarning, setDisplayPaymentWarning] = useState(false);
+  const { 
+    displayPaymentWarning, 
+    setDisplayPaymentWarning, 
+    timeRemaining, 
+    alertNumber, 
+    alertMessage, 
+    checkAndShowAlert 
+  } = useSubscriptionAlert();
 
   const [searchValue, setSearchValue] = useState("");
 
@@ -53,23 +61,15 @@ const Home: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (user) {
-      
-      const approvedStatus = user.establishments ? +user.establishments[0].approved_status : 1;
-
-      if (user.is_affiliate && !user.is_payed && ( approvedStatus == 2 ) ) {
-        setDisplayPaymentWarning(true);
-      }
-
-    }
-  }, []);
+    checkAndShowAlert();
+  }, [user, checkAndShowAlert]);
 
   return (
     <IonPage>
       <IonAlert
         isOpen={displayPaymentWarning}
-        title="Atenção"
-        message={`Seu espaço está quase garantido! Para oficializar e concluir o cadastro, oficialize a sua assinatura como afiliado Lupa!`}
+        title={`Alerta ${alertNumber}`}
+        message={`${alertMessage}\n\nTempo restante: ${timeRemaining}.\n\nSeu espaço está quase garantido!\nPara oficializar e concluir o cadastro, oficialize a sua assinatura como afiliado Lupa!`}
         buttons={[
           {
             text: "DEIXAR PARA DEPOIS",

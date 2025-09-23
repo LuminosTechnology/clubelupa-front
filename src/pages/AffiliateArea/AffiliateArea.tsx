@@ -3,7 +3,7 @@
  * Área privada do Afiliado – busca automaticamente o primeiro
  * afiliado vinculado ao token (não precisa de :id na rota)
  * ────────────────────────────────────────────────────────────── */
-import { IonContent, IonPage } from "@ionic/react";
+import { IonAlert, IonContent, IonPage } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
@@ -37,8 +37,9 @@ import {
   default as relatoriosIcon,
 } from "../../assets/relatorios.svg";
 import { useAuthContext } from "../../contexts/AuthContext";
+import { useSubscriptionAlert } from "../../hooks/useSubscriptionAlert";
 
-/* ─── Botão “Sair” centralizado ───────────────────────────────── */
+/* ─── Botão "Sair" centralizado ───────────────────────────────── */
 const LogoutButton = styled(Button)`
   display: block;
   margin: 0 auto;
@@ -49,6 +50,14 @@ const LogoutButton = styled(Button)`
 const AffiliateArea: React.FC = () => {
   const history = useHistory();
   const { user } = useAuthContext();
+  const { 
+    displayPaymentWarning, 
+    setDisplayPaymentWarning, 
+    timeRemaining, 
+    alertNumber, 
+    alertMessage, 
+    checkAndShowAlert 
+  } = useSubscriptionAlert();
   const [isApproved, setIsApproved] = useState(false);
 
   /* ─── ações ──────────────────────────────────────────────────── */
@@ -84,8 +93,35 @@ const AffiliateArea: React.FC = () => {
     fetchEstablishment();
   }, [user, establishment]);
 
+  // Verificar se deve mostrar o alerta quando não está aprovado
+  useEffect(() => {
+    checkAndShowAlert();
+  }, [user, checkAndShowAlert]);
+
   return (
     <IonPage>
+      <IonAlert
+        isOpen={displayPaymentWarning}
+        title={`Alerta ${alertNumber}`}
+        message={`${alertMessage}\n\nTempo restante: ${timeRemaining}.\n\nSeu espaço está quase garantido!\nPara oficializar e concluir o cadastro, oficialize a sua assinatura como afiliado Lupa!`}
+        buttons={[
+          {
+            text: "DEIXAR PARA DEPOIS",
+            role: "cancel",
+            handler: () => {
+              setDisplayPaymentWarning(false);
+            },
+          },
+          {
+            text: "CONCLUIR AGORA",
+            role: "confirm",
+            handler: () => {
+              setDisplayPaymentWarning(false);
+              history.push("/affiliate/paywall");
+            },
+          },
+        ]}
+      />
       <AppHeader
         title="Área dos Afiliados"
         backgroundColor="#868950"

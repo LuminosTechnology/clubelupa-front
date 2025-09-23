@@ -40,6 +40,7 @@ import "@ionic/react/css/text-transformation.css";
 import "@ionic/react/css/typography.css";
 import { PrivateRoute, PublicRoute } from "./components/Routes";
 import { useAuthContext } from "./contexts/AuthContext";
+import { NavigationProvider } from "./contexts/NavigationContext";
 import VerifyEmail from "./pages/VerifyEmail/VerifyEmail";
 import "./theme/variables.css";
 
@@ -103,8 +104,9 @@ const App: React.FC = () => {
   return (
     <IonApp>
       <GlobalFonts />
-      <IonReactRouter key={isAuthenticated ? "auth" : "no-auth"}>
-        <IonRouterOutlet>
+      <NavigationProvider>
+        <IonReactRouter key={isAuthenticated ? "auth" : "no-auth"}>
+          <IonRouterOutlet>
           <PublicRoute exact path="/login" component={Login} />
           <PublicRoute exact path="/register" component={Register} />
           <PublicRoute
@@ -213,8 +215,9 @@ const App: React.FC = () => {
           <PrivateRoute exact path="/home" component={Home} />
 
           <Redirect exact from="/" to={isAuthenticated ? "/home" : "/login"} />
-        </IonRouterOutlet>
-      </IonReactRouter>
+          </IonRouterOutlet>
+        </IonReactRouter>
+      </NavigationProvider>
     </IonApp>
   );
 };
