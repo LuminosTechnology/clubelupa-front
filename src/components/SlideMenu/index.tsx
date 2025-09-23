@@ -9,6 +9,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import { LOCAL_STORAGE_KEYS } from "../../config/constants";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { useNavigationContext } from "../../contexts/NavigationContext";
+import { useSubscriptionAlert } from "../../hooks/useSubscriptionAlert";
 import { logout } from "../../services/auth-service";
 import {
   CloseButton,
@@ -29,6 +30,7 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
   const location = useLocation();
   const { setIsAuthenticated, user, setUser } = useAuthContext();
   const { setIsMainMenuNavigation } = useNavigationContext();
+  const { checkAndShowAlert } = useSubscriptionAlert();
 
   /* ---------- fecha menu quando a rota mudar ----------------- */
   const prevPath = useRef(location.pathname);
@@ -120,8 +122,7 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
                       !user.is_payed &&
                       establishment?.approved_status === "2"
                     ) {
-                      // Redirecionar para a Home para mostrar o alerta
-                      history.push("/home");
+                      checkAndShowAlert(true);
                       onClose();
                       return;
                     }

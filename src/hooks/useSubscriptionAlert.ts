@@ -20,6 +20,7 @@ export const useSubscriptionAlert = () => {
   const [timeRemaining, setTimeRemaining] = useState("");
   const [alertNumber, setAlertNumber] = useState(0);
   const [alertMessage, setAlertMessage] = useState("");
+  const [hasShownAlert, setHasShownAlert] = useState(false);
 
   // Função para calcular o tempo restante
   const calculateTimeRemaining = (subscriptionDate: Date): TimeInfo => {
@@ -108,12 +109,12 @@ export const useSubscriptionAlert = () => {
   };
 
   // Função para verificar se deve mostrar o alerta
-  const checkAndShowAlert = () => {
+  const checkAndShowAlert = (forceShow = false) => {
     if (!user) return;
 
     const approvedStatus = user.establishments ? +user.establishments[0].approved_status : 1;
 
-    if (user.is_affiliate && !user.is_payed && (approvedStatus === 2)) {
+    if (user.is_affiliate && !user.is_payed && (approvedStatus === 2) && (forceShow || !hasShownAlert)) {
       // Pega a data de criação do usuário
       const subscriptionDate = user.created_at 
         ? new Date(String(user.created_at.default || user.created_at)) 
@@ -121,16 +122,18 @@ export const useSubscriptionAlert = () => {
       
       const timeInfo = calculateTimeRemaining(subscriptionDate);
       
-      // Formata o tempo restante
+      // Formata o tempo restante apenas no último dia (menos de 24 horas)
       let timeString = "";
-      if (timeInfo.days > 0) {
-        timeString = `${timeInfo.days}d ${timeInfo.hours}h ${timeInfo.minutes}m`;
-      } else if (timeInfo.hours > 0) {
-        timeString = `${timeInfo.hours}h ${timeInfo.minutes}m ${timeInfo.seconds}s`;
-      } else if (timeInfo.minutes > 0) {
-        timeString = `${timeInfo.minutes}m ${timeInfo.seconds}s`;
-      } else {
-        timeString = `${timeInfo.seconds}s`;
+      if (timeInfo.totalHours <= 24) {
+        if (timeInfo.days > 0) {
+          timeString = `${timeInfo.days}d ${timeInfo.hours}h ${timeInfo.minutes}m`;
+        } else if (timeInfo.hours > 0) {
+          timeString = `${timeInfo.hours}h ${timeInfo.minutes}m ${timeInfo.seconds}s`;
+        } else if (timeInfo.minutes > 0) {
+          timeString = `${timeInfo.minutes}m ${timeInfo.seconds}s`;
+        } else {
+          timeString = `${timeInfo.seconds}s`;
+        }
       }
       
       setTimeRemaining(timeString);
@@ -143,8 +146,15 @@ export const useSubscriptionAlert = () => {
       // Mostra o alerta apenas se ainda há tempo restante
       if (timeInfo.totalHours > 0) {
         setDisplayPaymentWarning(true);
+        if (!forceShow) {
+          setHasShownAlert(true);
+        }
       }
     }
+  };
+
+  const closeAlert = () => {
+    setDisplayPaymentWarning(false);
   };
 
   return {
@@ -153,6 +163,7 @@ export const useSubscriptionAlert = () => {
     timeRemaining,
     alertNumber,
     alertMessage,
-    checkAndShowAlert
+    checkAndShowAlert,
+    closeAlert
   };
 };

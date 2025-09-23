@@ -56,7 +56,8 @@ const AffiliateArea: React.FC = () => {
     timeRemaining, 
     alertNumber, 
     alertMessage, 
-    checkAndShowAlert 
+    checkAndShowAlert,
+    closeAlert
   } = useSubscriptionAlert();
   const [isApproved, setIsApproved] = useState(false);
 
@@ -93,30 +94,33 @@ const AffiliateArea: React.FC = () => {
     fetchEstablishment();
   }, [user, establishment]);
 
-  // Verificar se deve mostrar o alerta quando não está aprovado
+  // Verificar se deve bloquear acesso e mostrar alerta
   useEffect(() => {
-    checkAndShowAlert();
-  }, [user, checkAndShowAlert]);
+    if (user?.is_affiliate && !user.is_payed && establishment?.approved_status === "2") {
+      // Bloquear acesso e mostrar alerta (forçar exibição)
+      checkAndShowAlert(true);
+    }
+  }, [user, establishment, checkAndShowAlert]);
 
   return (
     <IonPage>
       <IonAlert
         isOpen={displayPaymentWarning}
         title={`Alerta ${alertNumber}`}
-        message={`${alertMessage}\n\nTempo restante: ${timeRemaining}.\n\nSeu espaço está quase garantido!\nPara oficializar e concluir o cadastro, oficialize a sua assinatura como afiliado Lupa!`}
+        message={`${alertMessage}${timeRemaining ? `\n\nTempo restante: ${timeRemaining}.` : ""}\n\nSeu espaço está quase garantido!\nPara oficializar e concluir o cadastro, oficialize a sua assinatura como afiliado Lupa!`}
         buttons={[
           {
             text: "DEIXAR PARA DEPOIS",
             role: "cancel",
             handler: () => {
-              setDisplayPaymentWarning(false);
+              closeAlert();
             },
           },
           {
             text: "CONCLUIR AGORA",
             role: "confirm",
             handler: () => {
-              setDisplayPaymentWarning(false);
+              closeAlert();
               history.push("/affiliate/paywall");
             },
           },
