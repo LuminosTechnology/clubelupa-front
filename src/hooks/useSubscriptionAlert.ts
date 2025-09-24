@@ -116,8 +116,8 @@ export const useSubscriptionAlert = () => {
 
     if (user.is_affiliate && !user.is_payed && (approvedStatus === 2) && (forceShow || !hasShownAlert)) {
       // Pega a data de criação do usuário
-      const subscriptionDate = user.created_at 
-        ? new Date(String(user.created_at.default || user.created_at)) 
+      const subscriptionDate = user.establishments?.[0].approved_date 
+        ? new Date(String(user.establishments?.[0].approved_date)) 
         : new Date();
       
       const timeInfo = calculateTimeRemaining(subscriptionDate);

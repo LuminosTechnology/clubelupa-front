@@ -204,6 +204,7 @@ export interface Establishment {
   product_photo_url?: string;
   behind_the_scenes_photo_url?: string;
   created_at?: FormattedDate;
+  approved_date?: FormattedDate;
 }
 
 export interface QueryParams {
