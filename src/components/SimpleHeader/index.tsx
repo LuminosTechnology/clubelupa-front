@@ -42,6 +42,9 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   useEffect(() => {
     if (!mainMenuRoutes.includes(location.pathname)) {
       setIsMainMenuNavigation(false);
+    } else {
+      // Se estamos em uma rota do menu principal, redefinir o estado para true
+      setIsMainMenuNavigation(true);
     }
   }, [location.pathname, mainMenuRoutes, setIsMainMenuNavigation]);
 
