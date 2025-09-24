@@ -57,7 +57,8 @@ export const useSubscriptionAlert = () => {
   };
 
   // Função para determinar qual alerta mostrar
-  const getAlertInfo = (totalHours: number): AlertInfo => {
+  const getAlertInfo = (timeInfo: TimeInfo): AlertInfo => {
+    const totalHours = timeInfo.totalHours;
     if (totalHours <= 0) {
       return {
         number: 7,
@@ -70,7 +71,7 @@ export const useSubscriptionAlert = () => {
         number: 7,
         message: totalHours === 24 
           ? "Restam 23h 59m 59s para expirar sua assinatura gratuita!"
-          : `Restam ${totalHours}h para expirar sua assinatura gratuita!`
+          : `${totalHours === 1 ? "Resta" : "Restam"} ${timeInfo.hours}h ${timeInfo.minutes}m para expirar sua assinatura gratuita!`
       };
     }
     
@@ -129,6 +130,12 @@ export const useSubscriptionAlert = () => {
       
       // Teste 2: Expira em 1 hora
       // const subscriptionDate = new Date(Date.now() - (6 * 24 * 60 * 60 * 1000) - (23 * 60 * 60 * 1000));
+
+      // Teste 3: Expira em 3 horas
+      // const subscriptionDate = new Date(Date.now() - (7 * 24 * 60 * 60 * 1000) + (3 * 60 * 60 * 1000));
+      
+      // Teste: Expira em 20h45min (20.75 horas)
+      // const subscriptionDate = new Date(Date.now() - (7 * 24 * 60 * 60 * 1000) + (20 * 60 * 60 * 1000) + (45 * 60 * 1000));
       
       // Teste 3: Expira em 1 dia
       // const subscriptionDate = new Date(Date.now() - (6 * 24 * 60 * 60 * 1000));
@@ -166,7 +173,7 @@ export const useSubscriptionAlert = () => {
       setTimeRemaining(timeString);
       
       // Determina qual alerta mostrar
-      const alertInfo = getAlertInfo(timeInfo.totalHours);
+      const alertInfo = getAlertInfo(timeInfo);
       setAlertNumber(alertInfo.number);
       setAlertMessage(alertInfo.message);
       
