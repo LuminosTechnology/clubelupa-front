@@ -1,3 +1,4 @@
+import { IonAlert } from "@ionic/react";
 import styled from "styled-components";
 
 export const Container = styled.div`
@@ -97,5 +98,10 @@ export const UserDataContainer = styled.div`
         border-bottom: none;
       }
     }
+  }
+`;
+export const StyledAlert = styled(IonAlert)`
+  .alert-message {
+    white-space: pre-line; /* Faz o \n virar quebra de linha */
   }
 `;

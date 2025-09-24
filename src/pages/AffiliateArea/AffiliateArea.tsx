@@ -20,6 +20,7 @@ import {
   Paragraph,
   ProfilePhoto,
   ProfileWrapper,
+  StyledAlert,
   SubInfo,
   Title,
   WarningButton,
@@ -52,9 +53,6 @@ const AffiliateArea: React.FC = () => {
   const { user } = useAuthContext();
   const { 
     displayPaymentWarning, 
-    setDisplayPaymentWarning, 
-    timeRemaining, 
-    alertNumber, 
     alertMessage, 
     checkAndShowAlert,
     closeAlert
@@ -104,10 +102,14 @@ const AffiliateArea: React.FC = () => {
 
   return (
     <IonPage>
-      <IonAlert
+      <StyledAlert
         isOpen={displayPaymentWarning}
-        title={`Alerta ${alertNumber}`}
-        message={`${alertMessage}${timeRemaining ? `\n\nTempo restante: ${timeRemaining}.` : ""}\n\nSeu espaço está quase garantido!\nPara oficializar e concluir o cadastro, oficialize a sua assinatura como afiliado Lupa!`}
+        title={`Seja bem-vindo(a) ao Lupa!`}
+        message={
+          `Seu espaço está quase garantido!\n\n` +
+          `Para oficializar e concluir o cadastro, oficialize a sua assinatura como afiliado Lupa!\n\n` +
+          `(${alertMessage})`
+        }
         buttons={[
           {
             text: "DEIXAR PARA DEPOIS",

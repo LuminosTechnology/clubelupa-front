@@ -204,7 +204,12 @@ export interface Establishment {
   product_photo_url?: string;
   behind_the_scenes_photo_url?: string;
   created_at?: FormattedDate;
-  approved_date?: FormattedDate;
+  approved_status_date?: {
+    default: string;
+    short: string;
+    short_with_time: string;
+    human: string;
+  };
 }
 
 export interface QueryParams {
