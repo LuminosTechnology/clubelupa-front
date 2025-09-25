@@ -682,7 +682,23 @@ const AffiliateRegister: React.FC = () => {
           <TermsParagraph>
             Ao entrar, você concorda com nossos
             <br />
-            <TermsLink href="#oi">Termos e política de Privacidade</TermsLink>
+            <div>
+              <TermsLink
+                onClick={() =>
+                  window.open("https://app.clubelupa.com.br/termos-e-condicoes", "_blank", "noopener")
+                }
+              >
+                Termos
+              </TermsLink>
+              &nbsp;e&nbsp;
+              <TermsLink
+                onClick={() =>
+                  window.open("https://app.clubelupa.com.br/politica-de-privacidade", "_blank", "noopener")
+                }
+              >
+                política de privacidade
+              </TermsLink> 
+            </div>               
           </TermsParagraph>
         </AffiliateContainer>
       </IonContent>

@@ -43,6 +43,7 @@ import {
   UploadPhoto,
 } from "./AffiliateEdit.style";
 import { OpeningHoursForm } from "./components/OpeningHoursForm";
+import { TypeValidations } from "../../utils/utils";
 
 /* ---------- estado (todos campos opcionais) ------------------- */
 
@@ -68,11 +69,11 @@ const AffiliateEdit: React.FC = () => {
   const [behindTheScenesPhotoUrl, setBehindTheScenesPhotoUrl] =
     useState<string>();
 
-  const [hasPhysicalAddress, setHasPhysicalAddress] = useState(true);
+  const [hasPhysicalAddress, setHasPhysicalAddress] = useState(false);
+  const [hasAppointment, setHasAppointment] = useState(false);
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [categories, setCategories] = useState<CategoryTreeNode[]>([]);
-  const [selectedCategory, setSelectedCategory] =
-    useState<CategoryTreeNode | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<CategoryTreeNode | null>(null);
   const { user } = useAuthContext();
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -93,6 +94,7 @@ const AffiliateEdit: React.FC = () => {
     instagram: "",
     site: "",
     categories: [],
+    has_appointment: false
   };
 
   const [form, setForm] =
@@ -110,7 +112,7 @@ const AffiliateEdit: React.FC = () => {
       user?.establishments[0].id
     );
 
-    console.log({ establishment });
+    //console.log(establishment)
 
     const address = establishment?.addresses[0];
 
@@ -125,8 +127,6 @@ const AffiliateEdit: React.FC = () => {
     const mainCategoryNode: CategoryTreeNode | undefined = categories.find(
       (category) => category.id === mainCategory?.id
     );
-
-    console.log({ mainCategoryNode, mainCategory, categories });
 
     if (mainCategoryNode) {
       setSelectedCategory(mainCategoryNode);
@@ -169,11 +169,14 @@ const AffiliateEdit: React.FC = () => {
       instagram: cleanInstagram,
       site: cleanSite,
       opening_hours: establishment?.opening_hours,
+      has_appointment: establishment.has_appointment,
     }));
 
-    // if (establishment?.addresses && establishment.addresses.length > 0) {
-    //   setHasPhysicalAddress(true);
-    // }
+    if (establishment?.addresses && establishment.addresses.length > 0) {
+      setHasPhysicalAddress(true);
+    }
+
+    if (!TypeValidations.boolIsNull(establishment.has_appointment)) setHasAppointment(establishment.has_appointment);
 
     setShopPhotoUrl(establishment.shop_photo_url);
     setProductPhotoUrl(establishment.product_photo_url);
@@ -195,8 +198,7 @@ const AffiliateEdit: React.FC = () => {
 
   const onShopPhotoClick = () => shopPhotoFileRef.current?.click();
   const onProductPhotoClick = () => productPhotoFileRef.current?.click();
-  const onBehindTheScenesPhotoClick = () =>
-    behindTheScenesFileRef.current?.click();
+  const onBehindTheScenesPhotoClick = () => behindTheScenesFileRef.current?.click();
 
   const onShopPhotoChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const file = e.target.files?.[0];
@@ -317,6 +319,7 @@ const AffiliateEdit: React.FC = () => {
       shop_photo: shopPhotoFile,
       product_photo: productPhotoFile,
       behind_the_scenes_photo: behindTheScenesPhotoFile,
+      has_appointment: hasAppointment,
     };
 
     if (newData.site && newData.site?.trim().length > 0) {
@@ -337,6 +340,15 @@ const AffiliateEdit: React.FC = () => {
       newErrors.instagram = "Informe o Instagram ou site";
       newErrors.site = "Informe o site ou Instagram";
     }
+
+    if (TypeValidations.stringIsNullOrEmpty(newData.name)) newErrors.name = "Nome do Local é obrigatório";
+
+    if (TypeValidations.arrayNumberIsNullOrEmpty(newData.attributes)) newErrors.attributes = "É obrigatório conter ao menos um atributo";
+
+    if (TypeValidations.stringIsNullOrEmpty(newData.description)) newErrors.description = "Descrição é obrigatório";
+
+    if (!newData.shop_photo && TypeValidations.stringIsNullOrEmpty(shopPhotoUrl))
+      newErrors.shop_photo = "A foto do estabeecimento é obrigatória";
 
     setErrors(newErrors);
 
@@ -426,6 +438,9 @@ const AffiliateEdit: React.FC = () => {
                         setForm({ ...form, name: e.target.value })
                       }
                     />
+                    {errors.name && (
+                      <ErrorMessage>{errors.name}</ErrorMessage>
+                    )}                    
                   </FieldWrapper>
                   <FieldWrapper>
                     <label>Celular | WhatsApp</label>
@@ -455,6 +470,7 @@ const AffiliateEdit: React.FC = () => {
                     <input />
                   </FieldWrapper> */}
 
+                  { /* Possui endereço físico? */ }
                   <FieldWrapper>
                     <label>Possui endereço físico?</label>
                     <IonRadioGroup
@@ -514,6 +530,7 @@ const AffiliateEdit: React.FC = () => {
                         />
                       </FieldWrapper>
 
+                      {/* Rua */}
                       <FieldWrapper>
                         <label>Rua</label>
                         <input
@@ -533,6 +550,7 @@ const AffiliateEdit: React.FC = () => {
                         )}
                       </FieldWrapper>
 
+                      {/*Número*/}
                       <FieldWrapper>
                         <label>Número</label>
                         <input
@@ -552,6 +570,7 @@ const AffiliateEdit: React.FC = () => {
                         )}
                       </FieldWrapper>
 
+                        {/*Complemento*/}
                       <FieldWrapper>
                         <label>Complemento</label>
                         <input
@@ -568,6 +587,7 @@ const AffiliateEdit: React.FC = () => {
                         />
                       </FieldWrapper>
 
+                      {/*Cidade*/}
                       <FieldWrapper>
                         <label>Cidade</label>
                         <input
@@ -587,6 +607,7 @@ const AffiliateEdit: React.FC = () => {
                         )}
                       </FieldWrapper>
 
+                      {/*UF*/}
                       <FieldWrapper>
                         <label>UF</label>
                         <input
@@ -609,6 +630,7 @@ const AffiliateEdit: React.FC = () => {
                     </>
                   )}
 
+                  {/*Categoria Principal*/}
                   <FieldWrapper>
                     <label>Categoria Principal</label>
                     <CustomSelect
@@ -637,6 +659,7 @@ const AffiliateEdit: React.FC = () => {
                     </CustomSelect>
                   </FieldWrapper>
 
+                  {/*Categorias Secundárias*/}
                   {selectedCategory && selectedCategory.children.length > 0 && (
                     <FieldWrapper>
                       <label>Categorias Secundárias</label>
@@ -665,6 +688,7 @@ const AffiliateEdit: React.FC = () => {
                     </FieldWrapper>
                   )}
 
+                  { /* Atributos */ }
                   <FieldWrapper>
                     <label>Atributos</label>
                     <CustomSelect
@@ -693,18 +717,44 @@ const AffiliateEdit: React.FC = () => {
                           </IonSelectOption>
                         ))}
                     </CustomSelect>
+                    {errors.attributes && (
+                      <ErrorMessage>{errors.attributes}</ErrorMessage>
+                    )}                      
                   </FieldWrapper>
 
+                  { /* Necessário Agendamento? */ }
                   <FieldWrapper>
-                    <label>Horários de funcionamento</label>
-                    <OpeningHoursForm
-                      value={form.opening_hours}
-                      onChange={(value) =>
-                        setForm((prev) => ({ ...prev, opening_hours: value }))
-                      }
-                    />
+                    <label>Necessário Agendamento?</label>
+                    <IonRadioGroup
+                      value={hasAppointment}
+                      onIonChange={(e) => setHasAppointment(e.detail.value)}
+                    >
+                      <AffiliateUpdateRadioContainer>
+                        <IonRadio value={true} labelPlacement="end">
+                          Sim
+                        </IonRadio>
+                        <IonRadio value={false} labelPlacement="end">
+                          Não
+                        </IonRadio>
+                      </AffiliateUpdateRadioContainer>
+                    </IonRadioGroup>
                   </FieldWrapper>
 
+
+                      { /* Horários de funcionamento */ }
+                      <FieldWrapper>
+                        <label>Horários de funcionamento (Para espaços físicos)</label>
+                        <OpeningHoursForm
+                          value={form.opening_hours}
+                          onChange={(value) =>
+                            setForm((prev) => ({ ...prev, opening_hours: value }))
+                          }
+                          disabled={hasAppointment}
+                        />
+                      </FieldWrapper>                                    
+
+
+                  { /* Instagram */ }
                   <FieldWrapper>
                     <label>Instagram</label>
                     <SiteContainer>
@@ -724,6 +774,7 @@ const AffiliateEdit: React.FC = () => {
                     )}
                   </FieldWrapper>
 
+                  { /* Site */ }
                   <FieldWrapper>
                     <label>Site</label>
                     <input
@@ -740,6 +791,7 @@ const AffiliateEdit: React.FC = () => {
                     {errors.site && <ErrorMessage>{errors.site}</ErrorMessage>}
                   </FieldWrapper>
 
+                  { /* Descrição */ }
                   <TextAreaWrapper>
                     <label>Descrição</label>
                     <textarea
@@ -749,8 +801,12 @@ const AffiliateEdit: React.FC = () => {
                         setForm({ ...form, description: e.target.value })
                       }
                     />
+                      {errors.description && (
+                        <ErrorMessage>{errors.description}</ErrorMessage>
+                      )}                    
                   </TextAreaWrapper>
 
+                  { /* Razão Social */ }
                   <FieldWrapper>
                     <label>Razão Social</label>
                     <input
@@ -761,6 +817,7 @@ const AffiliateEdit: React.FC = () => {
                     />
                   </FieldWrapper>
 
+                  { /* CNPJ */ }
                   <FieldWrapper>
                     <label>CNPJ</label>
                     <InputMask
@@ -772,6 +829,7 @@ const AffiliateEdit: React.FC = () => {
                     />
                   </FieldWrapper>
 
+                  { /* Tempo de Empresa */ }
                   <FieldWrapper>
                     <label>Tempo de Empresa</label>
                     <input
@@ -782,8 +840,9 @@ const AffiliateEdit: React.FC = () => {
                     />
                   </FieldWrapper>
 
+                  { /* Foto da Marca */ }
                   <FieldWrapper>
-                    <label>Foto do Estabelecimento</label>
+                    <label>Foto da Marca</label>
                     <UploadLogoColumn>
                       <input
                         type="file"
@@ -792,8 +851,8 @@ const AffiliateEdit: React.FC = () => {
                         onChange={onShopPhotoChange}
                       />
                       <p>
-                        Anexe aqui uma foto da sua loja ou espaço para que todos
-                        conheçam o coração do seu negócio.
+                        Anexe aqui uma foto da sua marca, loja ou espaço para que todos conheçam o coração do seu negócio. 
+                        <br/> Essa será utilizada como foto de capa nos resultados do aplicativo
                       </p>
                       <UploadPhoto onClick={onShopPhotoClick}>
                         <img
@@ -802,8 +861,12 @@ const AffiliateEdit: React.FC = () => {
                         />
                       </UploadPhoto>
                     </UploadLogoColumn>
+                      {errors.shop_photo && (
+                        <ErrorMessage>{errors.shop_photo}</ErrorMessage>
+                      )}                        
                   </FieldWrapper>
 
+                  { /* Foto do Produto */ }
                   <FieldWrapper>
                     <label>Foto do Produto</label>
                     <UploadLogoColumn>
@@ -826,6 +889,7 @@ const AffiliateEdit: React.FC = () => {
                     </UploadLogoColumn>
                   </FieldWrapper>
 
+                  { /* Foto dos Bastidores */ }
                   <FieldWrapper>
                     <label>Foto dos Bastidores</label>
                     <UploadLogoColumn>
@@ -851,6 +915,7 @@ const AffiliateEdit: React.FC = () => {
                       </UploadPhoto>
                     </UploadLogoColumn>
                   </FieldWrapper>
+
                   {Object.keys(errors).length > 0 && (
                     <ErrorMessage style={{ marginBottom: "16px" }}>
                       Por favor, corrija os campos acima para continuar.

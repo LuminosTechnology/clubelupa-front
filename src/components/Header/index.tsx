@@ -12,6 +12,10 @@ import SlideMenu from "../SlideMenu";
 import newSearchIcon from "../../assets/new_search.svg";
 import newMenuIcon from "../../assets/new_menu.svg";
 import { search } from "ionicons/icons";
+
+import { MenuIconWrapper } from "./components/notificationIcon.style";
+import { NotificationBadge } from "./components/notificationIcon";
+
 type Props = {
   onSearchChange: (value: string) => void;
 };
@@ -44,12 +48,14 @@ const Header: React.FC<Props> = ({ onSearchChange }) => {
             />
           </SearchWrapper>
 
-          {/* ícone de menu */}
-          <MenuIcon
-            src={newMenuIcon}
-            alt="Menu"
-            onClick={() => setIsMenuOpen(true)}
-          />
+          <MenuIconWrapper>
+            <NotificationBadge />
+            <MenuIcon
+              src={newMenuIcon}
+              alt="Menu"
+              onClick={() => setIsMenuOpen(true)}
+            />
+          </MenuIconWrapper>
         </BarWrapper>
       </HeaderContainer>
 

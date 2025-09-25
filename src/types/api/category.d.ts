@@ -9,6 +9,7 @@ export interface Category {
   description: string | null;
   color: string;
   icon_url: string;
+  icon_highlight_url: string;
   original_locale: string | null;
   is_active: boolean;
   is_active_text: string;

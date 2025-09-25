@@ -135,11 +135,12 @@ const Register: React.FC = () => {
             <ErrorMessage>{errors.nome_completo}</ErrorMessage>
           )}
 
-          <FloatingInput
+           <FloatingInput
             label="Data de Nascimento"
             value={form.birth_date}
             onChange={(v) => setForm({ ...form, birth_date: v })}
-            type="number"
+            type="text"
+            inputMode="numeric"
             mask="99/99/9999"
             error={!!errors.data_nascimento}
           />

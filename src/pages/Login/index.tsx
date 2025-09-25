@@ -147,13 +147,23 @@ const Login: React.FC = () => {
           {/* consentimento */}
           <TermsWrapper>
             <div>Ao entrar, você concorda com nossos</div>
-            <TermsLink
-              onClick={() =>
-                window.open("https://www.google.com", "_blank", "noopener")
-              }
-            >
-              Termos e política de privacidade
-            </TermsLink>
+            <div>
+              <TermsLink
+                onClick={() =>
+                  window.open("https://app.clubelupa.com.br/termos-e-condicoes", "_blank", "noopener")
+                }
+              >
+                Termos
+              </TermsLink>
+              &nbsp;e&nbsp;
+              <TermsLink
+                onClick={() =>
+                  window.open("https://app.clubelupa.com.br/politica-de-privacidade", "_blank", "noopener")
+                }
+              >
+                política de privacidade
+              </TermsLink> 
+            </div>           
           </TermsWrapper>
 
           {/* divisor “ou” */}

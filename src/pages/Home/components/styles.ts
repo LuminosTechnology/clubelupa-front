@@ -31,6 +31,12 @@ export const AchievementItem = styled.button`
   background-color: transparent;
   border: none;
   color: white;
+
+  &.disable{
+    img{
+      filter: grayscale(100%);
+    }
+  }
 `;
 
 export const MainPageContainer = styled.div`

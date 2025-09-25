@@ -23,7 +23,7 @@ const AffiliatePaywall: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasAffiliate, setHasAffiliate] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { refetchUser } = useAuthContext();
+  const { refetchUser, user } = useAuthContext();
 
   const handlePurchase = async () => {
     if (!affiliatePackage) return;
@@ -61,14 +61,22 @@ const AffiliatePaywall: React.FC = () => {
   };
 
   const fetchProductsAndCheckAccess = async () => {
-    setIsLoading(true);
+    setIsLoading(false);
     setError(null);
 
     if (!Capacitor.isNativePlatform() || !window.Purchases) {
       setError("Funcionalidade de assinatura não disponível no dispositivo");
-      setIsLoading(false);
+      setIsLoading(true);
       return;
     }
+
+      const approvedStatus = user && user.establishments ? +user.establishments[0].approved_status : 1;
+
+      if(approvedStatus != 2) {
+        setError("A assinatura será liberada após aprovação como afiliado");
+        setIsLoading(true)
+      }
+        
 
     try {
       const { customerInfo } = await window.Purchases.getCustomerInfo();

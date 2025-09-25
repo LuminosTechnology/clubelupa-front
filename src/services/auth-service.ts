@@ -19,6 +19,7 @@ import {
 } from "../types/api/user";
 import { LOCAL_STORAGE_KEYS } from "../config/constants";
 import { ChangePasswordRequest } from "../types/api/auth";
+import { TypeValidations } from "../utils/utils";
 
 export const login = async ({ email, password }: LoginUserRequest) => {
   const data = { email, password, device_name: "react-app" };
@@ -63,42 +64,56 @@ export const updateEstablishment = async ({
 }) => {
   const formData = new FormData();
 
+console.log(data)
+
   if (data.name) formData.append("name", data.name);
-  if (data.legal_name) formData.append("legal_name", data.legal_name);
   if (data.description) formData.append("description", data.description);
-  if (data.document_number)
-    formData.append("document_number", data.document_number);
-  if (data.company_age) formData.append("company_age", data.company_age);
-  if (data.business_model)
-    formData.append("business_model", data.business_model);
-  if (data.email) formData.append("email", data.email);
-  if (data.phone_number) formData.append("phone_number", data.phone_number);
-  if (data.whatsapp_number)
-    formData.append("whatsapp_number", data.whatsapp_number);
-  if (data.category_id !== undefined)
-    formData.append("category_id", data.category_id.toString());
+  if (data.business_model) formData.append("business_model", data.business_model);
+  if (data.category_id !== undefined) formData.append("category_id", data.category_id.toString());
   if (data.instagram) formData.append("instagram", data.instagram);
   if (data.site) formData.append("site", data.site);
+  if (!TypeValidations.boolIsNull(data.has_appointment)) formData.append("has_appointment", data.has_appointment.toString());
+
+  formData.append("legal_name", data.legal_name ?? "");
+  formData.append("document_number", data.document_number ?? "");
+  formData.append("company_age", data.company_age ?? "");
+  formData.append("email", data.email ?? "");
+  formData.append("phone_number", data.phone_number ?? "");
+  formData.append("whatsapp_number", data.whatsapp_number ?? "");
+  
   if (data.categories) {
     data.categories.forEach((category) =>
       formData.append("categories[]", category.toString())
     );
-  }
-  if (data.attributes) {
+  }  
+  
+  if (data.attributes && data.attributes.length > 0) {
     data.attributes.forEach((attribute) =>
       formData.append("attributes[]", attribute.toString())
     );
-  }
+  }//else{ formData.append("attributes[]", ""); }
 
-  if (data.opening_hours) {
+  let isOpeningHours = false;
+
+  if (data.opening_hours && !data.has_appointment) {    
+
     for (const [key, value] of Object.entries(data.opening_hours)) {
+    
       if (value && Array.isArray(value)) {
+       
         value.forEach((hour) => {
           formData.append(`opening_hours[${key}][]`, hour);
-        });
+        });       
+        
+        isOpeningHours = true;
+
       }
+
     }
   }
+
+  if ( !isOpeningHours && !data.has_appointment) { formData.append(`opening_hours[][]`, ""); }
+
 
   if (data.address) {
     for (const [key, value] of Object.entries(data.address)) {

@@ -3,7 +3,7 @@
  * Área privada do Afiliado – busca automaticamente o primeiro
  * afiliado vinculado ao token (não precisa de :id na rota)
  * ────────────────────────────────────────────────────────────── */
-import { IonContent, IonPage } from "@ionic/react";
+import { IonAlert, IonContent, IonPage } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
@@ -20,6 +20,7 @@ import {
   Paragraph,
   ProfilePhoto,
   ProfileWrapper,
+  StyledAlert,
   SubInfo,
   Title,
   WarningButton,
@@ -37,8 +38,9 @@ import {
   default as relatoriosIcon,
 } from "../../assets/relatorios.svg";
 import { useAuthContext } from "../../contexts/AuthContext";
+import { useSubscriptionAlert } from "../../hooks/useSubscriptionAlert";
 
-/* ─── Botão “Sair” centralizado ───────────────────────────────── */
+/* ─── Botão "Sair" centralizado ───────────────────────────────── */
 const LogoutButton = styled(Button)`
   display: block;
   margin: 0 auto;
@@ -49,6 +51,12 @@ const LogoutButton = styled(Button)`
 const AffiliateArea: React.FC = () => {
   const history = useHistory();
   const { user } = useAuthContext();
+  const { 
+    displayPaymentWarning, 
+    alertMessage, 
+    checkAndShowAlert,
+    closeAlert
+  } = useSubscriptionAlert();
   const [isApproved, setIsApproved] = useState(false);
 
   /* ─── ações ──────────────────────────────────────────────────── */
@@ -84,8 +92,42 @@ const AffiliateArea: React.FC = () => {
     fetchEstablishment();
   }, [user, establishment]);
 
+  // Verificar se deve bloquear acesso e mostrar alerta
+  useEffect(() => {
+    if (user?.is_affiliate && !user.is_payed && establishment?.approved_status === "2") {
+      // Bloquear acesso e mostrar alerta (forçar exibição)
+      checkAndShowAlert(true);
+    }
+  }, [user, establishment, checkAndShowAlert]);
+
   return (
     <IonPage>
+      <StyledAlert
+        isOpen={displayPaymentWarning}
+        title={`Seja bem-vindo(a) ao Lupa!`}
+        message={
+          `Seu espaço está quase garantido!\n\n` +
+          `Para oficializar e concluir o cadastro, oficialize a sua assinatura como afiliado Lupa!\n\n` +
+          `(${alertMessage})`
+        }
+        buttons={[
+          {
+            text: "DEIXAR PARA DEPOIS",
+            role: "cancel",
+            handler: () => {
+              closeAlert();
+            },
+          },
+          {
+            text: "CONCLUIR AGORA",
+            role: "confirm",
+            handler: () => {
+              closeAlert();
+              history.push("/affiliate/paywall");
+            },
+          },
+        ]}
+      />
       <AppHeader
         title="Área dos Afiliados"
         backgroundColor="#868950"

@@ -51,6 +51,8 @@ export interface UpdateAffiliateEstablishmentRequest {
 
   address?: Partial<CreateAddress>;
 
+  has_appointment: boolean;
+
   shop_photo?: File;
   product_photo?: File;
   behind_the_scenes_photo?: File;

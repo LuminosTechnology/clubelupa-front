@@ -6,7 +6,10 @@ import { IonIcon, useIonRouter } from "@ionic/react";
 import { close, logOut } from "ionicons/icons";
 import React, { useEffect, useMemo, useRef } from "react";
 import { useHistory, useLocation } from "react-router-dom";
+import { LOCAL_STORAGE_KEYS } from "../../config/constants";
 import { useAuthContext } from "../../contexts/AuthContext";
+import { useNavigationContext } from "../../contexts/NavigationContext";
+import { useSubscriptionAlert } from "../../hooks/useSubscriptionAlert";
 import { logout } from "../../services/auth-service";
 import {
   CloseButton,
@@ -16,7 +19,9 @@ import {
   MenuItems,
   MenuOverlay,
 } from "./SlideMenu.style";
-import { LOCAL_STORAGE_KEYS } from "../../config/constants";
+
+import { NotificationBadge } from "../../components/Header/components/notificationIcon";
+import { MenuIconWrapper } from "../../components/Header/components/notificationIcon.style";
 
 interface SlideMenuProps {
   isOpen: boolean;
@@ -27,6 +32,8 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
   const history = useHistory();
   const location = useLocation();
   const { setIsAuthenticated, user, setUser } = useAuthContext();
+  const { setIsMainMenuNavigation } = useNavigationContext();
+  const { checkAndShowAlert } = useSubscriptionAlert();
 
   /* ---------- fecha menu quando a rota mudar ----------------- */
   const prevPath = useRef(location.pathname);
@@ -60,6 +67,7 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
     const base = [
       { label: "Home", path: "/home", enabled: true },
       { label: "Perfil", path: "/profile", enabled: true },
+      { label: "Notificações", path: "/profile/notifications", enabled: true },
       { label: "Afiliados", path: "/affiliates", enabled: true },
       { label: "Troca de Moedas Lupa", path: "/lupacoins", enabled: true },
       { label: "Meu Plano", path: "/myplan", enabled: true },
@@ -110,12 +118,34 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
               key={item.path}
               onClick={() => {
                 if (item.enabled) {
+                  // Verificar se é a Área do Afiliado e se deve ser bloqueada
+                  if (item.path === "/affiliate/area") {
+                    const establishment = user?.establishments?.[0];
+                    if (
+                      user?.is_affiliate &&
+                      !user.is_payed &&
+                      establishment?.approved_status === "2"
+                    ) {
+                      checkAndShowAlert(true);
+                      onClose();
+                      return;
+                    }
+                  }
+
+                  // Marcar que estamos navegando entre páginas do menu principal
+                  setIsMainMenuNavigation(true);
                   history.push(item.path);
                   onClose();
                 }
               }}
             >
-              {item.label}
+              {item.label == 'Notificações' ? (
+                <MenuIconWrapper>
+                  {item.label}
+                  <NotificationBadge variant="menu" />
+                </MenuIconWrapper>
+              ) : item.label}
+
               {!item.enabled && (
                 <IonIcon
                   name="lock-closed"

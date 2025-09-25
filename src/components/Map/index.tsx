@@ -212,10 +212,19 @@ const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
             ? mainCategory.icon_url
             : "assets/affiliate_pin.png";
 
+          const iconHighlightUrl = mainCategory
+            ? mainCategory.icon_highlight_url
+            : "assets/affiliate_pin.png";            
+
+          const hasHighlight = e.has_highlight;
+
           const markerId = await gMap.addMarker({
             coordinate: location,
-            iconUrl: iconUrl,
-            iconSize: { width: 50, height: 50 },
+            iconUrl: hasHighlight ? iconHighlightUrl : iconUrl,
+            iconSize: { 
+              width: hasHighlight ? 60 : 50, 
+              height: hasHighlight ? 60 : 50 
+            },
             iconAnchor: { x: 25, y: 50 },
           });
 

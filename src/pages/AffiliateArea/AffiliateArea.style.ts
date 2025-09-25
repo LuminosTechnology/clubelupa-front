@@ -1,3 +1,4 @@
+import { IonAlert } from "@ionic/react";
 import styled from "styled-components";
 
 export const WarningText = styled.p`
@@ -104,4 +105,10 @@ export const LogoutContainer = styled.div`
   margin: 70px 0 0 0;
   display: flex;
   justify-content: center;
+`;
+
+export const StyledAlert = styled(IonAlert)`
+  .alert-message {
+    white-space: pre-line; /* Faz o \n virar quebra de linha */
+  }
 `;
