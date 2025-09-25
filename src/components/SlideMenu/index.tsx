@@ -67,7 +67,7 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
     const base = [
       { label: "Home", path: "/home", enabled: true },
       { label: "Perfil", path: "/profile", enabled: true },
-      { label: "Notificações", path: "/profile", enabled: true },
+      { label: "Notificações", path: "/profile/notifications", enabled: true },
       { label: "Afiliados", path: "/affiliates", enabled: true },
       { label: "Troca de Moedas Lupa", path: "/lupacoins", enabled: true },
       { label: "Meu Plano", path: "/myplan", enabled: true },
@@ -141,10 +141,11 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
             >
               {item.label == 'Notificações' ? (
                 <MenuIconWrapper>
-                  <>{item.label}</>
-                  <NotificationBadge />
+                  {item.label}
+                  <NotificationBadge variant="menu" />
                 </MenuIconWrapper>
               ) : item.label}
+
               {!item.enabled && (
                 <IonIcon
                   name="lock-closed"

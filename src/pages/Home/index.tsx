@@ -11,15 +11,13 @@ import Map from "../../components/Map";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { useSubscriptionAlert } from "../../hooks/useSubscriptionAlert";
 import { HomeBottomSheet } from "./components/home-bottom-sheet";
+import { StyledAlert } from "./home.style";
 
 const Home: React.FC = () => {
   const history = useHistory();
   const { user } = useAuthContext();  
   const { 
-    displayPaymentWarning, 
-    setDisplayPaymentWarning, 
-    timeRemaining, 
-    alertNumber, 
+    displayPaymentWarning,
     alertMessage, 
     checkAndShowAlert,
     closeAlert
@@ -67,20 +65,25 @@ const Home: React.FC = () => {
 
   return (
     <IonPage>
-      <IonAlert
+      <StyledAlert
         isOpen={displayPaymentWarning}
-        title={`Alerta ${alertNumber}`}
-        message={`${alertMessage}${timeRemaining ? `\n\nTempo restante: ${timeRemaining}.` : ""}\n\nSeu espaço está quase garantido!\nPara oficializar e concluir o cadastro, oficialize a sua assinatura como afiliado Lupa!`}
+        title={`Seja bem-vindo(a) ao Lupa!`}
+        message={
+          `Seu espaço está quase garantido!\n\n` +
+          `Para oficializar e concluir o cadastro, oficialize a sua assinatura como afiliado Lupa!\n\n` +
+          `(${alertMessage})`
+        }
+        cssClass="alert-multiline"
         buttons={[
           {
-            text: "DEIXAR PARA DEPOIS",
+            text: "Deixar para depois",
             role: "cancel",
             handler: () => {
               closeAlert();
             },
           },
           {
-            text: "CONCLUIR AGORA",
+            text: "Assinar agora",
             role: "confirm",
             handler: () => {
               closeAlert();

@@ -4,6 +4,7 @@ import { NotificationService } from "../services/notification-sevice";
 
 interface NotificationsContext extends Notifications { 
   refetchNotifications: () => Promise<void>; 
+  isLoading: boolean;
 }
 
 export const NotificationsContext = createContext<NotificationsContext>(
@@ -21,9 +22,26 @@ export const NotificationsProvider: React.FC<Props> = ({ children }) => {
         unread: [],
     });
 
+     const [isLoading, setIsLoading] = useState(true);
+
       const fetchNotifications = async () => {
-        const response = await NotificationService.getNotifications();
-        setNotifications(response);
+
+        setIsLoading(true);
+
+        try {
+          const response = await NotificationService.getNotifications();
+
+          if(response)
+            setNotifications(response);
+          else
+            setNotifications({ read: [], unread: [] });  
+
+        } catch (error) {
+           setNotifications({ read: [], unread: [] });
+        } finally {
+            setIsLoading(false);
+        }
+        
       };
 
         useEffect(() => {
@@ -33,6 +51,7 @@ export const NotificationsProvider: React.FC<Props> = ({ children }) => {
     const providerValue = {
       ...notifications,
       refetchNotifications: fetchNotifications,
+      isLoading
     };        
 
     return (

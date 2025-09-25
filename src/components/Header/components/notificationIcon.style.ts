@@ -1,29 +1,47 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
-export const NotificationIcon = styled.div`
+type NotificationIconProps = {
+  variant: 'header' | 'menu';
+};
+
+export const NotificationIcon = styled.div<NotificationIconProps>`
+
+  ${({ variant }) => {
+
+    switch(variant) {
+      case 'header':
+        return css`        
+          top: -1px;
+          left: 2px;        
+        `;
+      case 'menu':
+        return css`              
+          top: 0px;
+          right: -20px;         
+        `;
+    }
+
+  }}
+
   position: absolute;
-  top: -1px;
-  left: 2px;
   z-index: 9;
   
-  /* Desloca o contador para ficar bem no canto, sobrepondo o ícone */
   transform: translate(-40%, -40%);
 
   width: 16px;
   height: 16px;
-  border-radius: 50%; /* Deixa o elemento redondo */
+  border-radius: 50%;
   background-color: red;
   color: white;
   padding: 2px;
   
-  /* Centraliza o número dentro do círculo */
   display: flex;
   align-items: center;
   justify-content: center;
   
   font-size: 10px;
   font-weight: bold;
-  border: 1px solid white; /* Adiciona uma borda para destacar */
+  border: 1px solid white;
 `;
 
 export const MenuIconWrapper = styled.div`

@@ -19,6 +19,7 @@ import Login from "./pages/Login";
 import LupoCoins from "./pages/LupoCoins/LupoCoins";
 import MyPlan from "./pages/MyPlan/MyPlan";
 import Notification from "./pages/Notification/Notification";
+import NotificationsList from "./pages/Notifications/Notifications";
 import ProfilePage from "./pages/Profile/ProfilePage";
 import ProfilePageEdit from "./pages/ProfileEdit/ProfileEditPage";
 import ReccomendAndWin from "./pages/RecommendAndWin/RecommendAndWin";
@@ -198,6 +199,11 @@ const App: React.FC = () => {
             path="/profile/notification"
             component={Notification}
           />
+          <PrivateRoute
+            exact
+            path="/profile/notifications"
+            component={NotificationsList}
+          />          
           <PrivateRoute exact path="/profile/talktous" component={TalkToUs} />
           <PrivateRoute
             exact

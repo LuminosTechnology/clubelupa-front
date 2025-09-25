@@ -22,6 +22,11 @@ export const useSubscriptionAlert = () => {
   const [alertMessage, setAlertMessage] = useState("");
   const [hasShownAlert, setHasShownAlert] = useState(false);
 
+  // Reset hasShownAlert quando o usuário muda (login/logout)
+  useEffect(() => {
+    setHasShownAlert(false);
+  }, [user?.id]);
+
   // Função para calcular o tempo restante
   const calculateTimeRemaining = (subscriptionDate: Date): TimeInfo => {
     const now = new Date();
@@ -52,18 +57,21 @@ export const useSubscriptionAlert = () => {
   };
 
   // Função para determinar qual alerta mostrar
-  const getAlertInfo = (totalHours: number): AlertInfo => {
+  const getAlertInfo = (timeInfo: TimeInfo): AlertInfo => {
+    const totalHours = timeInfo.totalHours;
     if (totalHours <= 0) {
       return {
         number: 7,
-        message: "Sua assinatura gratuita expirou! Assine agora para continuar usando a Área do Afiliado."
+        message: "Seu tempo para oficializar e concluir o cadastrou expirou!"
       };
     }
     
     if (totalHours <= 24) {
       return {
         number: 7,
-        message: `Restam ${totalHours}h para expirar sua assinatura gratuita!`
+        message: totalHours === 24 
+          ? "Restam 23h 59m 59s para expirar sua assinatura gratuita!"
+          : `${totalHours === 1 ? "Resta" : "Restam"} ${timeInfo.hours}h ${timeInfo.minutes}m para expirar sua assinatura gratuita!`
       };
     }
     
@@ -115,10 +123,31 @@ export const useSubscriptionAlert = () => {
     const approvedStatus = user.establishments ? +user.establishments[0].approved_status : 1;
 
     if (user.is_affiliate && !user.is_payed && (approvedStatus === 2) && (forceShow || !hasShownAlert)) {
-      // Pega a data de criação do usuário
-      const subscriptionDate = user.establishments?.[0].approved_date 
-        ? new Date(String(user.establishments?.[0].approved_date)) 
-        : new Date();
+      // Para testar diferentes cenários, descomente uma das linhas abaixo:
+      
+      // Teste 1: Expirou hoje (0 horas restantes)
+      // const subscriptionDate = new Date(Date.now() - (7 * 24 * 60 * 60 * 1000));
+      
+      // Teste 2: Expira em 1 hora
+      // const subscriptionDate = new Date(Date.now() - (6 * 24 * 60 * 60 * 1000) - (23 * 60 * 60 * 1000));
+
+      // Teste 3: Expira em 3 horas
+      // const subscriptionDate = new Date(Date.now() - (7 * 24 * 60 * 60 * 1000) + (3 * 60 * 60 * 1000));
+      
+      // Teste: Expira em 20h45min (20.75 horas)
+      // const subscriptionDate = new Date(Date.now() - (7 * 24 * 60 * 60 * 1000) + (20 * 60 * 60 * 1000) + (45 * 60 * 1000));
+      
+      // Teste 3: Expira em 1 dia
+      // const subscriptionDate = new Date(Date.now() - (6 * 24 * 60 * 60 * 1000));
+      
+      // Teste 4: Expira em 3 dias
+      // const subscriptionDate = new Date(Date.now() - (4 * 24 * 60 * 60 * 1000));
+      
+      // Teste 5: Expira em 6 dias
+      // const subscriptionDate = new Date(Date.now() - (1 * 24 * 60 * 60 * 1000));
+      
+      // Data real do usuário
+       const subscriptionDate = new Date(String(user.establishments?.[0].approved_status_date?.default)) 
       
       const timeInfo = calculateTimeRemaining(subscriptionDate);
       
@@ -136,10 +165,15 @@ export const useSubscriptionAlert = () => {
         }
       }
       
+      // Se restar exatamente 1 dia (24 horas), mostra como 23h 59m 59s
+      if (timeInfo.totalHours === 24) {
+        timeString = "23h 59m 59s";
+      }
+      
       setTimeRemaining(timeString);
       
       // Determina qual alerta mostrar
-      const alertInfo = getAlertInfo(timeInfo.totalHours);
+      const alertInfo = getAlertInfo(timeInfo);
       setAlertNumber(alertInfo.number);
       setAlertMessage(alertInfo.message);
       
