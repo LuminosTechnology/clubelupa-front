@@ -60,6 +60,7 @@ export const MenuItem = styled.button<{ enabled?: boolean }>`
   transition: opacity 0.2s ease;
   width: 100%;
   text-align: left;
+  position: relative;
 
   display: flex;
   align-items: center;

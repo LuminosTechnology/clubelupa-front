@@ -20,6 +20,9 @@ import {
   MenuOverlay,
 } from "./SlideMenu.style";
 
+import { NotificationBadge } from "../../components/Header/components/notificationIcon";
+import { MenuIconWrapper } from "../../components/Header/components/notificationIcon.style";
+
 interface SlideMenuProps {
   isOpen: boolean;
   onClose: () => void;
@@ -64,6 +67,7 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
     const base = [
       { label: "Home", path: "/home", enabled: true },
       { label: "Perfil", path: "/profile", enabled: true },
+      { label: "Notificações", path: "/profile", enabled: true },
       { label: "Afiliados", path: "/affiliates", enabled: true },
       { label: "Troca de Moedas Lupa", path: "/lupacoins", enabled: true },
       { label: "Meu Plano", path: "/myplan", enabled: true },
@@ -135,7 +139,12 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
                 }
               }}
             >
-              {item.label}
+              {item.label == 'Notificações' ? (
+                <MenuIconWrapper>
+                  <>{item.label}</>
+                  <NotificationBadge />
+                </MenuIconWrapper>
+              ) : item.label}
               {!item.enabled && (
                 <IonIcon
                   name="lock-closed"

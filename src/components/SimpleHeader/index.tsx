@@ -4,8 +4,12 @@ import {
   HeaderContainer,
   Title,
   MenuIcon,
-  RightSpacer,
+  RightSpacer,  
 } from "./header.style";
+
+import { MenuIconWrapper } from "../Header/components/notificationIcon.style";
+
+import { NotificationBadge } from "../Header/components/notificationIcon";
 
 import { BackButton } from "../BackButton/backButton.style";
 import arrowLeft from "../../assets/arrow-left.svg";
@@ -70,11 +74,14 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 
         {/* menu hamburguer ou espaçador */}
         {showMenu ? (
-          <MenuIcon
-            src={menuIcon}
-            alt="Menu"
-            onClick={() => setIsMenuOpen(true)}
-          />
+          <MenuIconWrapper>
+            <NotificationBadge />
+            <MenuIcon
+              src={menuIcon}
+              alt="Menu"
+              onClick={() => setIsMenuOpen(true)}
+            />
+          </MenuIconWrapper>
         ) : (
           <RightSpacer />
         )}

@@ -27,6 +27,7 @@ export interface Medal {
   updated_at: FormattedDate;
   deleted_at: FormattedDate;
   required_level_id: number;
+  containsMedal?: boolean;
 }
 
 export interface CurrentLevel {
@@ -44,5 +45,6 @@ export interface GamificationSummaryResponse {
   coins_balance: number;
   medals_count: number;
   medals: Medal[];
+  does_not_have_medals: Medal[];
   days_as_member: string;
 }

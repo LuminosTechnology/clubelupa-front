@@ -14,7 +14,7 @@ import { HomeBottomSheet } from "./components/home-bottom-sheet";
 
 const Home: React.FC = () => {
   const history = useHistory();
-  const { user } = useAuthContext();
+  const { user } = useAuthContext();  
   const { 
     displayPaymentWarning, 
     setDisplayPaymentWarning, 

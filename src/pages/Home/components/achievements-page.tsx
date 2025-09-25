@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGamificationContext } from "../../../contexts/GamificationContext";
 import { Medal } from "../../../types/api/user";
 import {
@@ -13,6 +13,23 @@ import {
 export const AchievementsPage = () => {
   const { gamificationSummary } = useGamificationContext();
   const [selectedMedal, setSelectedMedal] = useState<Medal | null>(null);
+  const [medals, setMedals] = useState<Medal[] | null>(null);
+
+useEffect( () => {
+
+  const med = gamificationSummary && gamificationSummary.medals.map(medal => ({ 
+    ...medal, containsMedal: true
+  } ) );
+
+  const doNotHaveMedals = gamificationSummary && gamificationSummary.does_not_have_medals.map(medal => ({ 
+    ...medal, containsMedal: false
+  } ) );;
+
+  const medalList = [...med ?? [], ...doNotHaveMedals ?? []]
+
+  setMedals(medalList);
+
+}, [gamificationSummary?.does_not_have_medals, gamificationSummary?.medals] );
 
   return (
     <AchievementsContainer>
@@ -31,10 +48,11 @@ export const AchievementsPage = () => {
         <>
           <AchievementsTitle>Conquistas</AchievementsTitle>
           <AchievementsListContainer>
-            {gamificationSummary?.medals.map((medal) => (
+            {medals?.map((medal) => (
               <AchievementItem
                 key={medal.id}
-                onClick={() => setSelectedMedal(medal)}
+                onClick={() => { medal.containsMedal && setSelectedMedal(medal) } }
+                className={`${!medal.containsMedal && 'disable'}`}
               >
                 <img src={medal.icon_url} alt={medal.name} />
                 <span>{medal.name}</span>
