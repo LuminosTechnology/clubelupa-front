@@ -32,7 +32,7 @@ const MyPlan: React.FC = () => {
   }, []);
 
   const getPlanName = () => {
-    if (!user?.is_payed) return "GRATUÍTO";
+    if (!user?.is_payed) return "GRATUITO";
     if (user?.is_affiliate) return "AFILIADO";
     return "SÓCIO PREMIUM";
   };

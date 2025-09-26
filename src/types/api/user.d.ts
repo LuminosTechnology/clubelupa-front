@@ -48,3 +48,33 @@ export interface GamificationSummaryResponse {
   does_not_have_medals: Medal[];
   days_as_member: string;
 }
+
+export interface GamificationReward {
+  coins_earned: number;
+  level_up_info: LevelUpInfo | null;
+  medals_earned: MedalEarned[];
+  points_earned: number;
+}
+
+export interface LevelUpInfo {
+  type: "level_up";
+  new_level: number;
+  old_level: number;
+  new_level_name: string;
+}
+
+export interface MedalEarned {
+  id: number;
+  name: string;
+  type: "medal";
+  icon_url: string;
+}
+
+export interface GamificationResult {
+  status: "pending" | "processing" | "completed" | "failed";
+  rewards: GamificationReward;
+}
+
+export interface GamificationResultResponse {
+  data: GamificationResult;
+}
