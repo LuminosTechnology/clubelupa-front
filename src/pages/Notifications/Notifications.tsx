@@ -1,55 +1,81 @@
-import React, { useState } from "react";
-import { 
-    IonContent, 
-    IonPage, 
-    IonList, 
-    IonItem, 
-    IonLabel, 
-    IonListHeader, 
-    IonSpinner, 
-    IonIcon,
-    IonModal,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonButtons,
+import React, {useState} from 'react';
+import {
     IonButton,
-    IonText
+    IonButtons,
+    IonContent,
+    IonHeader,
+    IonIcon,
+    IonItem,
+    IonItemOption,
+    IonItemOptions,
+    IonItemSliding,
+    IonLabel,
+    IonList,
+    IonListHeader,
+    IonModal,
+    IonPage,
+    IonSpinner,
+    IonText,
+    IonTitle,
+    IonToolbar,
+    useIonAlert
 } from "@ionic/react";
+
 import AppHeader from "../../components/SimpleHeader";
-
 import { useNotificationsContext } from "../../contexts/NotificationsContext";
-import { Notification } from "../../types/api/notifications";
 
+import { Notification } from "../../types/api/notifications";
 import { NotificationService } from "../../services/notification-sevice";
 
-import { ellipse, close } from 'ionicons/icons';
+import { close, ellipse, trash } from 'ionicons/icons';
 
 const Notifications: React.FC = () => {
-    // 1. Buscando os dados e funções do nosso contexto global
-    const { read, unread, refetchNotifications, isLoading } = useNotificationsContext(); // Supondo que o contexto forneça um estado de loading
 
-    // 2. Estado para controlar qual notificação está aberta na modal
+    const { read, unread, refetchNotifications, isLoading } = useNotificationsContext();
+
     const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
 
-    // 3. Função para lidar com o clique em uma notificação não lida
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+
+    const [presentAlert] = useIonAlert();
+
     const handleUnreadNotificationClick = async (notification: Notification) => {
-        // Mostra a modal imediatamente para o usuário
         setSelectedNotification(notification);
 
         try {
-            // Chama a API para marcar como lida no backend
             await NotificationService.markAsRead(notification.id);
-            // Atualiza o estado global de notificações
             await refetchNotifications();
         } catch (error) {
             console.error("Falha ao marcar notificação como lida:", error);
         }
     };
 
-    // Função para renderizar o conteúdo principal
+    const handleDeleteNotification = (notificationId: string, slidingItem: HTMLIonItemSlidingElement | null) => {
+        presentAlert({
+            header: 'Confirmar Exclusão',
+            message: 'Você tem certeza de que deseja excluir esta notificação?',
+            buttons: [
+                { text: 'Cancelar', role: 'cancel', handler: () => slidingItem?.close() },
+                {
+                    text: 'Excluir',
+                    role: 'confirm',
+                    handler: async () => {
+                        setDeletingId(notificationId);
+                        try {
+                            await NotificationService.deleteNotification(notificationId);
+                            await refetchNotifications();
+                        } catch (error) {
+                            console.error("Falha ao excluir notificação:", error);                            
+                        } finally {                            
+                            setDeletingId(null);
+                        }
+                    },
+                },
+            ],
+        });
+    };
+
     const renderContent = () => {
-        // Se estiver carregando, mostre um spinner
         if (isLoading) {
             return (
                 <div className="ion-text-center ion-padding">
@@ -58,7 +84,6 @@ const Notifications: React.FC = () => {
             );
         }
 
-        // Se não houver notificações, mostre uma mensagem amigável
         if (unread.length === 0 && read.length === 0) {
             return (
                 <div className="ion-text-center ion-padding">
@@ -75,19 +100,26 @@ const Notifications: React.FC = () => {
                         <IonListHeader>
                             <IonLabel>Não Lidas</IonLabel>
                         </IonListHeader>
-                        {unread.map(notification => (
-                            <IonItem 
-                                key={notification.id}
-                                button // Faz o item parecer clicável (feedback visual)
-                                detail={true} // Adiciona a setinha no final (iOS)
-                                onClick={() => handleUnreadNotificationClick(notification)}
-                            >
-                                <IonIcon slot="start" icon={ellipse} color="primary" />
-                                <IonLabel>
-                                    <p>{notification.data.message}</p>
-                                </IonLabel>
-                            </IonItem>
-                        ))}
+                        {unread.map(notification => {
+                            const slidingItemRef = React.createRef<HTMLIonItemSlidingElement>();
+                            return (
+                                <IonItemSliding key={notification.id} ref={slidingItemRef}>
+                                    <IonItemOptions side="end">
+                                        <IonItemOption color="danger" onClick={() => handleDeleteNotification(notification.id, slidingItemRef.current)}>
+                                            <IonIcon slot="icon-only" icon={trash} />
+                                        </IonItemOption>
+                                    </IonItemOptions>
+
+                                    <IonItem button detail={true} onClick={() => handleUnreadNotificationClick(notification)}>
+                                        <IonIcon slot="start" icon={ellipse} color="primary" />
+                                        <IonLabel>
+                                            <p>{notification.data.message}</p>
+                                        </IonLabel>
+                                        {deletingId === notification.id && <IonSpinner slot="end" name="dots" />}
+                                    </IonItem>
+                                </IonItemSliding>
+                            );
+                        })}
                     </IonList>
                 )}
 
@@ -97,14 +129,25 @@ const Notifications: React.FC = () => {
                         <IonListHeader>
                             <IonLabel>Lidas</IonLabel>
                         </IonListHeader>
-                        {read.map(notification => (
-                            <IonItem key={notification.id} lines="full">
-                                {/* Itens lidos não são clicáveis e têm menos destaque */}
-                                <IonLabel color="medium">
-                                    <p>{notification.data.message}</p>
-                                </IonLabel>
-                            </IonItem>
-                        ))}
+                        {read.map(notification => {
+                            const slidingItemRef = React.createRef<HTMLIonItemSlidingElement>();
+                             return (
+                                <IonItemSliding key={notification.id} ref={slidingItemRef}>
+                                    <IonItemOptions side="end">
+                                        <IonItemOption color="danger" onClick={() => handleDeleteNotification(notification.id, slidingItemRef.current)}>
+                                            <IonIcon slot="icon-only" icon={trash} />
+                                        </IonItemOption>
+                                    </IonItemOptions>
+
+                                    <IonItem lines="full">
+                                        <IonLabel color="medium">
+                                            <p>{notification.data.message}</p>
+                                        </IonLabel>
+                                        {deletingId === notification.id && <IonSpinner slot="end" name="dots" />}
+                                    </IonItem>
+                                </IonItemSliding>
+                            );
+                        })}
                     </IonList>
                 )}
             </>
