@@ -9,6 +9,9 @@ export const NotificationService = {
   },
   markAsRead: async (notificationId: string): Promise<void> => {
       await api.post(`user/notifications/${notificationId}/mark-as-read`);
+  }, 
+  deleteNotification: async (notificationId: string): Promise<void> => {
+      await api.delete(`/user/notifications/${notificationId}`);
   }  
 
 };
