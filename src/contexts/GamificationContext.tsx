@@ -1,7 +1,9 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { GamificationSummaryResponse } from "../types/api/user";
 import { getGamificationSummary } from "../services/auth-service";
 import { useAuthContext } from "./AuthContext";
+
+import { RewardsApiResponse, RewardItem } from "../types/api/rewards";
 
 type GamificationContextType = {
   gamificationSummary: GamificationSummaryResponse | undefined;
@@ -9,6 +11,12 @@ type GamificationContextType = {
     React.SetStateAction<GamificationSummaryResponse | undefined>
   >;
   refetchGamificationSummary: () => void;
+  currentReward: RewardItem | null; 
+  addRewardsToQueue: (rewards: RewardsApiResponse) => void;
+  dismissCurrentReward: () => void;
+  postRewardRedirect: string | null;
+  setPostRewardRedirect: React.Dispatch<React.SetStateAction<string | null>>;
+  clearPostRewardRedirect: () => void;
 };
 
 export const GamificationContext = createContext<GamificationContextType>(
@@ -20,9 +28,15 @@ type Props = {
 };
 
 export function GamificationProvider({ children }: Props) {
+
   const [gamificationSummary, setGamificationSummary] = useState<
     GamificationSummaryResponse | undefined
   >();
+
+  const [rewardQueue, setRewardQueue] = useState<RewardItem[]>([]);
+  const [currentReward, setCurrentReward] = useState<RewardItem | null>(null);
+
+   const [postRewardRedirect, setPostRewardRedirect] = useState<string | null>(null);
 
   const { user, isAuthenticated } = useAuthContext();
 
@@ -30,17 +44,77 @@ export function GamificationProvider({ children }: Props) {
     await fetchGamificationSummary();
   };
 
-  const fetchGamificationSummary = async () => {
+  const fetchGamificationSummary = useCallback(async () => {
     if (!user || !isAuthenticated) return;
-    const response = await getGamificationSummary();
-    setGamificationSummary(response);
-  };
+    try {
+        const response = await getGamificationSummary();
+        setGamificationSummary(response);
+    } catch(error) {
+        console.error("Falha ao buscar sumário de gamificação:", error);
+    }
+  }, [user, isAuthenticated]);
 
   useEffect(() => {
     fetchGamificationSummary();
   }, [user, isAuthenticated]);
 
-  console.log({ gamificationSummary });
+const addRewardsToQueue = (rewards: RewardsApiResponse) => {
+    const newRewards: RewardItem[] = [];
+
+    if (rewards.points_earned > 0) {
+      newRewards.push({ type: 'points', data: { amount: rewards.points_earned } });
+    }
+    if (rewards.coins_earned > 0) {
+      newRewards.push({ type: 'coins', data: { amount: rewards.coins_earned } });
+    }
+    if (rewards.level_up_info) {
+      newRewards.push({ type: 'level_up', data: rewards.level_up_info });
+    }
+    rewards.medals_earned.forEach(medal => {
+      newRewards.push({ type: 'medal', data: medal });
+    });
+
+    if (newRewards.length > 0) {
+        setRewardQueue(prevQueue => [...prevQueue, ...newRewards]);
+    }
+  };
+
+  const dismissCurrentReward = () => {
+    setCurrentReward(null);
+
+    if (postRewardRedirect) {
+      setPostRewardRedirect(null);
+    }
+  };
+
+  const clearPostRewardRedirect = () => {
+    setPostRewardRedirect(null);
+  };
+
+useEffect(() => {
+    if (!currentReward && rewardQueue.length > 0) {
+      
+      const timer = setTimeout(() => {
+        const [nextReward, ...remainingQueue] = rewardQueue;
+        
+        // Define o próximo item como a recompensa atual (o que vai fazer a modal aparecer)
+        setCurrentReward(nextReward);
+        
+        // Atualiza a fila para conter apenas os itens restantes
+        setRewardQueue(remainingQueue);
+
+      }, 600); 
+
+      return () => clearTimeout(timer);
+    }
+  }, [rewardQueue, currentReward]);
+
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.log("Modo de teste de gamificação ativado. Use window.testRewards(data) no console.");
+      window.testRewards = addRewardsToQueue;
+    }
+  }, [addRewardsToQueue]);
 
   return (
     <GamificationContext.Provider
@@ -48,6 +122,12 @@ export function GamificationProvider({ children }: Props) {
         gamificationSummary,
         setGamificationSummary,
         refetchGamificationSummary,
+        currentReward,
+        addRewardsToQueue,
+        dismissCurrentReward,
+        postRewardRedirect, 
+        setPostRewardRedirect, 
+        clearPostRewardRedirect             
       }}
     >
       {children}
