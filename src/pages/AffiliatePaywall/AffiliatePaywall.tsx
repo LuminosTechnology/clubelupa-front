@@ -86,7 +86,6 @@ const AffiliatePaywall: React.FC = () => {
 
       const offerings = await window.Purchases.getOfferings();
       if (offerings.current && offerings.current.availablePackages.length > 0) {
-        console.log(offerings.current.availablePackages);
         const foundAffiliateOffering = offerings.current.availablePackages.find(
           (p) => p.identifier === "$rc_afiliado_monthly"
         );

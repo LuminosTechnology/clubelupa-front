@@ -171,7 +171,6 @@ const AffiliateRegister: React.FC = () => {
       !affiliate.address.state
     )
       return;
-    console.log("Tried to fetch coords");
     try {
       const coords = await GeocodeService.getCoordsByAddress({
         street: affiliate.address.street,

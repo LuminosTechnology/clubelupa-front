@@ -36,12 +36,8 @@ export const verifyEmail = async ({
   email: string;
   code: string;
 }) => {
-  console.log("[Auth Service] Attempting email verification with data:", {
-    email,
-    code,
-  });
+
   const response = await api.post("/verify", { email, code });
-  console.log("[Auth Service] Email verification response:", response.data);
   return response.data;
 };
 
@@ -64,7 +60,6 @@ export const updateEstablishment = async ({
 }) => {
   const formData = new FormData();
 
-console.log(data)
 
   if (data.name) formData.append("name", data.name);
   if (data.description) formData.append("description", data.description);
@@ -137,7 +132,6 @@ console.log(data)
 };
 
 export const logout = async () => {
-  console.log("[Auth Service] Attempting logout");
   const token = await getToken();
   if (!token) {
     console.error(
@@ -145,10 +139,8 @@ export const logout = async () => {
     );
     return;
   }
-  console.log("[Auth Service] Logging out with token:", token);
   const response = await api.post("/logout");
 
-  console.log("[Auth Service] Token removed successfully, logout complete");
 };
 
 export const getToken = async () => {
@@ -157,12 +149,10 @@ export const getToken = async () => {
 };
 
 export const forgotPassword = async (data: ForgotPasswordRequest) => {
-  console.log("[Auth Service] Requesting password reset code with data:", data);
   const response = await api.post<{ message: string }>(
     "/forgot-password",
     data
   );
-  console.log("[Auth Service] Password reset code response:", response.data);
   return response.data;
 };
 
@@ -174,9 +164,7 @@ export const forgotPasswordVerify = async (
 };
 
 export const resetPassword = async (data: ResetPasswordRequest) => {
-  console.log("[Auth Service] Resetting password with data:", data);
   const response = await api.post("/reset-password", data);
-  console.log("[Auth Service] Password reset response:", response.data);
   return response.data;
 };
 
@@ -187,7 +175,6 @@ export const getUserByToken = async () => {
 
 export const updateUserProfile = async (userData: UpdateUserRequest) => {
   const formData = new FormData();
-  console.log({ userData });
   if (userData.avatar) {
     formData.append("avatar", userData.avatar);
   }

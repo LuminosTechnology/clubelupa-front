@@ -34,7 +34,6 @@ export const getAllEstablishments = async (
   if (!!search) params["filter[Search]"] = search;
   params.sort = "name";
 
-  console.log({ categories });
   if (categories && categories.length > 0) {
     params["filter[categories]"] = categories.join(",");
   }

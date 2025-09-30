@@ -123,11 +123,12 @@ const AffiliateView: React.FC = () => {
         return { ...prev, is_checked_in_by_me_last_hour: true };
       });
 
-      await doCheckIn(Number(id));
+      const checkinResponse = await doCheckIn(Number(id));
       setShowCheckIn(true);
       setTimeout(async () => {
-        await refetchGamificationSummary();
+        await refetchGamificationSummary();        
       }, 1000);
+      
     } catch (e) {
       setData((prev) => {
         if (!prev) return undefined;

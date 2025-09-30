@@ -183,7 +183,6 @@ const AffiliateBecome: React.FC = () => {
 
     setForm(newData);
     if (Object.keys(newErrors).length > 0) {
-      console.log({ newErrors });
       setIsLoading(false);
       return false;
     }

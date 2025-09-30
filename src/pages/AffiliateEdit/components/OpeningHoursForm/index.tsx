@@ -86,7 +86,6 @@ export const OpeningHoursForm: React.FC<Props> = ({ onChange, value, disabled = 
   };
 
   const splitTimes = (timesArray: string[]) => {
-    console.log("split");
     return timesArray.map((time, index) => {
       const [from, to] = time.split("-");
       return {

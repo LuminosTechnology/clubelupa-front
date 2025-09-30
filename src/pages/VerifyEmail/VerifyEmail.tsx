@@ -60,7 +60,6 @@ const VerifyEmail: React.FC = () => {
   };
 
   const onSubmit = async () => {
-    console.log({ code: code.join(""), email });
     try {
       await verifyEmail({ email, code: code.join("") });
       resetForm();

@@ -19,7 +19,6 @@ const ChangePassword: React.FC = () => {
   const history = useHistory();
   const { email } = useParams<{ email: string }>();
 
-  console.log(email);
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};

@@ -70,7 +70,6 @@ const ForgotPasswordVerify: React.FC = () => {
     }
   };
 
-  console.log({ form });
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -90,7 +89,6 @@ const ForgotPasswordVerify: React.FC = () => {
   };
 
   const onSubmit = async () => {
-    console.log({ form });
     if (validateForm()) {
       try {
         const response = await forgotPasswordVerify({

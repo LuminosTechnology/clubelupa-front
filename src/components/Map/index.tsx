@@ -181,7 +181,6 @@ const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
     const updateMarkers = async () => {
       // Limpe o objeto de referência
 
-      console.log("Atualizando marcadores...");
       // Remova os marcadores existentes
       const markersIds = Object.keys(markerMapRef.current);
       if (markersIds.length > 0) {

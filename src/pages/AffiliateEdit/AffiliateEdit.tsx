@@ -112,7 +112,6 @@ const AffiliateEdit: React.FC = () => {
       user?.establishments[0].id
     );
 
-    //console.log(establishment)
 
     const address = establishment?.addresses[0];
 
@@ -354,7 +353,6 @@ const AffiliateEdit: React.FC = () => {
 
     setForm(newData);
     if (Object.keys(newErrors).length > 0) {
-      console.log({ newErrors });
       setIsLoading(false);
       return false;
     }
@@ -382,7 +380,6 @@ const AffiliateEdit: React.FC = () => {
     if (!establishment?.id) return;
     const validatedForm = await validateForm();
     if (!validatedForm) return;
-    console.log({ validatedForm });
 
     try {
       await updateEstablishment({ data: validatedForm, id: establishment.id });

@@ -70,11 +70,7 @@ export interface MedalEarned {
   icon_url: string;
 }
 
-export interface GamificationResult {
+export interface GamificationResultResponse {
   status: "pending" | "processing" | "completed" | "failed";
   rewards: GamificationReward;
-}
-
-export interface GamificationResultResponse {
-  data: GamificationResult;
 }

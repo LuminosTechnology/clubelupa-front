@@ -46,7 +46,6 @@ const Register: React.FC = () => {
       newErrors.data_nascimento = "Data de nascimento é obrigatória";
 
     const birthDateError = validateBirthDate(form.birth_date);
-    console.log({ birthDateError });
     if (birthDateError) newErrors.data_nascimento = birthDateError;
 
     if (!form.phone_number) newErrors.phone_number = "Telefone é obrigatório";
@@ -75,7 +74,6 @@ const Register: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  console.log(errors);
   const resetForm = () => {
     setForm({
       name: "",
@@ -92,7 +90,6 @@ const Register: React.FC = () => {
     if (!validateForm()) return;
 
     try {
-      console.log({ user: form });
       await register(form);
       history.push("/register/verify-email", { email: form.email });
       resetForm();

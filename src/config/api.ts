@@ -2,6 +2,7 @@ import axios from "axios";
 import { getToken } from "../services/auth-service";
 import { API_CONFIG } from "./constants";
 import { GamificationService } from "../services/gamification-service";
+import { RewardsApiResponse } from "../types/api/rewards";
 
 // const API_URL =
 //   "https://y57yu3j3k2.execute-api.sa-east-1.amazonaws.com/prod/api";
@@ -41,13 +42,9 @@ const shouldProcessGamification = (url: string): boolean => {
 api.interceptors.response.use(
   async (response) => {
     const url = response.config.url || '';
-    const transactionId = response.data?.transaction_id;
-    console.log({ url, transactionId });
+    const transactionId = response.data?.data?.transaction_id;
     // Só processa gamificação para endpoints específicos
     if (shouldProcessGamification(url) && transactionId && response.status >= 200 && response.status < 300) {
-      console.log(`Gamification endpoint detected: ${url}`);
-      console.log(`Transaction ID found: ${transactionId}`);
-      
       // Processa a gamificação em background sem bloquear a resposta
       GamificationService.waitForGamificationResult(transactionId, (status) => {
         console.log(`Gamification status for transaction ${transactionId}: ${status}`);
@@ -55,10 +52,16 @@ api.interceptors.response.use(
         if (result) {
           const processedResult = GamificationService.processGamificationResult(result);
           if (processedResult && processedResult.hasRewards) {
-            console.log('🎉 Gamification rewards detected:', processedResult.rewards);
-            // Emite evento customizado para notificar o contexto
+            // Converte para RewardsApiResponse e envia para a fila do GamificationContext
+            const rewardsData: RewardsApiResponse = {
+              coins_earned: processedResult.rewards.coins_earned,
+              level_up_info: processedResult.rewards.level_up_info,
+              medals_earned: processedResult.rewards.medals_earned,
+              points_earned: processedResult.rewards.points_earned
+            };
+            
             window.dispatchEvent(new CustomEvent('gamification-rewards', {
-              detail: processedResult
+              detail: rewardsData
             }));
           }
         }

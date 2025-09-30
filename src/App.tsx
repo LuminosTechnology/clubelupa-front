@@ -60,6 +60,9 @@ import { GlobalFonts } from "./styles/GlobalFonts";
 import { SplashScreen } from "./components/SplashScreen";
 import ForgotPasswordVerify from "./pages/ForgotPasswordVerify/ForgotPasswordVerify";
 
+import { GlobalRewardModal } from "./components/GlobalRewardModal/GlobalRewardModal";
+import { RewardRouterListener } from './components/RewardRouterListener/RewardRouterListener'; 
+
 declare global {
   interface Window {
     Purchases?: PurchasesPlugin;
@@ -106,7 +109,11 @@ const App: React.FC = () => {
     <IonApp>
       <GlobalFonts />
       <NavigationProvider>
+        <GlobalRewardModal />
         <IonReactRouter key={isAuthenticated ? "auth" : "no-auth"}>
+
+          <RewardRouterListener />
+
           <IonRouterOutlet>
           <PublicRoute exact path="/login" component={Login} />
           <PublicRoute exact path="/register" component={Register} />

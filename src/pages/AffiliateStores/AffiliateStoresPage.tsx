@@ -90,7 +90,6 @@ const AffiliateStoresPage: React.FC = () => {
     const element = document.getElementById(letter);
     if (element) element.scrollIntoView({ behavior: "smooth" });
   };
-  console.log({ categoriesFilter });
 
   const containerRef = useRef<HTMLIonContentElement>(null);
 

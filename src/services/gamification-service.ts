@@ -24,20 +24,20 @@ export class GamificationService {
     onProgress?: (status: string) => void
   ): Promise<GamificationResultResponse | null> {
     let attempts = 0;
-
+    debugger
     while (attempts < this.MAX_ATTEMPTS) {
       try {
         const result = await this.getGamificationResult(transactionId);
         
         if (onProgress) {
-          onProgress(result.data.status);
+          onProgress(result.status);
         }
 
-        if (result.data.status === "completed") {
+        if (result.status === "completed") {
           return result;
         }
 
-        if (result.data.status === "failed") {
+        if (result.status === "failed") {
           console.warn(`Gamification result failed for transaction ${transactionId}`);
           return null;
         }
@@ -60,7 +60,7 @@ export class GamificationService {
    * Processa o resultado da gamificação e retorna informações estruturadas
    */
   static processGamificationResult(result: GamificationResultResponse) {
-    const { status, rewards } = result.data;
+    const { status, rewards } = result;
     
     if (status !== "completed") {
       return null;
