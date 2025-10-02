@@ -61,7 +61,9 @@ import { SplashScreen } from "./components/SplashScreen";
 import ForgotPasswordVerify from "./pages/ForgotPasswordVerify/ForgotPasswordVerify";
 
 import { GlobalRewardModal } from "./components/GlobalRewardModal/GlobalRewardModal";
+import { GlobalPopupModal } from "./components/GlobalPopupModal/GlobalPopupModal";
 import { RewardRouterListener } from './components/RewardRouterListener/RewardRouterListener'; 
+import { PopupRouterListener } from './components/PopupRouterListener/PopupRouterListener';
 
 declare global {
   interface Window {
@@ -110,9 +112,11 @@ const App: React.FC = () => {
       <GlobalFonts />
       <NavigationProvider>
         <GlobalRewardModal />
+        <GlobalPopupModal />
         <IonReactRouter key={isAuthenticated ? "auth" : "no-auth"}>
 
           <RewardRouterListener />
+          <PopupRouterListener />
 
           <IonRouterOutlet>
           <PublicRoute exact path="/login" component={Login} />

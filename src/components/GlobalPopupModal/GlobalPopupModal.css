@@ -1,0 +1,34 @@
+
+.global-popup-modal {
+    --background: transparent; 
+    --box-shadow: none; 
+}
+
+.global-popup-modal .popup-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.global-popup-modal .popup-image {
+    width: 90%;
+    max-width: 400px;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.global-popup-modal .popup-close-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    --color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+}
