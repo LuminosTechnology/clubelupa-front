@@ -179,70 +179,61 @@ const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
     if (!gMap || establishments.length === 0) return;
 
     const updateMarkers = async () => {
-      // Limpe o objeto de referência
-
-      // Remova os marcadores existentes
       const markersIds = Object.keys(markerMapRef.current);
       if (markersIds.length > 0) {
         await gMap.removeMarkers(markersIds);
       }
-      await gMap.removeAllMapListeners();
-
       markerMapRef.current = {};
-
-      await Promise.all(
-        establishments.map(async (e) => {
-          if (!e.addresses.length) return;
-          if (
-            e.addresses[0].latitude === null ||
-            e.addresses[0].longitude === null
-          )
-            return;
-          const location = {
-            lat: Number(e.addresses[0].latitude),
-            lng: Number(e.addresses[0].longitude),
-          };
-
-          const mainCategory = e.categories.find(
-            (category) => category.parent_id === null
-          );
-
-          const iconUrl = mainCategory
-            ? mainCategory.icon_url
-            : "assets/affiliate_pin.png";
-
-          const iconHighlightUrl = mainCategory
-            ? mainCategory.icon_highlight_url
-            : "assets/affiliate_pin.png";            
-
-          const hasHighlight = e.has_highlight;
-
+    
+      // Agrupar estabelecimentos por coordenada
+      const coordGroups: Record<string, Establishment[]> = {};
+      establishments.forEach((e) => {
+        const lat = Number(e.addresses[0]?.latitude);
+        const lng = Number(e.addresses[0]?.longitude);
+        if (!lat || !lng) return;
+    
+        const key = `${lat.toFixed(6)}_${lng.toFixed(6)}`;
+        if (!coordGroups[key]) coordGroups[key] = [];
+        coordGroups[key].push(e);
+      });
+    
+      // Para cada grupo de coordenadas, aplicar um deslocamento
+      for (const key in coordGroups) {
+        const group = coordGroups[key];
+        const angleStep = (2 * Math.PI) / group.length;
+        const radius = 0.0001; // ~11 metros, ajusta conforme zoom
+    
+        for (let i = 0; i < group.length; i++) {
+          const e = group[i];
+    
+          // Deslocamento circular em torno da coordenada base
+          const baseLat = Number(e.addresses[0].latitude);
+          const baseLng = Number(e.addresses[0].longitude);
+    
+          const offsetLat = baseLat + radius * Math.cos(i * angleStep);
+          const offsetLng = baseLng + radius * Math.sin(i * angleStep);
+    
+          const iconUrl =
+            e.categories.find((c) => c.parent_id === null)?.icon_url ||
+            "assets/affiliate_pin.png";
+    
           const markerId = await gMap.addMarker({
-            coordinate: location,
-            iconUrl: hasHighlight ? iconHighlightUrl : iconUrl,
-            iconSize: { 
-              width: hasHighlight ? 60 : 50, 
-              height: hasHighlight ? 60 : 50 
-            },
+            coordinate: { lat: offsetLat, lng: offsetLng },
+            iconUrl,
+            iconSize: { width: 50, height: 50 },
             iconAnchor: { x: 25, y: 50 },
           });
-
-          const id = markerId || e.id;
-          markerMapRef.current[id] = e;
-        })
-      );
-
+    
+          markerMapRef.current[markerId || e.id] = e;
+        }
+      }
+    
       await gMap.setOnMarkerClickListener((m) => {
         const establishment = markerMapRef.current[m.markerId];
         if (establishment) setSelected(establishment);
       });
-
-      await gMap.setCamera({
-        coordinate: DEFAULT_LOCATION,
-        zoom: 11,
-        animate: true,
-      });
     };
+    
 
     updateMarkers();
   }, [establishments, gMap]);

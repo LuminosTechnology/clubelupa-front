@@ -30,6 +30,7 @@ const GAMIFICATION_ENDPOINTS = [
   '/purchases/scan',
   '/purchases/scan-barcode',
   '/purchases/upload-invoice',
+  '/products-purchase-requests',
 ];
 
 // Função para verificar se o endpoint deve processar gamificação
