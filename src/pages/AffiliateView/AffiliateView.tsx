@@ -1,6 +1,7 @@
 import { CapacitorBarcodeScanner } from "@capacitor/barcode-scanner";
 import { Geolocation } from "@capacitor/geolocation";
 import {
+  IonActionSheet,
   IonAlert,
   IonContent,
   IonIcon,
@@ -9,7 +10,7 @@ import {
   IonToast,
 } from "@ionic/react";
 import { AxiosError } from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import backButtonVerde from "../../assets/arrow-left.svg";
 import HeartIcon from "../../assets/like.svg?react";
@@ -21,10 +22,14 @@ import {
   toggleFavorite,
 } from "../../services/affiliateService";
 import { CodeScannerService } from "../../services/code-scan-service";
+import { uploadInvoice } from "../../services/invoice-upload-service";
 import { Establishment } from "../../types/api/api";
 import { haversine } from "../../utils/haversine";
 import {
   AddressText,
+  AlternativeButton,
+  AlternativeLabel,
+  AlternativeSection,
   BackButton,
   BackButtonWrapper,
   BehindScenesPhoto,
@@ -32,6 +37,7 @@ import {
   CheckinMessage,
   CTAButton,
   Description,
+  Divider,
   ErrorMessage,
   InfoContainer,
   LikeButton,
@@ -75,6 +81,16 @@ const AffiliateView: React.FC = () => {
   const [scanMessage, setScanMessage] = useState<string | undefined>(undefined);
   const [isLoadingScan, setIsLoadingScan] = useState(false);
 
+  const [receiptPhotoFile, setReceiptPhotoFile] = useState<File | undefined>(undefined);
+  const [receiptPhotoUrl, setReceiptPhotoUrl] = useState<string | undefined>(undefined);
+  const receiptPhotoFileRef = useRef<HTMLInputElement>(null);
+  const [showPhotoOptions, setShowPhotoOptions] = useState(false);
+
+  const [isUploadingInvoice, setIsUploadingInvoice] = useState(false);
+  const [showInvoiceSuccess, setShowInvoiceSuccess] = useState(false);
+  const [showInvoiceError, setShowInvoiceError] = useState(false);
+  const [invoiceMessage, setInvoiceMessage] = useState<string | undefined>(undefined);
+
   const { refetchGamificationSummary } = useGamificationContext();
 
   const color = data?.categories[0]?.color || "#E6C178";
@@ -114,6 +130,77 @@ const AffiliateView: React.FC = () => {
     } finally {
       setIsLoadingScan(false);
     }
+  };
+
+  const handleReceiptPhotoClick = () => {
+    setShowPhotoOptions(true);
+  };
+
+  const handleReceiptPhotoChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setReceiptPhotoFile(file);
+    setReceiptPhotoUrl(URL.createObjectURL(file));
+  };
+
+  const clearReceiptPhoto = () => {
+    setReceiptPhotoFile(undefined);
+    setReceiptPhotoUrl(undefined);
+    if (receiptPhotoFileRef.current) {
+      receiptPhotoFileRef.current.value = '';
+    }
+  };
+
+  const handleInvoiceUpload = async () => {
+    if (!receiptPhotoFile || !id) return;
+
+    setIsUploadingInvoice(true);
+    try {
+      const response = await uploadInvoice({
+        establishment_id: Number(id),
+        invoice_file: receiptPhotoFile,
+      });
+      
+      setInvoiceMessage(response.message);
+      setShowInvoiceSuccess(true);
+      
+      clearReceiptPhoto();
+    } catch (error: any) {
+      console.error("Erro ao enviar nota fiscal:", error);
+      
+      if (error.response?.data?.message) {
+        setInvoiceMessage(error.response.data.message);
+      } else {
+        setInvoiceMessage("Erro ao enviar nota fiscal. Tente novamente.");
+      }
+      setShowInvoiceError(true);
+    } finally {
+      setIsUploadingInvoice(false);
+    }
+  };
+
+  const handleCameraOption = async () => {
+    setShowPhotoOptions(false);
+    setIsLoadingScan(true);
+    try {
+      const result = await CapacitorBarcodeScanner.scanBarcode({ hint: 0 });
+      if (result.ScanResult) {
+        setReceiptPhotoUrl(result.ScanResult);
+        setScanMessage("Foto capturada com sucesso!");
+        setShowScanSuccess(true);
+      }
+    } catch (error: any) {
+      setScanMessage("Erro ao capturar foto");
+      setShowScanError(true);
+      console.error("Erro ao capturar foto:", error);
+    } finally {
+      setIsLoadingScan(false);
+    }
+  };
+
+  const handleGalleryOption = () => {
+    setShowPhotoOptions(false);
+    receiptPhotoFileRef.current?.click();
   };
 
   const handleCheckIn = async () => {
@@ -253,6 +340,47 @@ const AffiliateView: React.FC = () => {
         message={`Você realizou check-in em ${data?.name}`}
         buttons={["OK"]}
         onDidDismiss={() => setShowCheckIn(false)}
+      />
+      <IonAlert
+        isOpen={showInvoiceSuccess}
+        header="Nota fiscal enviada"
+        message={invoiceMessage}
+        buttons={["OK"]}
+        onDidDismiss={() => {
+          setShowInvoiceSuccess(false);
+        }}
+      />
+      <IonAlert
+        isOpen={showInvoiceError}
+        header="Erro ao enviar nota fiscal"
+        message={invoiceMessage}
+        buttons={["OK"]}
+        onDidDismiss={() => {
+          setShowInvoiceError(false);
+          clearReceiptPhoto();
+        }}
+      />
+      <IonActionSheet
+        isOpen={showPhotoOptions}
+        header="Escolha uma opção"
+        buttons={[
+          {
+            text: "Tirar foto",
+            icon: "camera",
+            handler: handleCameraOption,
+          },
+          {
+            text: "Escolher da galeria",
+            icon: "images",
+            handler: handleGalleryOption,
+          },
+          {
+            text: "Cancelar",
+            icon: "close",
+            role: "cancel",
+          },
+        ]}
+        onDidDismiss={() => setShowPhotoOptions(false)}
       />
       <IonContent fullscreen style={{ "--background": "#ffffff" } as any}>
         {!data ? (
@@ -416,6 +544,56 @@ const AffiliateView: React.FC = () => {
                   </CTAButton>
                 )}
               </ButtonsContainer>
+
+              {data.can_has_purchase && (
+                <>
+                  <Divider />
+                  <AlternativeSection>
+                    <AlternativeLabel>
+                      Não possui QR Code ou Código de Barras?
+                    </AlternativeLabel>
+                    <AlternativeButton bg={color} onClick={handleReceiptPhotoClick}>
+                      Enviar foto do recibo
+                    </AlternativeButton>
+                    <input
+                      type="file"
+                      ref={receiptPhotoFileRef}
+                      style={{ display: "none" }}
+                      onChange={handleReceiptPhotoChange}
+                      accept="image/*"
+                    />
+                    {receiptPhotoUrl && (
+                      <div style={{ marginTop: "12px", textAlign: "center" }}>
+                        <img
+                          src={receiptPhotoUrl}
+                          alt="Foto do recibo"
+                          style={{
+                            maxWidth: "200px",
+                            maxHeight: "200px",
+                            borderRadius: "8px",
+                            border: `2px solid ${color}`,
+                          }}
+                        />
+                        <p style={{ margin: "8px 0 0", fontSize: "12px", color: "#666" }}>
+                          Foto selecionada com sucesso!
+                        </p>
+                        <AlternativeButton 
+                          bg={color} 
+                          onClick={handleInvoiceUpload}
+                          disabled={isUploadingInvoice}
+                          style={{ 
+                            marginTop: "12px",
+                            opacity: isUploadingInvoice ? 0.6 : 1,
+                            cursor: isUploadingInvoice ? "not-allowed" : "pointer"
+                          }}
+                        >
+                          {isUploadingInvoice ? "Enviando..." : "Enviar Nota Fiscal"}
+                        </AlternativeButton>
+                      </div>
+                    )}
+                  </AlternativeSection>
+                </>
+              )}
             </InfoContainer>
           </ScrollArea>
         )}
