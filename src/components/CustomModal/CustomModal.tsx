@@ -4,7 +4,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Importaremos os estilos que vamos criar a seguir
-import { ModalWrapper, ModalBackdrop, ModalContent } from './CustomModal.style.ts';
+import { ModalWrapper, ModalBackdrop, ModalContent } from './CustomModal.style';
 
 interface CustomModalProps {
     isOpen: boolean;
