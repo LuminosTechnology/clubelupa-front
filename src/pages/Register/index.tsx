@@ -32,6 +32,7 @@ const Register: React.FC = () => {
     password: "",
     password_confirmation: "",
     phone_number: "",
+    auto_premium_code: "",
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -82,6 +83,7 @@ const Register: React.FC = () => {
       email: "",
       password: "",
       password_confirmation: "",
+      auto_premium_code: "",
     });
   };
 
@@ -182,6 +184,13 @@ const Register: React.FC = () => {
           {errors.password_confirmation && (
             <ErrorMessage>{errors.password_confirmation}</ErrorMessage>
           )}
+
+          <FloatingInput
+            label="Código automático de sócio"
+            value={form.auto_premium_code || ""}
+            onChange={(v) => setForm({ ...form, auto_premium_code: v })}
+            maxLength={50}
+          />
 
           {Object.keys(errors).length > 0 && (
             <ErrorMessage style={{ marginBottom: "16px" }}>
