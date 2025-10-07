@@ -16,6 +16,7 @@ import {
   StoreListContainer,
   StoreName,
   StoreUnderlined,
+  StoreGeneralContainer
 } from "./AffiliateStoresPage.style";
 
 import { getAllEstablishments } from "../../services/affiliateService";
@@ -134,6 +135,7 @@ const AffiliateStoresPage: React.FC = () => {
           onDidDismiss={() => setError(undefined)}
         />
         <Container>
+
           <SearchBar
             value={query}
             onChange={setQuery}
@@ -141,81 +143,88 @@ const AffiliateStoresPage: React.FC = () => {
             onFilterClick={() => setIsFilterOpen(true)}
           />
 
-          <StoreListContainer>
-            {establishments.map((establishment) => {
-              if (!establishment || !establishment.name || !establishment.id)
-                return null;
-              const firstLetter = establishment.name.charAt(0).toUpperCase();
-              let sectionId;
+          <StoreGeneralContainer>
 
-              if (!firstLetters.has(firstLetter)) {
-                firstLetters.add(firstLetter);
-                sectionId = firstLetter;
-              }
+              <StoreListContainer>
+                {establishments.map((establishment) => {
+                  if (!establishment || !establishment.name || !establishment.id)
+                    return null;
+                  const firstLetter = establishment.name.charAt(0).toUpperCase();
+                  let sectionId;
 
-              return (
-                <StoreCard
-                  key={establishment.id}
-                  id={sectionId}
-                  onClick={() =>
-                    history.push(`/affiliate-view/${establishment.id}`)
+                  if (!firstLetters.has(firstLetter)) {
+                    firstLetters.add(firstLetter);
+                    sectionId = firstLetter;
                   }
-                >
-                  <StoreImage
-                    src={
-                      establishment.shop_photo_url ??
-                      "/assets/default-photo.png"
-                    }
-                    alt={establishment.name}
-                  />
 
-                  <StoreInfo
-                    style={{
-                      background:
-                        establishment.categories &&
-                        establishment.categories.length > 0
-                          ? establishment.categories[0]?.color ?? "#E6C178"
-                          : "#E6C178",
-                    }}
-                  >
-                    <StoreName>{establishment.name}</StoreName>
-                    {establishment.categories &&
-                      establishment.categories.length > 0 && (
+                  return (
+                    <StoreCard
+                      key={establishment.id}
+                      id={sectionId}
+                      onClick={() =>
+                        history.push(`/affiliate-view/${establishment.id}`)
+                      }
+                    >
+                      <StoreImage
+                        src={
+                          establishment.shop_photo_url ??
+                          "/assets/default-photo.png"
+                        }
+                        alt={establishment.name}
+                      />
+
+                      <StoreInfo
+                        style={{
+                          background:
+                            establishment.categories &&
+                            establishment.categories.length > 0
+                              ? establishment.categories[0]?.color ?? "#E6C178"
+                              : "#E6C178",
+                        }}
+                      >
+                        <StoreName>{establishment.name}</StoreName>
+                        {establishment.categories &&
+                          establishment.categories.length > 0 && (
+                            <StoreLine>
+                              Categoria: {establishment.categories[0].name}
+                            </StoreLine>
+                          )}
                         <StoreLine>
-                          Categoria: {establishment.categories[0].name}
+                          Estrutura: {handleStructure(establishment)}
                         </StoreLine>
-                      )}
-                    <StoreLine>
-                      Estrutura: {handleStructure(establishment)}
-                    </StoreLine>
-                    <StoreUnderlined>Ver mais</StoreUnderlined>
+                        <StoreUnderlined>Ver mais</StoreUnderlined>
 
-                    {/* {!!s.horario && <StoreLine>{s.schedule}</StoreLine>} */}
-                    {/* {!!s.benefits && <StoreLine>{s.benefits}</StoreLine>} */}
-                  </StoreInfo>
-                </StoreCard>
-              );
-            })}
-          </StoreListContainer>
+                        {/* {!!s.horario && <StoreLine>{s.schedule}</StoreLine>} */}
+                        {/* {!!s.benefits && <StoreLine>{s.benefits}</StoreLine>} */}
+                      </StoreInfo>
+                    </StoreCard>
+                  );
+                })}
 
-          <AlphabetContainer
-            id="alphabet-scroll"
-            onTouchStart={handleTouch}
-            onTouchMove={handleTouch}
-            onMouseDown={handleMouse}
-            onMouseMove={handleMouse}
-          >
-            {alphabet.split("").map((letter) => (
-              <AlphabetLetter
-                disabled
-                key={letter}
-                className={selectedLetter === letter ? "active" : ""}
-                onClick={() => scrollToLetter(letter)}
+              </StoreListContainer>
+
+              <AlphabetContainer
+                id="alphabet-scroll"
+                onTouchStart={handleTouch}
+                onTouchMove={handleTouch}
+                onMouseDown={handleMouse}
+                onMouseMove={handleMouse}
               >
-                {letter}
-              </AlphabetLetter>
-            ))}
-          </AlphabetContainer>
+                {alphabet.split("").map((letter) => (
+                  <AlphabetLetter
+                    disabled
+                    key={letter}
+                    className={selectedLetter === letter ? "active" : ""}
+                    onClick={() => scrollToLetter(letter)}
+                  >
+                    {letter}
+                  </AlphabetLetter>
+                ))}
+              </AlphabetContainer>
+
+          </StoreGeneralContainer>
+
+
         </Container>
       </IonContent>
     </IonPage>
