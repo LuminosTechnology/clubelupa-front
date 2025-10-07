@@ -120,7 +120,9 @@ export const useSubscriptionAlert = () => {
   const checkAndShowAlert = (forceShow = false) => {
     if (!user) return;
 
-    const approvedStatus = user.establishments ? +user.establishments[0].approved_status : 1;
+     const approvedStatus = user.establishments && user.establishments.length > 0 
+                            ? +user.establishments[0].approved_status 
+                            : 1;
 
     if (user.is_affiliate && !user.is_payed && (approvedStatus === 2) && (forceShow || !hasShownAlert)) {
       // Para testar diferentes cenários, descomente uma das linhas abaixo:

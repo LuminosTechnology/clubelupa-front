@@ -336,3 +336,45 @@ export const ConfettiPiece = styled.div<{
   border-radius: 2px;
   pointer-events: none;
 `;
+
+export const Divider = styled.div`
+  width: 100%;
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 20px 0;
+`;
+
+export const AlternativeSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 0 25px;
+`;
+
+export const AlternativeLabel = styled.p`
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+`;
+
+export const AlternativeButton = styled.button<{ bg: string }>`
+  display: block;
+  width: 217px;
+  margin: 0 auto;
+  padding: 14px 0;
+  background: ${({ bg }) => bg};
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
+`;
