@@ -82,7 +82,6 @@ export const AvatarContainer = styled.div`
   transition: all 0.3s ease; 
   img {
     border-radius: 50%;
-    border: 4px solid #fff;
   }
 `;
 
