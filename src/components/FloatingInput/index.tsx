@@ -18,6 +18,7 @@ interface FloatingInputProps {
   isPassword?: boolean;
   error?: boolean;
   mask?: string;
+  maxLength?: number;
   inputMode?:
     | "text"
     | "numeric"
@@ -37,6 +38,7 @@ const FloatingInput: React.FC<FloatingInputProps> = ({
   isPassword = false,
   error = false,
   mask,
+  maxLength,
   inputMode,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -80,6 +82,7 @@ const FloatingInput: React.FC<FloatingInputProps> = ({
             type={type}
             maskChar={null}
             inputMode={inputMode}
+            maxLength={maxLength}
             value={value}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               onChange(e.target.value)
@@ -92,6 +95,7 @@ const FloatingInput: React.FC<FloatingInputProps> = ({
           <Input
             ref={inputRef}
             type={isPassword ? (showPassword ? "text" : "password") : type}
+            maxLength={maxLength}
             value={value}
             onChange={(e) => onChange(e.target.value)}
             onFocus={() => setIsFocused(true)}

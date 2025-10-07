@@ -7,6 +7,7 @@ export interface RegisterUserRequest {
   phone_number: string;
   password: string;
   password_confirmation: string;
+  auto_premium_code?: string;
   avatar?: File;
 }
 
