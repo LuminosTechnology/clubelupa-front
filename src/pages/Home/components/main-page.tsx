@@ -1,47 +1,93 @@
 import {
   MainPageContainer,
   MainPageInformation,
-  MainPageMedalButton,
-  MainPageMedalButtonsContainer,
+  MainPageTitle,
+  MainPageSubtitle,
+  PointsBadge,
+  PointsBadgeWrapper,
+  MedalsPreviewGrid,
+  MedalCard,
+  MedalCircle,
+  MedalLabel,
+  SeeMoreLink,
+  TitleContainer,
+  AchievementsParagraph,
+  SelectedMedalImage,
+  AchievementsTitle,
+  MedalInformationContainer,
 } from "./styles";
-
-import ConquistaIcon from "../../../assets/home-conquistas.svg?react";
-import LugaresIcon from "../../../assets/home-lugares.svg?react";
 import { useGamificationContext } from "../../../contexts/GamificationContext";
+import { Medal } from "../../../types/api/user";
+import { useEffect, useState } from "react";
 
-type Props = {
-  onMedalsClick: () => void;
-  onFavoritePlacesClick: () => void;
-};
+export const MainPage: React.FC = () => {
+  const { gamificationSummary, selectedMedal, setSelectedMedalState } = useGamificationContext();
+  const [medals, setMedals] = useState<Medal[] | null>(null);
 
-export const MainPage: React.FC<Props> = ({
-  onMedalsClick,
-  onFavoritePlacesClick,
-}) => {
-  const { gamificationSummary } = useGamificationContext();
+  useEffect( () => {
+    const med = gamificationSummary && gamificationSummary.medals.map(medal => ({ 
+      ...medal, containsMedal: true
+    } ) );
+  
+    const doNotHaveMedals = gamificationSummary && gamificationSummary.does_not_have_medals.map(medal => ({ 
+      ...medal, containsMedal: false
+    } ) );;
+  
+    const medalList = [...med ?? [], ...doNotHaveMedals ?? []]
+  
+    setMedals(medalList);
+  
+  }, [gamificationSummary?.does_not_have_medals, gamificationSummary?.medals] );
+
 
   return (
     <MainPageContainer>
-      <MainPageMedalButtonsContainer>
-        <MainPageMedalButton onClick={onMedalsClick}>
-          <ConquistaIcon />
-          <span>Conquistas</span>
-        </MainPageMedalButton>
-        <MainPageMedalButton onClick={onFavoritePlacesClick}>
-          <LugaresIcon />
-          <span>Lugares Favoritos</span>
-        </MainPageMedalButton>
-      </MainPageMedalButtonsContainer>
+
+      {selectedMedal ? (
+        <MedalInformationContainer>
+            <SelectedMedalImage
+              src={selectedMedal.icon_url}
+              alt={selectedMedal.name}
+            />
+            <AchievementsTitle>Parabéns</AchievementsTitle>
+            <AchievementsParagraph>
+              {selectedMedal.description}
+            </AchievementsParagraph>
+        </MedalInformationContainer>
+      ) : (
       <MainPageInformation>
-        <span>
-          Lugares já visitados com Lupa:{" "}
-          {gamificationSummary?.visited_establishments_count}
-        </span>
-        <span>
-          Moedas Lupa acumuladas: {gamificationSummary?.coins_balance}
-        </span>
-        <span>Dias usando o Lupa: {gamificationSummary?.days_as_member}</span>
-      </MainPageInformation>
+        
+        <TitleContainer>
+          <MainPageTitle>Complete objetivos</MainPageTitle>
+          <MainPageSubtitle>e desbloqueie medalhas!</MainPageSubtitle>
+        </TitleContainer>
+
+        <PointsBadgeWrapper>
+          <PointsBadge>
+            Você tem: {gamificationSummary?.points_balance ?? 0} pontos
+          </PointsBadge>
+        </PointsBadgeWrapper>
+
+        <MedalsPreviewGrid>
+          {medals?.map((m) => {
+            const isInEarnedMedals = gamificationSummary?.medals?.some(earnedMedal => earnedMedal.id === m.id) || false;
+            
+            return (
+              <MedalCard key={m.id}>
+                <MedalCircle $src={m.icon_url} $earned={isInEarnedMedals} />
+                <MedalLabel>{m.name}</MedalLabel>
+                
+                {
+                  isInEarnedMedals && (
+                    <SeeMoreLink onClick={() => { m.containsMedal && setSelectedMedalState(m) } }>Ver mais</SeeMoreLink>
+                  )
+                }
+              </MedalCard>
+            );
+          })}
+        </MedalsPreviewGrid>
+    </MainPageInformation>
+    )}
     </MainPageContainer>
   );
 };

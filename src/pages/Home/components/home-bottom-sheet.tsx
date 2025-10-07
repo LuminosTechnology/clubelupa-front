@@ -2,8 +2,8 @@ import { useState } from "react";
 import { BottomSheet } from "../../../components/BottomSheet";
 import { ColapseButtonsContainer, CollapsedButton } from "../home.style";
 
-import StoreIcon from "../../../assets/home-home.svg?react";
-import LupaIcon from "../../../assets/home-lupa.svg?react";
+import StoreIcon from "../../../assets/store.svg?react";
+import BookOpenIcon from "../../../assets/book-open.svg?react";
 import { MainPage } from "./main-page";
 import { useHistory } from "react-router";
 import { AchievementsPage } from "./achievements-page";
@@ -16,10 +16,7 @@ export const HomeBottomSheet = () => {
     switch (view) {
       case "main":
         return (
-          <MainPage
-            onMedalsClick={() => setView("medals")}
-            onFavoritePlacesClick={() => history.push("/favorites")}
-          />
+          <MainPage />
         );
       case "medals":
         return <AchievementsPage />;
@@ -33,16 +30,14 @@ export const HomeBottomSheet = () => {
       displayAvatar
       onClose={() => setView("main")}
       closeContent={
-        <>
           <ColapseButtonsContainer>
             <CollapsedButton onClick={() => history.push("/affiliates")}>
-              <LupaIcon />
+              <BookOpenIcon style={{ width: '70px', height: 'auto', fill: '#8e9455', stroke: '#8e9455' }} />
             </CollapsedButton>
             <CollapsedButton onClick={() => history.push("/lupacoins")}>
-              <StoreIcon />
+              <StoreIcon style={{ width: '70px', height: 'auto', fill: '#8e9455', stroke: '#8e9455' }} />
             </CollapsedButton>
           </ColapseButtonsContainer>
-        </>
       }
       openContent={renderOpenContent()}
     />

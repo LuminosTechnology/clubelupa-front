@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
-import { GamificationSummaryResponse } from "../types/api/user";
+import { GamificationSummaryResponse, Medal } from "../types/api/user";
 import { getGamificationSummary } from "../services/auth-service";
 import { useAuthContext } from "./AuthContext";
 
@@ -17,6 +17,8 @@ type GamificationContextType = {
   postRewardRedirect: string | null;
   setPostRewardRedirect: React.Dispatch<React.SetStateAction<string | null>>;
   clearPostRewardRedirect: () => void;
+  setSelectedMedalState: (medal: Medal | null) => void;
+  selectedMedal: Medal | null;
 };
 
 export const GamificationContext = createContext<GamificationContextType>(
@@ -37,6 +39,7 @@ export function GamificationProvider({ children }: Props) {
   const [currentReward, setCurrentReward] = useState<RewardItem | null>(null);
 
    const [postRewardRedirect, setPostRewardRedirect] = useState<string | null>(null);
+   const [selectedMedal, setSelectedMedal] = useState<Medal | null>(null);
 
   const { user, isAuthenticated } = useAuthContext();
 
@@ -136,6 +139,10 @@ useEffect(() => {
     }
   }, [addRewardsToQueue]);
 
+  const setSelectedMedalState = (medal: Medal | null) => {
+    setSelectedMedal(medal);
+  };
+
   return (
     <GamificationContext.Provider
       value={{
@@ -147,7 +154,9 @@ useEffect(() => {
         dismissCurrentReward,
         postRewardRedirect, 
         setPostRewardRedirect, 
-        clearPostRewardRedirect             
+        clearPostRewardRedirect,
+        setSelectedMedalState,
+        selectedMedal
       }}
     >
       {children}

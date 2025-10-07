@@ -8,12 +8,20 @@ export const CustomCard = styled.div`
   left: 0;
   right: 0;
   margin: 0;
-  border-radius: 40px 40px 0 0;
+  border-radius: 60px 60px 0 0;
   padding: 1rem;
   bottom: calc(-80vh);
-  background-color: #8e9455;
 
-  color: white;
+  background: linear-gradient(
+    180deg,
+    #fafafa 0%,
+    #f2f3eb 25%,
+    #e3e6d2 45%,
+    #bac090 75%,
+    #a3ab6a 100%
+  );
+
+  color: #43403e;
 
   display: flex;
   flex-direction: column;
@@ -38,16 +46,32 @@ export const CustomCard = styled.div`
   .closed {
     display: block;
   }
+
   .open {
     display: none;
   }
 
-  &[data-open="true"] .closed {
+  &[data-open='true'] .closed {
     display: none;
   }
 
-  &[data-open="true"] .open {
+  &[data-open='true'] .open {
     display: block;
+  }
+
+  &[data-open='true'] .avatar-container {
+    top: 20px;
+    margin-bottom: 1rem; 
+    z-index: 1;
+
+  }
+
+  &[data-open='true'] .avatar-progress-border {
+    width: 90px !important;
+  }
+
+  &[data-open='false'] .main-page-medal-buttons-container {
+  display: none;
   }
 `;
 
@@ -55,6 +79,10 @@ export const AvatarContainer = styled.div`
   position: absolute;
   top: -55px;
   z-index: 10;
+  transition: all 0.3s ease; 
+  img {
+    border-radius: 50%;
+  }
 `;
 
 export const AvatarProgressBorder = styled.div<{ $progress: number }>`
@@ -112,4 +140,29 @@ export const CloseButton = styled.button`
   justify-items: center;
   margin: 0 auto;
   margin-top: 2rem;
+`;
+
+
+export const MainPageMedalButtonsContainer = styled.div`
+  display: flex;
+  gap: 2rem;
+  align-items: start;
+  justify-content: space-between;
+  width: 100%;
+`;
+
+export const MainPageMedalButton = styled.button`
+  background-color: transparent;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 16px;
+
+  span {
+    text-align: center;
+    color: #8e9455;
+    font-size: 0.875rem;
+    max-width: 100px;
+  }
 `;

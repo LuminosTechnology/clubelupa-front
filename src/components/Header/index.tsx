@@ -35,7 +35,7 @@ const Header: React.FC<Props> = ({ onSearchChange }) => {
       <HeaderContainer>
         <BarWrapper>
           {/* input com borda preta */}
-          <SearchWrapper>
+          { /* <SearchWrapper> */ }
             <SearchIcon src={newSearchIcon} alt="Buscar" />
             <SearchInput
               placeholder="O que você procura hoje?"
@@ -46,7 +46,7 @@ const Header: React.FC<Props> = ({ onSearchChange }) => {
               onKeyDown={handleKeyDown}
               value={searchValue}
             />
-          </SearchWrapper>
+          { /* </SearchWrapper> */ }
 
           <MenuIconWrapper>
             <NotificationBadge />

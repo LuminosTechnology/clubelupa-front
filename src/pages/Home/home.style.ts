@@ -105,3 +105,4 @@ export const StyledAlert = styled(IonAlert)`
     white-space: pre-line; /* Faz o \n virar quebra de linha */
   }
 `;
+

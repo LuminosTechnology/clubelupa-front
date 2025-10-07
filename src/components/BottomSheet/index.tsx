@@ -7,11 +7,16 @@ import {
   CloseButton,
   CustomCard,
   LevelBadge,
+  MainPageMedalButtonsContainer,
+  MainPageMedalButton,
 } from "./styles";
 import CoinLevel from "../../assets/moeda_vazia.png";
 import XIcon from "../../assets/x.svg?react";
 import { useGamificationContext } from "../../contexts/GamificationContext";
 
+import StoreIcon from "../../assets/store.svg?react";
+import BookOpenIcon from "../../assets/book-open.svg?react";
+import { useHistory } from "react-router";
 type Props = {
   openContent: ReactNode;
   closeContent: ReactNode;
@@ -27,7 +32,8 @@ export const BottomSheet: React.FC<Props> = ({
 }) => {
   const drawerRef = useRef<HTMLDivElement>(null);
   const { user } = useAuthContext();
-  const { gamificationSummary } = useGamificationContext();
+  const { gamificationSummary, selectedMedal, setSelectedMedalState } = useGamificationContext();
+  const history = useHistory();
 
   const OPEN_Y = -window.innerHeight * 0.8;
   const CLOSED_Y = -80;
@@ -85,20 +91,34 @@ export const BottomSheet: React.FC<Props> = ({
   }, []);
 
   const handleClose = () => {
+    if(selectedMedal) {
+      setSelectedMedalState(null);
+      return;
+    }
     let c = drawerRef.current;
     if (!c) return;
 
     c.style.transform = `translateY(${CLOSED_Y}px)`;
     c.dataset.open = "false";
-
+    
     onClose();
   };
 
   return (
     <CustomCard ref={drawerRef}>
+       <MainPageMedalButtonsContainer className="main-page-medal-buttons-container">
+        <MainPageMedalButton onClick={() => history.push("/affiliates")}>
+        <BookOpenIcon style={{ width: '70px', height: 'auto', fill: '#8e9455', stroke: '#8e9455'  }} />
+          <span>Afiliados</span>
+        </MainPageMedalButton>
+        <MainPageMedalButton onClick={() => history.push("/lupacoins")}>
+          <StoreIcon style={{ width: '70px', height: 'auto', fill: '#8e9455', stroke: '#8e9455'  }} />
+          <span>Experiências</span>
+        </MainPageMedalButton>
+      </MainPageMedalButtonsContainer>
       {displayAvatar && (
-        <AvatarContainer>
-          <AvatarProgressBorder $progress={40}>
+        <AvatarContainer className="avatar-container">
+          <AvatarProgressBorder $progress={40} className="avatar-progress-border">
             <img src={user?.avatar_url || "/assets/default-photo.png"} alt="" />
           </AvatarProgressBorder>
           <LevelBadge>
