@@ -38,7 +38,7 @@ export const SearchWrapper = styled.div`
   display: flex;
   align-items: center;
   background: transparent;
-  border: 1px solid rgba(0, 0, 0, 0.24);
+  border: none;
   border-radius: 100px;
   padding: 0 12px;
 `;
@@ -57,12 +57,13 @@ export const SearchIcon = styled.img`
 export const SearchInput = styled.input`
   flex: 1;
   height: 25px; /* altura do campo de texto */
-  margin-left: 8px;
+  padding-left: 8px;
   background: transparent;
   border: none;
   outline: none;
-  font-size: 14px;
+  font-size: 16px;
   color: #666666;
+  text-align: center;
 
   &::placeholder {
     color: #cbccce;

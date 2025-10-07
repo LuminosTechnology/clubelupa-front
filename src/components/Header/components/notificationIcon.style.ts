@@ -42,6 +42,10 @@ export const NotificationIcon = styled.div<NotificationIconProps>`
   font-size: 10px;
   font-weight: bold;
   border: 1px solid white;
+
+  &.displayNone {
+    display: none;
+  }
 `;
 
 export const MenuIconWrapper = styled.div`
