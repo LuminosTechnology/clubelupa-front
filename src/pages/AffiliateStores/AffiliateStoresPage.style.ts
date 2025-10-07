@@ -15,9 +15,14 @@ export const ListWrapper = styled.div`
   padding-bottom: 28px;
 `;
 
+export const StoreGeneralContainer = styled.div`
+  position: relative;
+
+`;
+
 export const AlphabetContainer = styled.div`
-  position: fixed;
-  top: 140px;
+  position: absolute;
+  top: 0;
   right: 0;
   display: flex;
   flex-direction: column;
