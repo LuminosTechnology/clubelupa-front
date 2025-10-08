@@ -1,5 +1,3 @@
-import { IonCard } from "@ionic/react";
-import CloseIcon from "../../assets/footer-close.svg?react";
 import styled from "styled-components";
 
 export const CustomCard = styled.div`
@@ -8,10 +6,9 @@ export const CustomCard = styled.div`
   left: 0;
   right: 0;
   margin: 0;
-  border-radius: 60px 60px 0 0;
-  padding: 1rem;
-  bottom: calc(-80vh);
+  padding: 0 1rem;
 
+  justify-content: flex-start;
   background: linear-gradient(
     180deg,
     #fafafa 0%,
@@ -37,18 +34,28 @@ export const CustomCard = styled.div`
   }
 
   .content-wrapper {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
+   width: 100%;
+   height: auto;
   }
 
   .closed {
     display: block;
+    width: 100%;
+    padding-top: 8px;
   }
 
   .open {
     display: none;
+    min-height: calc(70vh - 200px);
+  }
+
+  &[data-open='true'] {
+    padding-top: 1rem;
+    border-radius: 60px 60px 0 0;
+  }
+
+  &[data-open='false'] {
+    border-radius: 30px 30px 0 0;
   }
 
   &[data-open='true'] .closed {
@@ -72,6 +79,16 @@ export const CustomCard = styled.div`
 
   &[data-open='false'] .main-page-medal-buttons-container {
   display: none;
+  }
+
+  &[data-open='true'] .swipe-indicator-container {
+    display: block;
+    opacity: 1;
+  }
+
+  &[data-open='false'] .swipe-indicator-container {
+    display: none;
+    opacity: 0;
   }
 `;
 
@@ -134,12 +151,15 @@ export const CloseButton = styled.button`
   border: 1px solid white;
   border-radius: 50%;
   aspect-ratio: 1;
-  padding: 1rem;
+  padding: 0.875rem;
   display: flex;
   align-items: center;
   justify-items: center;
   margin: 0 auto;
-  margin-top: 2rem;
+  position: sticky;
+  z-index: 50;
+  justify-self: center;
+  margin-bottom: 10px;
 `;
 
 
@@ -158,6 +178,8 @@ export const MainPageMedalButton = styled.button`
   flex-direction: column;
   align-items: center;
   padding: 0 16px;
+  position: relative;
+  z-index: 30;
 
   span {
     text-align: center;
@@ -165,4 +187,17 @@ export const MainPageMedalButton = styled.button`
     font-size: 0.875rem;
     max-width: 100px;
   }
+`;
+
+export const SwipeIndicator = styled.div`
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 4px;
+  background-color: rgba(104, 102, 102, 0.5);
+  border-radius: 2px;
+  z-index: 20;
+  transition: opacity 0.3s ease;
 `;

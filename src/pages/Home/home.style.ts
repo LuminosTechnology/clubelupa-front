@@ -18,18 +18,25 @@ export const ColapseButtonsContainer = styled.div`
   flex: 1;
   width: 100%;
   justify-content: space-between;
+  align-content: center;
   align-items: center;
-  padding: 0 3rem;
   z-index: 20;
-`;
+  `;
 
 export const CollapsedButton = styled.button`
   background: none;
+  flex-direction: column;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 20;
+  position: relative;
+  span {
+    text-align: center;
+    color: #8e9455;
+    font-size: 0.875rem;
+  }
 `;
 
 export const ContainerSuccess = styled.div`

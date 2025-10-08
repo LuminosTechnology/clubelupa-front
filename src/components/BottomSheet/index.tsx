@@ -6,17 +6,17 @@ import {
   AvatarProgressBorder,
   CloseButton,
   CustomCard,
-  LevelBadge,
   MainPageMedalButtonsContainer,
   MainPageMedalButton,
+  SwipeIndicator,
 } from "./styles";
-import CoinLevel from "../../assets/moeda_vazia.png";
 import XIcon from "../../assets/x.svg?react";
 import { useGamificationContext } from "../../contexts/GamificationContext";
-
+import MedalDefault from "../../assets/medalha-geral.png";
 import StoreIcon from "../../assets/store.svg?react";
 import BookOpenIcon from "../../assets/book-open.svg?react";
 import { useHistory } from "react-router";
+
 type Props = {
   openContent: ReactNode;
   closeContent: ReactNode;
@@ -32,9 +32,8 @@ export const BottomSheet: React.FC<Props> = ({
 }) => {
   const drawerRef = useRef<HTMLDivElement>(null);
   const { user } = useAuthContext();
-  const { gamificationSummary, selectedMedal, setSelectedMedalState } = useGamificationContext();
+  const {  selectedMedal, setSelectedMedalState } = useGamificationContext();
   const history = useHistory();
-
   const OPEN_Y = -window.innerHeight * 0.8;
   const CLOSED_Y = -80;
 
@@ -104,28 +103,75 @@ export const BottomSheet: React.FC<Props> = ({
     onClose();
   };
 
+  const handleOpen = () => {
+    const c = drawerRef.current;
+    if (!c) return;
+  
+    if (c.dataset.open === "true") return;
+  
+    c.style.transition = "200ms ease-out";
+    c.style.transform = `translateY(${OPEN_Y}px)`;
+    c.dataset.open = "true";
+  };
+  
+
+  const handleClick = (e: React.MouseEvent) => {
+    const c = drawerRef.current;
+    if (!c) return;
+  
+    if (c.dataset.open === "true") return;
+  
+    const target = e.target as HTMLElement;
+    const isIconOrButton = target.closest(
+      ".main-page-medal-buttons-container, button, [data-icon]"
+    );
+  
+    if (isIconOrButton) {
+      e.stopPropagation();
+      return;
+    }
+  
+    handleOpen();
+  };
+  
+  
+
   return (
-    <CustomCard ref={drawerRef}>
+    <CustomCard ref={drawerRef} onClick={handleClick}>
+      <div className="swipe-indicator-container">
+        <SwipeIndicator  />
+      </div>
        <MainPageMedalButtonsContainer className="main-page-medal-buttons-container">
-        <MainPageMedalButton onClick={() => history.push("/affiliates")}>
+        <MainPageMedalButton 
+          onClick={(e) => {
+            e.stopPropagation();
+            history.push("/affiliates");
+          }} 
+          data-icon="book-open"
+        >
         <BookOpenIcon style={{ width: '70px', height: 'auto', fill: '#8e9455', stroke: '#8e9455'  }} />
           <span>Afiliados</span>
         </MainPageMedalButton>
-        <MainPageMedalButton onClick={() => history.push("/lupacoins")}>
+        <MainPageMedalButton 
+          onClick={(e) => {
+            e.stopPropagation();
+            history.push("/lupacoins");
+          }} 
+          data-icon="store"
+        >
           <StoreIcon style={{ width: '70px', height: 'auto', fill: '#8e9455', stroke: '#8e9455'  }} />
           <span>Experiências</span>
+          <img src={MedalDefault} alt="Medalha" style={{ width: '18px', height: 'auto', fill: '#8e9455', stroke: '#8e9455', position: 'absolute', bottom: '20px', left: '35px' }} />
         </MainPageMedalButton>
       </MainPageMedalButtonsContainer>
       {displayAvatar && (
+        <>
         <AvatarContainer className="avatar-container">
           <AvatarProgressBorder $progress={40} className="avatar-progress-border">
             <img src={user?.avatar_url || "/assets/default-photo.png"} alt="" />
           </AvatarProgressBorder>
-          <LevelBadge>
-            <img src={CoinLevel} alt="Moeda de nível" />
-            <span>{gamificationSummary?.current_level.number || "0"}</span>
-          </LevelBadge>
         </AvatarContainer>
+        </>
       )}
       <div className="swipe-helper" />
       <div className="content-wrapper">

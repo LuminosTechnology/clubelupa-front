@@ -46,8 +46,19 @@ export const AchievementItem = styled.button`
 export const MainPageContainer = styled.div`
   margin-top: 64px;
   overflow-y: auto;
-  max-height: 54vh;
+  max-height: calc(65vh - 100px);
+  
+  @media (max-height: 600px) {
+    max-height: calc(55vh - 100px);
+    padding-bottom: 100px;
+  }
+  
+  @media (max-height: 500px) {
+    max-height: calc(45vh - 100px);
+    padding-bottom: 120px;
+  }
 `;
+
 
 export const TitleContainer = styled.div`
   display: flex;
@@ -113,7 +124,7 @@ export const MedalCircle = styled.div<{ $src?: string; $earned?: boolean }>`
   justify-content: center;
   position: relative;
   background: ${({ $src }) => ($src ? `url(${$src}) center/80% no-repeat` : "transparent")};
-  filter: ${({ $earned }) => ($earned ? 'grayscale(0%)' : 'grayscale(100%)')};
+  filter: ${({ $earned }) => ($earned ? 'grayscale(0%) blur(0px)' : 'grayscale(100%) blur(2px)')};
 `;
 
 export const MedalLabel = styled.div`

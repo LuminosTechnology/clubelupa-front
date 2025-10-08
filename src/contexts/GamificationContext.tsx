@@ -43,6 +43,7 @@ export function GamificationProvider({ children }: Props) {
 
   const { user, isAuthenticated } = useAuthContext();
 
+
   const refetchGamificationSummary = async () => {
     await fetchGamificationSummary();
   };
@@ -156,7 +157,7 @@ useEffect(() => {
         setPostRewardRedirect, 
         clearPostRewardRedirect,
         setSelectedMedalState,
-        selectedMedal
+        selectedMedal,
       }}
     >
       {children}
