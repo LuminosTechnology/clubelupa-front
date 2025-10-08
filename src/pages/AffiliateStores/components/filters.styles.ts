@@ -13,13 +13,26 @@ export const Modal = styled(IonModal)`
     
   }
 
-  ion-item {
+  ion-button {
+    background-color: #e6c178;
+    color: #000;
+    border: none;
+    padding: 2% 1%;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin: -2% 0 0 4%;
+  }
+
+    ion-item {
     color: #9fa369;    
+    border: none;
   }
 
     button {
       border: none;
     }  
+
 `;
 
 export const List = styled(IonList)`
@@ -65,21 +78,9 @@ export const Header = styled.div`
   
 `;
 
-export const CloseButton = styled.button`
-    background: transparent;
-    border: 1px solid #fff;
-    color: #fff;
-    padding: 0;
-    cursor: pointer;
-
-    ion-icon {
-        font-size: 24px;
-    }
-`;
-
 export const SubmitButton = styled.button`
   background-color: #e6c178;
-  color: #fff;
+  color: #000;
   border: none;
   padding: 1rem;
   border-radius: 5px;

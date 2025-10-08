@@ -17,6 +17,7 @@ import { CategoryService } from "../../../services/category-service";
 import { CategoryTreeNode } from "../../../types/api/category";
 import { Checkbox, Header, Modal, SubmitButton } from "./filters.styles";
 import { close } from "ionicons/icons"; 
+import { color } from "framer-motion";
 
 type IonModalReactProps = ComponentPropsWithoutRef<typeof IonModal>;
 
@@ -75,11 +76,19 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
     }
   };
 
+const handleClearFilters = () => {
+    setSelectedSub([]);
+    setSelectedCategory(null);
+    //setOpenAccordion(null);
+
+    //onFilter([]);
+    
+  };  
+
   const handleSubmit = () => {
     let categoriesIds = [];
     const isFatherCategory = selectedCategory !== null;
     const isChildrenCategory = selectedSub.length > 0;
-    debugger;
 
     if (isFatherCategory && !isChildrenCategory) categoriesIds.push(selectedCategory);
 
@@ -147,6 +156,13 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
         </IonAccordionGroup>
         <br />
         <SubmitButton onClick={handleSubmit}>Filtrar</SubmitButton>
+        <IonButton 
+            fill="clear" 
+            size="small" 
+            onClick={handleClearFilters}
+        >
+            Limpar Filtros
+        </IonButton>        
       </IonContent>
     </Modal>
   );
