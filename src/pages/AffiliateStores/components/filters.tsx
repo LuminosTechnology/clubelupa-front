@@ -77,12 +77,14 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
 
   const handleSubmit = () => {
     let categoriesIds = [];
-    if (selectedCategory !== null) {
-      categoriesIds.push(selectedCategory);
-    }
-    if (selectedSub.length > 0) {
-      categoriesIds.push(...selectedSub);
-    }
+    const isFatherCategory = selectedCategory !== null;
+    const isChildrenCategory = selectedSub.length > 0;
+    debugger;
+
+    if (isFatherCategory && !isChildrenCategory) categoriesIds.push(selectedCategory);
+
+    if (isChildrenCategory) categoriesIds.push(...selectedSub);
+
     onFilter(categoriesIds);
   };
 
