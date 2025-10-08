@@ -20,7 +20,7 @@ export const CustomModal: React.FC<CustomModalProps> = ({ isOpen, onClose, child
                 <ModalWrapper>
                     {/* O fundo escuro com animação de fade */}
                     <ModalBackdrop
-                        onClick={onClose} // Clicar no fundo fecha a modal
+                        //onClick={onClose}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}

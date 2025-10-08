@@ -65,6 +65,10 @@ const AffiliateStoresPage: React.FC = () => {
     handleSelectLetter(touch.clientY);
   };
 
+  const handleCloseModal = () => {
+    setIsFilterOpen(false);
+}
+
   const handleMouse = (e: React.MouseEvent) => {
     if (e.buttons) {
       // Only if mouse is pressed
@@ -111,6 +115,8 @@ const AffiliateStoresPage: React.FC = () => {
     <IonPage style={{ "--background": "#ffffff" }}>
       <CategoryFilter
         isOpen={isFilterOpen}
+        onClose={handleCloseModal}
+        onDidDismiss={handleCloseModal}
         onFilter={(ids) => {
           setCategoriesFilter(ids);
           setIsFilterOpen(false);

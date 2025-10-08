@@ -9,20 +9,26 @@ import {
   IonModal,
   IonRadio,
   IonRadioGroup,
+  IonButton,
+  IonIcon
 } from "@ionic/react";
 import React, { ComponentPropsWithoutRef, useEffect, useState } from "react";
 import { CategoryService } from "../../../services/category-service";
 import { CategoryTreeNode } from "../../../types/api/category";
 import { Checkbox, Header, Modal, SubmitButton } from "./filters.styles";
+import { close } from "ionicons/icons"; 
+import { color } from "framer-motion";
 
 type IonModalReactProps = ComponentPropsWithoutRef<typeof IonModal>;
 
 type CategoryFilterProps = IonModalReactProps & {
   onFilter: (categoriesIds: number[]) => unknown;
+  onClose: () => void; 
 };
 
 export const CategoryFilter: React.FC<CategoryFilterProps> = ({
   onFilter,
+  onClose,
   ...rest
 }) => {
   const [categories, setCategories] = useState<CategoryTreeNode[]>([]);
@@ -70,14 +76,24 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
     }
   };
 
+const handleClearFilters = () => {
+    setSelectedSub([]);
+    setSelectedCategory(null);
+    //setOpenAccordion(null);
+
+    //onFilter([]);
+    
+  };  
+
   const handleSubmit = () => {
     let categoriesIds = [];
-    if (selectedCategory !== null) {
-      categoriesIds.push(selectedCategory);
-    }
-    if (selectedSub.length > 0) {
-      categoriesIds.push(...selectedSub);
-    }
+    const isFatherCategory = selectedCategory !== null;
+    const isChildrenCategory = selectedSub.length > 0;
+
+    if (isFatherCategory && !isChildrenCategory) categoriesIds.push(selectedCategory);
+
+    if (isChildrenCategory) categoriesIds.push(...selectedSub);
+
     onFilter(categoriesIds);
   };
 
@@ -85,8 +101,10 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
     <Modal {...rest}>
       <IonContent>
         <Header>
-          <h1>Filtro de Categorias</h1>
-          <SubmitButton onClick={handleSubmit}>Filtrar</SubmitButton>
+          <h1>Filtro de Busca</h1>       
+          <IonButton fill="clear" onClick={onClose}>
+            <IonIcon icon={close} slot="icon-only" />
+          </IonButton>             
         </Header>
 
         <IonAccordionGroup>
@@ -136,6 +154,15 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({
             )
           )}
         </IonAccordionGroup>
+        <br />
+        <SubmitButton onClick={handleSubmit}>Filtrar</SubmitButton>
+        <IonButton 
+            fill="clear" 
+            size="small" 
+            onClick={handleClearFilters}
+        >
+            Limpar Filtros
+        </IonButton>        
       </IonContent>
     </Modal>
   );
