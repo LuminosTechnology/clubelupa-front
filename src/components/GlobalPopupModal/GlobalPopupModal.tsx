@@ -3,10 +3,6 @@ import { IonContent, IonIcon } from '@ionic/react';
 import { usePopupContext } from '../../contexts/PopupContext';
 import { close } from 'ionicons/icons';
 
-// 1. REMOVA O IMPORT DO ARQUIVO CSS ANTIGO
-// import './GlobalPopupModal.css'; 
-
-// 2. IMPORTE OS NOVOS STYLED COMPONENTS
 import {
     StyledPopupModal,
     PopupContainer,
@@ -20,12 +16,11 @@ export const GlobalPopupModal: React.FC = () => {
     const { currentPopup, dismissPopup, handlePopupAction } = usePopupContext();
 
     return (
-        // 3. SUBSTITUA IonModal por StyledPopupModal
         <CustomModal
             isOpen={!!currentPopup}
             onClose={dismissPopup}
         >
-            {/* O conteúdo que você quer exibir DENTRO da modal vai aqui */}
+            
             <PopupContainer>
                 <CloseButton
                     fill="clear"

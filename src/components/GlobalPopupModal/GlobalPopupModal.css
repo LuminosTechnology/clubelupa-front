@@ -23,8 +23,8 @@
 
 .global-popup-modal .popup-close-button {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 0.4%;
+    right: 6%;
     z-index: 10;
     --color: white;
     background-color: rgba(0, 0, 0, 0.5);
