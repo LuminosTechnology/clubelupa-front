@@ -189,6 +189,7 @@ const App: React.FC = () => {
             component={AffiliateEdit}
           />
           <PrivateRoute exact path="/affiliates" component={AffiliateStores} />
+          
           <PrivateRoute
             exact
             path="/affiliate-view/:id"
