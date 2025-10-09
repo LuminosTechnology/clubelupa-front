@@ -11,7 +11,8 @@ import Map from "../../components/Map";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { useSubscriptionAlert } from "../../hooks/useSubscriptionAlert";
 import { HomeBottomSheet } from "./components/home-bottom-sheet";
-import { StyledAlert } from "./home.style";
+import { StyledAlert, Teste } from "./home.style";
+import { StatusBar, Style } from '@capacitor/status-bar';
 
 const Home: React.FC = () => {
   const history = useHistory();
@@ -63,47 +64,60 @@ const Home: React.FC = () => {
     checkAndShowAlert();
   }, [user, checkAndShowAlert]);
 
+  useEffect(() => {
+    // Faz a barra sobrepor a WebView (importante!)
+    StatusBar.setOverlaysWebView({ overlay: true });
+
+    // Define a cor da barra como transparente
+    StatusBar.setBackgroundColor({ color: 'transparent' });
+
+    // Define o estilo dos ícones como claro (brancos)
+    StatusBar.setStyle({ style: Style.Light });
+  }, []);
+  
   return (
-    <IonPage>
-      <StyledAlert
-        isOpen={displayPaymentWarning}
-        title={`Seja bem-vindo(a) ao Lupa!`}
-        message={
-          `Seu espaço está quase garantido!\n\n` +
-          `Para oficializar e concluir o cadastro, oficialize a sua assinatura como afiliado Lupa!\n\n` +
-          `(${alertMessage})`
-        }
-        cssClass="alert-multiline"
-        buttons={[
-          {
-            text: "Deixar para depois",
-            role: "cancel",
-            handler: () => {
-              closeAlert();
+    <Teste>
+      <IonPage>
+        <StyledAlert
+          isOpen={displayPaymentWarning}
+          title={`Seja bem-vindo(a) ao Lupa!`}
+          message={
+            `Seu espaço está quase garantido!\n\n` +
+            `Para oficializar e concluir o cadastro, oficialize a sua assinatura como afiliado Lupa!\n\n` +
+            `(${alertMessage})`
+          }
+          cssClass="alert-multiline"
+          buttons={[
+            {
+              text: "Deixar para depois",
+              role: "cancel",
+              handler: () => {
+                closeAlert();
+              },
             },
-          },
-          {
-            text: "Assinar agora",
-            role: "confirm",
-            handler: () => {
-              closeAlert();
-              history.push("/affiliate/paywall");
+            {
+              text: "Assinar agora",
+              role: "confirm",
+              handler: () => {
+                closeAlert();
+                history.push("/affiliate/paywall");
+              },
             },
-          },
-        ]}
-      />
-      <IonContent scrollY={false}>
-        <Header onSearchChange={setSearchValue} />
-        <Map
-          searchValue={searchValue}
-          mapReady={mapReady}
-          onViewMore={(affiliate) => {
-            history.push(`/affiliate-view/${affiliate.id}`);
-          }}
+          ]}
         />
-        <HomeBottomSheet />
-      </IonContent>
-    </IonPage>
+        <IonContent scrollY={false}>
+          <Header onSearchChange={setSearchValue} />
+          <Map
+            searchValue={searchValue}
+            mapReady={mapReady}
+            onViewMore={(affiliate) => {
+              history.push(`/affiliate-view/${affiliate.id}`);
+            }}
+          />
+          <HomeBottomSheet />
+        </IonContent>
+      </IonPage>
+    </Teste>
   );
 };
 
