@@ -1,4 +1,3 @@
-// src/pages/Vouncher/Vouncher.tsx
 import {
   IonAlert,
   IonContent,
@@ -51,13 +50,16 @@ const LupoCoins: React.FC = () => {
   const history = useHistory();
   const [showFooter, setShowFooter] = useState(false);
   const [displayPaymentWarning, setDisplayPaymentWarning] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRedeeming, setIsRedeeming] = useState(false);
 
   const [selected, setSelected] = useState<Experience | undefined>();
 
-  const { gamificationSummary } = useGamificationContext();
+  const { gamificationSummary, refetchGamificationSummary, addRewardToQueue } = useGamificationContext();
   const { user } = useAuthContext();
 
   useEffect(() => {
@@ -80,6 +82,36 @@ const LupoCoins: React.FC = () => {
     fetchExperiences();
   }, []);
 
+  const handleRedeemExperience = async () => {
+    if (!selected) return;
+    
+    setIsRedeeming(true);
+    try {
+      await ExperienceService.redeemExperience(selected.id);
+      setShowFooter(false);
+      setSelected(undefined);
+      
+      const experienceReward = {
+        type: 'experience' as const,
+        data: {
+          title: selected.title,
+          establishment: selected.establishment?.name || ''
+        }
+      };
+      
+      addRewardToQueue(experienceReward);
+      
+      await refetchGamificationSummary();
+      
+    } catch (error) {
+      console.error('Error redeeming experience:', error);
+      setAlertMessage("Erro ao resgatar experiência. Tente novamente.");
+      setShowErrorAlert(true);
+    } finally {
+      setIsRedeeming(false);
+    }
+  };
+
   return (
     <IonPage>
       <IonAlert
@@ -90,6 +122,14 @@ const LupoCoins: React.FC = () => {
         }}
         title="Atenção"
         message={`Área exclusiva para sócios Lupa: aqui você troca suas moedas por experiências únicas em Curitiba. Torne-se sócio e venha desbloquear esse mundo com a gente!`}
+        buttons={["OK"]}
+      />
+      
+      <IonAlert
+        isOpen={showErrorAlert}
+        onDidDismiss={() => setShowErrorAlert(false)}
+        title="Erro"
+        message={alertMessage}
         buttons={["OK"]}
       />
       <AppHeader
@@ -178,7 +218,12 @@ const LupoCoins: React.FC = () => {
                   </VoucherText>
                 </VoucherSection>
                 {selected?.can_redeem ? (
-                  <VoucherButton>quero trocar minhas moedas lupa</VoucherButton>
+                  <VoucherButton 
+                    onClick={handleRedeemExperience}
+                    disabled={isRedeeming}
+                  >
+                    {isRedeeming ? "Processando..." : "quero trocar minhas moedas lupa"}
+                  </VoucherButton>
                 ) : (
                   <VoucherText>
                     Você não possui Moedas Lupa o suficiente

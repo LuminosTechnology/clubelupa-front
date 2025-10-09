@@ -1,6 +1,6 @@
-// src/pages/AffiliateStores/AffiliateStoresPage.tsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IonPage, IonContent } from "@ionic/react";
+import { useLocation } from "react-router-dom";
 
 import AppHeader from "../../components/SimpleHeader";
 import SearchBar from '../../components/SearchButton/SearchBar';
@@ -10,14 +10,13 @@ import {
   Container,
   ListWrapper,
   StoreCard,
-  StoreImage,
   StoreInfo,
   StoreLine,
-  StoreLineLink,
 } from "./Experience.style";
 
 import searchIcon from "../../assets/lupa-search.svg";
-import sampleImg from "../../assets/sample-store.png";
+import { ExperienceService } from "../../services/experiencesService";
+import { ExperienceHistory } from "../../types/api/experiences";
 
 export interface Store {
   id: number;
@@ -26,19 +25,24 @@ export interface Store {
   img: string;
 }
 
-export const stores: Store[] = [
-  { id: 1, name: "Alameda Simple Organic", category: "Cosméticos", img: sampleImg },
-  { id: 2, name: "Bio Verde", category: "Alimentação", img: sampleImg },
-  { id: 3, name: "Casa Natural", category: "Saúde", img: sampleImg },
-  { id: 4, name: "Eco Shop", category: "Casa", img: sampleImg },
-];
 
 const Experience: React.FC = () => {
   const [query, setQuery] = useState("");
+  const [experiences, setExperiences] = useState<ExperienceHistory[]>([]);
+  const location = useLocation();
+ 
+  const fetchExperiences = async () => {
+    const response = await ExperienceService.getExperiencesByUser();
+    setExperiences(response);
+  };
 
-  const filteredStores = stores.filter(s =>
-    s.name.toLowerCase().includes(query.toLowerCase().trim())
-  );
+  useEffect(() => {
+    fetchExperiences();
+  }, []);
+
+  useEffect(() => {
+    fetchExperiences();
+  }, [location.pathname]);
 
   return (
     <IonPage>
@@ -59,14 +63,12 @@ const Experience: React.FC = () => {
             />
 
             <ListWrapper>
-              {filteredStores.map(store => (
-                <StoreCard key={store.id}>
-                  <StoreImage src={store.img} alt={store.name} />
+              {experiences.map(exp => (
+                <StoreCard key={exp.id}>
                   <StoreInfo>
-                    <StoreLine>{store.name}</StoreLine>
-                    <StoreLine>{store.category}</StoreLine>
-                    <StoreLine>Horário de funcionamento</StoreLine>
-                    <StoreLineLink href="/home">Benefícios</StoreLineLink>
+                    <StoreLine>{exp.experience_name}</StoreLine>
+                    <StoreLine>{exp.establishment_name}</StoreLine>
+                    <StoreLine>{exp.cost_in_coins} Moedas</StoreLine>
                   </StoreInfo>
                 </StoreCard>
               ))}

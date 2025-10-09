@@ -25,3 +25,23 @@ export type Experience = {
   updated_at: FormattedDate;
   deleted_at?: FormattedDate;
 };
+
+export type ExperienceHistory = {     
+  id: number,
+  experience_name: string;
+  establishment_name: string;
+  cost_in_coins: number;
+  redeemed_at: FormattedDate;
+  short: string;
+  short_with_time: string;
+  human: string;
+  }
+
+  export interface RedeemExperienceRequest {
+    experience_id: number;
+  }
+  
+  export interface RedeemExperienceResponse {
+    message: string;
+    data: any;
+  }

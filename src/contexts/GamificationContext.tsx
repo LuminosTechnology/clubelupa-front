@@ -13,6 +13,7 @@ type GamificationContextType = {
   refetchGamificationSummary: () => void;
   currentReward: RewardItem | null; 
   addRewardsToQueue: (rewards: RewardsApiResponse) => void;
+  addRewardToQueue: (reward: RewardItem) => void;
   dismissCurrentReward: () => void;
   postRewardRedirect: string | null;
   setPostRewardRedirect: React.Dispatch<React.SetStateAction<string | null>>;
@@ -78,6 +79,10 @@ export function GamificationProvider({ children }: Props) {
     if (newRewards.length > 0) {
         setRewardQueue(prevQueue => [...prevQueue, ...newRewards]);
     }
+  };
+
+  const addRewardToQueue = (reward: RewardItem) => {
+    setRewardQueue(prevQueue => [...prevQueue, reward]);
   };
 
   useEffect(() => {
@@ -152,6 +157,7 @@ useEffect(() => {
         refetchGamificationSummary,
         currentReward,
         addRewardsToQueue,
+        addRewardToQueue,
         dismissCurrentReward,
         postRewardRedirect, 
         setPostRewardRedirect, 

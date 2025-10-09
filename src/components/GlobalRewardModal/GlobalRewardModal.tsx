@@ -2,8 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
     IonModal,
     IonContent,
-    IonButtons,
-    IonButton,
     IonIcon
 } from '@ionic/react';
 import Confetti from 'react-confetti';
@@ -39,9 +37,11 @@ const RewardDetails: React.FC<RewardDetailsProps> = ({ reward, onAction }) => {
     const showShareButton = reward.type === 'points' 
                             || reward.type === 'coins' 
                             || reward.type === 'medal' 
-                            || reward.type === 'level_up';
+                            || reward.type === 'level_up'
+                            || reward.type === 'experience';
 
     const isCoin = reward.type === 'coins';
+    const isExperience = reward.type === 'experience';
 
     switch (reward.type) {
         case 'points':
@@ -81,6 +81,16 @@ const RewardDetails: React.FC<RewardDetailsProps> = ({ reward, onAction }) => {
                 </>
             );
         break;
+        case 'experience':
+            content = (
+                <>
+                    <h2 className="reward-title addington">Parabéns!</h2>
+                    <p className="reward-subtitle addington italic">Você desbloqueou mais uma experiência incrível!</p>
+                    <p className="reward-subtitle karla">{reward.data.title}</p>
+                    <p className="reward-subtitle karla">{reward.data.establishment}</p>
+                </>
+            );
+        break;
         default:
             return null;
     }
@@ -90,13 +100,14 @@ const RewardDetails: React.FC<RewardDetailsProps> = ({ reward, onAction }) => {
             {content}
             {showShareButton && (
                 <ShareButton onClick={onAction}>
-                    {!isCoin && <IonIcon
+                    {!isCoin && !isExperience && <IonIcon
                                     icon={shareSocialOutline}
                                     style={{ fontSize: 20, marginRight: 12 }}
                                 />
                     }
 
-                    { reward.type === 'coins' ? 'Trocar Moedas' : 'COMPARTILHAR' }
+                    { reward.type === 'coins' ? 'Trocar Moedas' : 
+                      reward.type === 'experience' ? 'Ir para Histórico' : 'COMPARTILHAR' }
                 </ShareButton>
             )}
         </>
@@ -133,6 +144,9 @@ export const GlobalRewardModal: React.FC = () => {
             case 'medal':
                 shareText = `Desbloqueei a medalha "${currentReward.data.name}" no App Lupa! 🏆`;
                 break;
+            case 'experience':
+                shareText = `Desbloqueei uma experiência incrível no App Lupa! 🎉 ${currentReward.data.title} - ${currentReward.data.establishment} 🎉`;
+                break;
         }
         
         try {
@@ -156,6 +170,10 @@ export const GlobalRewardModal: React.FC = () => {
 
         if (currentReward.type === 'coins'){
             setPostRewardRedirect('/lupacoins');
+            handleClose();
+        }
+        else if (currentReward.type === 'experience'){
+            setPostRewardRedirect('/experience');
             handleClose();
         }
         else{ 

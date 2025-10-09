@@ -24,4 +24,5 @@ export type RewardItem =
   | { type: 'points'; data: { amount: number } }
   | { type: 'coins'; data: { amount: number } }
   | { type: 'medal'; data: Medal }
-  | { type: 'level_up'; data: LevelUpInfo };
+  | { type: 'level_up'; data: LevelUpInfo }
+  | { type: 'experience'; data: { title: string; establishment: string } };

@@ -81,16 +81,17 @@ export const CustomModalContent = styled.div`
 
 export const VoucherImage = styled.img`
   width: 100%;
-  border-radius: 40px;
+  border-radius: 100px;
   height: 120px;
   object-fit: cover;
+  padding: 0 1rem;
 `;
 
 export const VoucherContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  padding: 0 2rem;
+  padding: 0 1rem;
 `;
 
 export const EstablishmentName = styled.h3`
