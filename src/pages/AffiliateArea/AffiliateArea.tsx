@@ -152,7 +152,7 @@ const AffiliateArea: React.FC = () => {
                 Ainda não detectamos sua assinatura. Sua marca não será exibida
                 no mapa.
               </WarningText>
-              <WarningButton onClick={() => history.push("/affiliate/paywall")}>
+              <WarningButton onClick={() => history.push("/myplan")}>
                 Assinar agora
               </WarningButton>
             </>

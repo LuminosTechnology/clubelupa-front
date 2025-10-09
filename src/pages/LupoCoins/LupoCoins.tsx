@@ -62,9 +62,6 @@ const LupoCoins: React.FC = () => {
 
   useEffect(() => {
     if (!user) return;
-    if (!user.is_payed) {
-      setDisplayPaymentWarning(true);
-    }
 
     const fetchExperiences = async () => {
       setIsLoading(true);
@@ -80,6 +77,17 @@ const LupoCoins: React.FC = () => {
     fetchExperiences();
   }, []);
 
+  const handleExperienceClick = (item: Experience) => {
+
+    if (user && !user.is_payed) {
+      setDisplayPaymentWarning(true);
+    }else{
+      setSelected(item);
+      setShowFooter(true);
+    }
+
+  };
+
   return (
     <IonPage>
       <IonAlert
@@ -92,6 +100,7 @@ const LupoCoins: React.FC = () => {
         message={`Área exclusiva para sócios Lupa: aqui você troca suas moedas por experiências únicas em Curitiba. Torne-se sócio e venha desbloquear esse mundo com a gente!`}
         buttons={["OK"]}
       />
+
       <AppHeader
         title="Minhas Moedas Lupa"
         backgroundColor="#E0A075"
@@ -127,8 +136,7 @@ const LupoCoins: React.FC = () => {
                     </VouncherQuantity>
                     <ViewMore
                       onClick={() => {
-                        setSelected(item);
-                        setShowFooter(true);
+                        handleExperienceClick(item)
                       }}
                     >
                       Ver Mais
