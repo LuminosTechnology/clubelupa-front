@@ -20,6 +20,7 @@ import {
   doCheckIn,
   fetchSingleEstablishmentData,
   toggleFavorite,
+  getCheckinDistanceMeters
 } from "../../services/affiliateService";
 import { CodeScannerService } from "../../services/code-scan-service";
 import { uploadInvoice } from "../../services/invoice-upload-service";
@@ -241,6 +242,8 @@ const AffiliateView: React.FC = () => {
         const response = await fetchSingleEstablishmentData(Number(id));
         const establishment = response.data;
 
+        const checkinDistance = await getCheckinDistanceMeters();
+
         setData(establishment);
         setFavorite(establishment.is_favorited_by_me);
 
@@ -255,7 +258,7 @@ const AffiliateView: React.FC = () => {
           response.data.addresses[0].longitude
         );
 
-        const DISTANCE_THRESHOLD = 10_000;
+        const DISTANCE_THRESHOLD = checkinDistance ? checkinDistance : 50;
         const isWithinDistance = distance < DISTANCE_THRESHOLD;
         const hasNotCheckedInLastHour =
           !establishment.is_checked_in_by_me_last_hour;

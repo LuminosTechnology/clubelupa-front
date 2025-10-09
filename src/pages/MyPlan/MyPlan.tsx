@@ -1,4 +1,4 @@
-// src/pages/MyPlan/MyPlan.tsx
+
 import { IonCheckbox, IonContent, IonLabel, IonPage } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import AppHeader from "../../components/SimpleHeader";
@@ -40,11 +40,12 @@ const MyPlan: React.FC = () => {
   const renderContent = () => {
     if (!user) return;
     const establishment = user.establishments && user.establishments[0];
-    if (!establishment) return;
+    const isApprovedAfiliate = establishment && establishment.approved_status === "2";  
 
     if (user.is_payed) {
+      
       if (user.is_affiliate) {
-        if (establishment.approved_status === "2") {
+        if (isApprovedAfiliate) {
           return (
             <>
               <AffiliateBenefits />
@@ -56,9 +57,27 @@ const MyPlan: React.FC = () => {
       } else {
         return <SocioPremiumBenefits />;
       }
+
     } else {
       if (user.is_affiliate) {
-        return <BecomeAnAffiliateSection />;
+          if(isApprovedAfiliate){   
+            return <BecomeAnAffiliateSection />;
+          }else{
+              return (
+                <>
+                <br />
+                  <Title>Sua conta de afiliado ainda não foi aprovada</Title>
+                  <Paragraph>
+                    O processo de análise é feito pelo nosso time e pode levar até
+                    72 horas. <br />
+                    Assim que sua conta for aprovada, você receberá uma notificação
+                    e poderá acessar a área de afiliados normalmente.
+                  </Paragraph>
+                </>                
+              );
+          }
+          
+
       } else {
         return <PremiumPackageSection />;
       }
@@ -88,6 +107,7 @@ const MyPlan: React.FC = () => {
           <PlanValue>MEU PLANO: {getPlanName()}</PlanValue>
 
           {renderContent()}
+
 
           {/* {packages.map((pkg) => (
             <>

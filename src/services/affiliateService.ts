@@ -79,6 +79,18 @@ export const uploadAffiliatePhoto = async (
   return data;
 };
 
+interface CheckinDistanceMeters {
+  max_checkin_distance_meters: number;
+}
+
+export const getCheckinDistanceMeters = async () => {
+  const response = await api.get< CheckinDistanceMeters >(
+    `/settings`
+  );
+  return Number(response.data.max_checkin_distance_meters);
+};
+
+
 export const fetchMyEstablishmentData = async (id: number) => {
   const response = await api.get<Establishment>("/my-establishments/" + id);
   return response.data;

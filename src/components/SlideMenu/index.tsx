@@ -85,7 +85,7 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
     } else if (user?.is_affiliate && !user.is_payed) {
       base.push({
         label: "Ativar Assinatura",
-        path: "/affiliate/paywall",
+        path: "/myplan",
         enabled: true,
       });
     } else {
