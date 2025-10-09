@@ -8,6 +8,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
 
+    if let statusBarFrame = UIApplication.shared.windows.first?.windowScene?.statusBarManager?.statusBarFrame {
+        let statusBarView = UIView(frame: statusBarFrame)
+        statusBarView.backgroundColor = UIColor.clear
+        UIApplication.shared.windows.first?.addSubview(statusBarView)
+
         return true
     }
 
