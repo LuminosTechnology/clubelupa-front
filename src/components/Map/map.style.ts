@@ -2,9 +2,9 @@ import styled from "styled-components";
 
 /* --------- área do mapa --------- */
 export const MapWrapper = styled.div`
-  position: absolute;
-  width: 100vw;
-  height: 100vh;
+  position: relative;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   background: transparent;
 `;
