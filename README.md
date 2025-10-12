@@ -62,9 +62,7 @@ npx cap open android
 ## ⚙️ Configuração do Ambiente para rodar no xcode para gerar builds
 
 ```bash
-npx ionic build
-npx cap sync ios
-npx cap open ios
+npm run ios
 ```
 
 ## 🚀 Passo a passo para build no iOS e envio para AppStore
