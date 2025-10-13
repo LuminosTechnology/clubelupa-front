@@ -1,8 +1,9 @@
 import styled from "styled-components";
 
 export const CustomCard = styled.div`
-  position: absolute;
-  height: 80vh;
+  position: relative;
+  height: 20%;
+  bottom: 0;
   left: 0;
   right: 0;
   margin: 0;
