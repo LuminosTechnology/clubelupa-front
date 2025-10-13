@@ -11,7 +11,7 @@ import Map from "../../components/Map";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { useSubscriptionAlert } from "../../hooks/useSubscriptionAlert";
 import { HomeBottomSheet } from "./components/home-bottom-sheet";
-import { StyledAlert, Teste } from "./home.style";
+import { StyledAlert } from "./home.style";
 import { StatusBar, Style } from '@capacitor/status-bar';
 
 const Home: React.FC = () => {
@@ -76,7 +76,6 @@ const Home: React.FC = () => {
   }, []);
   
   return (
-    <Teste>
       <IonPage>
         <StyledAlert
           isOpen={displayPaymentWarning}
@@ -117,7 +116,6 @@ const Home: React.FC = () => {
           <HomeBottomSheet />
         </IonContent>
       </IonPage>
-    </Teste>
   );
 };
 

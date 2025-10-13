@@ -1,20 +1,6 @@
 import { IonAlert } from "@ionic/react";
 import styled from "styled-components";
 
-export const Teste = styled.div`
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding-top: 0;
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-    background: transparent;
-    z-index: 1;  
-`;
-
 export const Container = styled.div`
   display: flex;
   flex-direction: column;

@@ -54,9 +54,7 @@ npm install -g @ionic/cli
 ## ⚙️ Configuração do Ambiente para rodar no Android Studio para gerar builds
 
 ```bash
-npx ionic build
-npx cap sync android
-npx cap open android
+npm run android
 ```
 
 ## ⚙️ Configuração do Ambiente para rodar no xcode para gerar builds
