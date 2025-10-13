@@ -1,11 +1,10 @@
 import styled from "styled-components";
 
 export const CustomCard = styled.div`
-  position: absolute;
+  position: relative;
+  height: 20%;
+  top: 100%;
   height: 80vh;
-  left: 0;
-  right: 0;
-  margin: 0;
   padding: 0 1rem;
 
   justify-content: flex-start;

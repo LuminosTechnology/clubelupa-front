@@ -4,12 +4,12 @@ import styled from "styled-components";
  * Container absoluto (sem cor), apenas posiciona o BarWrapper
  */
 export const HeaderContainer = styled.div`
+  display: flex;
+  justify-content: center; /* centraliza o filho */
   position: absolute;
   top: 55px; /* 55px do topo */
   left: 0;
   right: 0;
-  display: flex;
-  justify-content: center; /* centraliza o filho */
   z-index: 10;
 `;
 
