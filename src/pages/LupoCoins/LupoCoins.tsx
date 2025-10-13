@@ -52,6 +52,7 @@ const LupoCoins: React.FC = () => {
   const [displayPaymentWarning, setDisplayPaymentWarning] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [showConfirmationAlert, setShowConfirmationAlert] = useState(false);
 
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -142,6 +143,27 @@ const LupoCoins: React.FC = () => {
         buttons={["OK"]}
       />
 
+      <IonAlert
+        isOpen={showConfirmationAlert}
+        onDidDismiss={() => setShowConfirmationAlert(false)}
+        title="Confirmar Troca"
+        message={`Tem certeza que deseja trocar ${selected?.cost_in_coins} Moedas Lupa por esta experiência? Esta ação não pode ser desfeita.`}
+        buttons={[
+          {
+            text: "Cancelar",
+            role: "cancel",
+            handler: () => setShowConfirmationAlert(false)
+          },
+          {
+            text: "Confirmar",
+            handler: () => {
+              setShowConfirmationAlert(false);
+              handleRedeemExperience();
+            }
+          }
+        ]}
+      />
+
       <AppHeader
         title="Minhas Moedas Lupa"
         backgroundColor="#E0A075"
@@ -228,7 +250,7 @@ const LupoCoins: React.FC = () => {
                 </VoucherSection>
                 {selected?.can_redeem ? (
                   <VoucherButton 
-                    onClick={handleRedeemExperience}
+                    onClick={() => setShowConfirmationAlert(true)}
                     disabled={isRedeeming}
                   >
                     {isRedeeming ? "Processando..." : "quero trocar minhas moedas lupa"}
