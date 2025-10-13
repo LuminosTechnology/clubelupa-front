@@ -5,6 +5,7 @@ export const MapWrapper = styled.div`
   position: absolute;
   width: 100%;
   height: 100%;
+  top: 0;
   overflow: hidden;
   background: transparent;
 `;
