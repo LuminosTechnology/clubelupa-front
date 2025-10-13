@@ -10,7 +10,8 @@
     "test.e2e": "cypress run",
     "test.unit": "vitest",
     "lint": "eslint",
-    "ios": "npx ionic build && npx cap sync ios && npx cap open ios"
+    "ios": "npx ionic build && npx cap sync ios && npx cap open ios",
+    "android": "npx ionic build && npx cap sync android && npx cap open android"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.2",
