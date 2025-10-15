@@ -16,6 +16,12 @@ export const MapLoader = styled.div`
   justify-content: center;
 `;
 
+export const InvoiceShowAreaButton = styled.button`
+`;
+
+export const InvoiceArea = styled.div`
+`;
+
 /* --------- popup / card ---------- */
 export const RestaurantCard = styled.div`
   position: absolute;
@@ -36,6 +42,7 @@ export const RestaurantCard = styled.div`
   &.show {
     opacity: 1;
     transform: translate(-50%, -50%);
+    z-index: 990;
   }
 `;
 
