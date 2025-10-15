@@ -84,10 +84,11 @@ const RewardDetails: React.FC<RewardDetailsProps> = ({ reward, onAction }) => {
         case 'experience':
             content = (
                 <>
+                    <img src={coinsIcon} alt="Moedas" className="reward-icon" />  
                     <h2 className="reward-title addington">Parabéns!</h2>
                     <p className="reward-subtitle addington italic">Você desbloqueou mais uma experiência incrível!</p>
                     <p className="reward-subtitle karla">{reward.data.title}</p>
-                    <p className="reward-subtitle karla">{reward.data.establishment}</p>
+                    <p className="reward-subtitle karla">{reward.data.establishment}</p>                    
                 </>
             );
         break;
@@ -110,6 +111,7 @@ const RewardDetails: React.FC<RewardDetailsProps> = ({ reward, onAction }) => {
                       reward.type === 'experience' ? 'Ir para Histórico' : 'COMPARTILHAR' }
                 </ShareButton>
             )}
+            <div style={{height: '20%'}}></div>
         </>
     );
 
