@@ -22,7 +22,8 @@ import {
   ScanButton,
   ViewMoreButton,
   InvoiceArea,
-  InvoiceShowAreaButton
+  InvoiceShowAreaButton,
+  SendNotaFiscalButton
 } from "./map.style";
 
 import { uploadInvoice } from '../../services/invoice-upload-service';
@@ -652,39 +653,39 @@ const id = 96;
                           onChange={handleReceiptPhotoChange}
                           accept="image/*"
                         />
-                        {receiptPhotoUrl && (
-                          <div style={{ marginTop: "12px", textAlign: "center" }}>
-                            <img
-                              src={receiptPhotoUrl}
-                              alt="Foto do recibo"
-                              style={{
-                                maxWidth: "200px",
-                                maxHeight: "200px",
-                                borderRadius: "8px",
-                                border: `2px solid ${color}`,
-                              }}
-                            />
-                            <p style={{ margin: "8px 0 0", fontSize: "12px", color: "#666" }}>
-                              Foto selecionada com sucesso!
-                            </p>
-                            <AlternativeButton 
-                              bg={color} 
-                              onClick={handleInvoiceUpload}
-                              disabled={isUploadingInvoice}
-                              style={{ 
-                                marginTop: "12px",
-                                opacity: isUploadingInvoice ? 0.6 : 1,
-                                cursor: isUploadingInvoice ? "not-allowed" : "pointer"
-                              }}
-                            >
-                              {isUploadingInvoice ? "Enviando..." : "Enviar Nota Fiscal"}
-                            </AlternativeButton>
-                          </div>
-                        )}
                       </AlternativeSection>
                     </>
                     <br />
-                
+                    {receiptPhotoUrl && (
+                      <div style={{ marginTop: "12px", textAlign: "center" }}>
+                        <img
+                          src={receiptPhotoUrl}
+                          alt="Foto do recibo"
+                          style={{
+                            maxWidth: "200px",
+                            maxHeight: "200px",
+                            borderRadius: "8px",
+                            border: `2px solid ${color}`,
+                          }}
+                        />
+                        <p style={{ margin: "8px 0 0", fontSize: "12px", color: "#666" }}>
+                          Foto selecionada com sucesso!
+                        </p>
+                        <SendNotaFiscalButton 
+                          bg={color} 
+                          onClick={handleInvoiceUpload}
+                          disabled={isUploadingInvoice}
+                          style={{ 
+                            marginTop: "12px",
+                            opacity: isUploadingInvoice ? 0.6 : 1,
+                            cursor: isUploadingInvoice ? "not-allowed" : "pointer"
+                          }}
+                        >
+                          {isUploadingInvoice ? "Enviando..." : "Enviar Nota Fiscal"}
+                        </SendNotaFiscalButton>
+                      </div>
+                    )}
+                    <br />            
 
                   </InvoiceArea>             
               )}

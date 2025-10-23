@@ -39,6 +39,10 @@ export const MainPage: React.FC = () => {
   
   }, [gamificationSummary?.does_not_have_medals, gamificationSummary?.medals] );
 
+  const handleSeeMore = (medal: Medal, isInEarnedMedals: Boolean) => {
+    medal.containsMedal = isInEarnedMedals ? true : false;
+    setSelectedMedalState(medal);
+  }
 
   return (
     <MainPageContainer>
@@ -48,6 +52,7 @@ export const MainPage: React.FC = () => {
             <SelectedMedalImage
               src={selectedMedal.icon_url}
               alt={selectedMedal.name}
+              $containsMedal={false}
             />
             <AchievementsTitle>Parabéns</AchievementsTitle>
             <AchievementsParagraph>
@@ -77,11 +82,7 @@ export const MainPage: React.FC = () => {
                 <MedalCircle $src={m.icon_url} $earned={isInEarnedMedals} />
                 <MedalLabel>{m.name}</MedalLabel>
                 
-                {
-                  isInEarnedMedals && (
-                    <SeeMoreLink onClick={() => { m.containsMedal && setSelectedMedalState(m) } }>Ver mais</SeeMoreLink>
-                  )
-                }
+                <SeeMoreLink onClick={ () => handleSeeMore(m, isInEarnedMedals) }>Ver mais</SeeMoreLink>
               </MedalCard>
             );
           })}

@@ -33,34 +33,37 @@ useEffect( () => {
 
   return (
     <AchievementsContainer>
-      {selectedMedal ? (
+      {selectedMedal && (
         <>
           <SelectedMedalImage
             src={selectedMedal.icon_url}
             alt={selectedMedal.name}
+            $containsMedal={selectedMedal.containsMedal}
           />
           <AchievementsTitle>Parabéns</AchievementsTitle>
           <AchievementsParagraph>
             {selectedMedal.description}
           </AchievementsParagraph>
         </>
-      ) : (
-        <>
-          <AchievementsTitle>Conquistas</AchievementsTitle>
-          <AchievementsListContainer>
-            {medals?.map((medal) => (
-              <AchievementItem
-                key={medal.id}
-                onClick={() => { medal.containsMedal && setSelectedMedal(medal) } }
-                className={`${!medal.containsMedal && 'disable'}`}
-              >
-                <img src={medal.icon_url} alt={medal.name} />
-                <span>{medal.name}</span>
-              </AchievementItem>
-            ))}
-          </AchievementsListContainer>
-        </>
-      )}
+      ) 
+      // : (
+      //   <>
+      //     <AchievementsTitle>Conquistas</AchievementsTitle>
+      //     <AchievementsListContainer>
+      //       {medals?.map((medal) => (
+      //         <AchievementItem
+      //           key={medal.id}
+      //           onClick={() => { medal.containsMedal && setSelectedMedal(medal) } }
+      //           className={`${!medal.containsMedal && 'disable'}`}
+      //         >
+      //           <img src={medal.icon_url} alt={medal.name} />
+      //           <span>{medal.name}</span>
+      //         </AchievementItem>
+      //       ))}
+      //     </AchievementsListContainer>
+      //   </>
+      // )
+    }
     </AchievementsContainer>
   );
 };

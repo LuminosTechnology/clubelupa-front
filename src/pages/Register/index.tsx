@@ -184,6 +184,9 @@ const Register: React.FC = () => {
           {errors.password_confirmation && (
             <ErrorMessage>{errors.password_confirmation}</ErrorMessage>
           )}
+          <br />
+          <br />
+          <>É criador de conteúdo ou assessoria de imprensa? Inclua aqui o seu código:</>
 
           <FloatingInput
             label="Código automático de sócio"

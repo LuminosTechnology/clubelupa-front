@@ -19,6 +19,26 @@ export const MapLoader = styled.div`
 export const InvoiceShowAreaButton = styled.button`
 `;
 
+export const SendNotaFiscalButton = styled.button<{ bg: string }>`
+  display: block;
+  width: 217px;
+  margin: 0 auto;
+  padding: 14px 0;
+  background: ${({ bg }) => bg};
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
+`;
+
 export const InvoiceArea = styled.div`
 `;
 
