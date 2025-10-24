@@ -65,6 +65,8 @@ import { GlobalPopupModal } from "./components/GlobalPopupModal/GlobalPopupModal
 import { RewardRouterListener } from './components/RewardRouterListener/RewardRouterListener'; 
 import { PopupRouterListener } from './components/PopupRouterListener/PopupRouterListener';
 
+import DeeplinkHandler from "./components/DeeplinkHandler/DeeplinkHandler";
+
 declare global {
   interface Window {
     Purchases?: PurchasesPlugin;
@@ -114,6 +116,8 @@ const App: React.FC = () => {
         <GlobalRewardModal />
         <GlobalPopupModal />
         <IonReactRouter key={isAuthenticated ? "auth" : "no-auth"}>
+
+          <DeeplinkHandler />
 
           <RewardRouterListener />
           <PopupRouterListener />

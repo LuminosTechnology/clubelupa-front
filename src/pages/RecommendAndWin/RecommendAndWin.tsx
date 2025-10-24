@@ -25,6 +25,13 @@ import { useAuthContext } from "../../contexts/AuthContext";
 const RecommendAndWin: React.FC = () => {
   const history = useHistory();
   const { user } = useAuthContext();
+debugger;
+
+  const DEEPLINK_SCHEME = "clubelupa"; 
+  const referralCode = user?.referral_code;
+  const referralLink = `${DEEPLINK_SCHEME}://register?referral_code=${referralCode}`;
+
+  const inviteMessage = `Olá! Estou te convidando para o Clube Lupa. Cadastre-se usando meu link e aproveite os benefícios: ${referralLink}`;
 
   const handleLogout = async () => {
     await logout();
@@ -32,11 +39,14 @@ const RecommendAndWin: React.FC = () => {
   };
 
   const handleWhats = () => {
-    window.open("https://wa.me/seunumerodetelefone", "_blank");
+    if (!referralCode) return;
+    window.open(`https://wa.me/?text=${encodeURIComponent(inviteMessage)}`, "_blank");
   };
 
   const handleEmail = () => {
-    window.location.href = "mailto:contato@clubelupa.com.br";
+    if (!referralCode) return;
+    const subject = "Convite para o Clube Lupa!";
+    window.location.href = `mailto:contato@clubelupa.com.br?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(inviteMessage)}`;
   };
 
   return (
@@ -64,11 +74,11 @@ const RecommendAndWin: React.FC = () => {
           <InviteText>Enviar convite pelo</InviteText>
 
           <LogoutWrapper>
-            <ActionButton onClick={handleWhats}>
+            <ActionButton onClick={handleWhats} disabled={!referralCode}>
               <ActionIcon src={whatsIcon} alt="WhatsApp" />
               WHATSAPP
             </ActionButton>
-            <ActionButton onClick={handleEmail}>
+            <ActionButton onClick={handleEmail} disabled={!referralCode}>
               <ActionIcon src={emailIcon} alt="Email" />
               EMAIL
             </ActionButton>

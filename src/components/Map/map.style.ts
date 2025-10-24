@@ -19,6 +19,31 @@ export const MapLoader = styled.div`
 export const InvoiceShowAreaButton = styled.button`
 `;
 
+// map.style.ts
+
+// ... (outros imports e estilos)
+
+export const RecenterButton = styled.div`
+  position: absolute;
+  bottom: 14%;
+  right: 4%;
+  z-index: 5;
+  background: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 28px;
+    color: #3880ff; /* Cor padrão do Ionic */
+  }
+`;
+
 export const SendNotaFiscalButton = styled.button<{ bg: string }>`
   display: block;
   width: 217px;

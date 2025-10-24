@@ -72,8 +72,8 @@ const SlideMenu: React.FC<SlideMenuProps> = ({ isOpen, onClose }) => {
       { label: "Troca de Moedas Lupa", path: "/lupacoins", enabled: true },
       { label: "Meu Plano", path: "/myplan", enabled: true },
       { label: "Meus Favoritos", path: "/favorites", enabled: true },
-      { label: "Histórico", path: "/experience", enabled: false },
-      { label: "Indique e Ganhe", path: "/recommendandwin", enabled: false },
+      { label: "Histórico", path: "/experience", enabled: true },
+      { label: "Indique e Ganhe", path: "/recommendandwin", enabled: true },
     ];
 
     if (user?.is_affiliate && user.is_payed) {

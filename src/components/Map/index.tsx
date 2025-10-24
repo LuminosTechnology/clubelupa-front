@@ -7,7 +7,7 @@ import {
   useIonViewWillEnter,
   IonActionSheet
 } from "@ionic/react";
-import { close, qrCode, documentText } from "ionicons/icons";
+import { close, qrCode, documentText, locate } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ButtonsContainer,
@@ -23,7 +23,8 @@ import {
   ViewMoreButton,
   InvoiceArea,
   InvoiceShowAreaButton,
-  SendNotaFiscalButton
+  SendNotaFiscalButton,
+  RecenterButton
 } from "./map.style";
 
 import { uploadInvoice } from '../../services/invoice-upload-service';
@@ -138,6 +139,8 @@ const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
 
   /* ─── Inicialização do Mapa (nova lógica) ───────────────────────────── */
   useEffect(() => {
+
+  
     const initMap = async () => {
       if (gMap) return;
       if (!mapRef.current || !mapReady) return;
@@ -172,13 +175,21 @@ const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
         },
       });
 
-      await newMap.disableClustering();
+      //await newMap.disableClustering();
       await newMap.enableCurrentLocation(true);
 
       setGMap(newMap);
     };
 
     initMap();
+
+    return () => {
+      if (gMap) {
+        gMap.destroy();
+        setGMap(null);
+      }
+    };
+
   }, [mapReady]);
 
   useIonViewWillEnter(() => {
@@ -381,15 +392,23 @@ const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
     }
   };
 
-const id = 96;
+const handleRecenterMap = async () => {
+    if (gMap && userLoc) {
+      await gMap.setCamera({
+        coordinate: userLoc,
+        zoom: 11, // Um zoom mais próximo é melhor para recentralizar
+        animate: true,
+      });
+    }
+  };
 
   const handleInvoiceUpload = async () => {
-    if (!receiptPhotoFile || !id) return;
+    if (!receiptPhotoFile || !selected?.id) return;
 
     setIsUploadingInvoice(true);
     try {
       const response = await uploadInvoice({
-        establishment_id: Number(id),
+        establishment_id: Number(selected.id),
         invoice_file: receiptPhotoFile,
       });
       
@@ -508,6 +527,10 @@ const id = 96;
           height: "100%",
         }}
       ></capacitor-google-map>
+
+      <RecenterButton onClick={handleRecenterMap}>
+        <IonIcon icon={locate} />
+      </RecenterButton>
 
       <IonActionSheet
         isOpen={showPhotoOptions}

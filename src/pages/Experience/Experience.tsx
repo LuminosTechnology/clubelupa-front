@@ -44,6 +44,16 @@ const Experience: React.FC = () => {
     fetchExperiences();
   }, [location.pathname]);
 
+
+  const filteredExperiences = experiences.filter(exp => {
+    const queryLower = query.toLowerCase();
+
+    const experienceNameMatch = (exp.experience_name || '').toLowerCase().includes(queryLower);
+    const establishmentNameMatch = (exp.establishment_name || '').toLowerCase().includes(queryLower);
+
+    return experienceNameMatch || establishmentNameMatch;
+  });
+
   return (
     <IonPage>
       <AppHeader
@@ -63,7 +73,7 @@ const Experience: React.FC = () => {
             />
 
             <ListWrapper>
-              {experiences.map(exp => (
+              {filteredExperiences.map(exp => (
                 <StoreCard key={exp.id}>
                   <StoreInfo>
                     <StoreLine>{exp.experience_name}</StoreLine>
