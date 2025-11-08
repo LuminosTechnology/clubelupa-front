@@ -11,6 +11,7 @@ import AffiliatePendingApprovalRegisterSuccess from "./pages/AffiliateRegister/A
 import AffiliateRegister from "./pages/AffiliateRegister/AffiliateRegister";
 import AffiliateStores from "./pages/AffiliateStores/AffiliateStoresPage";
 import AffiliateView from "./pages/AffiliateView/AffiliateView";
+import { AffiliateExperiencePage } from "./pages/AffiliateExperience/AffiliateExperience";
 import Experience from "./pages/Experience/Experience";
 import ForgotPassword from "./pages/ForgotPassword";
 import ChangePassword from "./pages/ForgotPassword/ChangePassword";
@@ -177,6 +178,11 @@ const App: React.FC = () => {
             path="/affiliate/advertising"
             component={AffiliateAdsPage}
           />
+          <PrivateRoute
+            exact
+            path="/affiliate/experience"
+            component={AffiliateExperiencePage}
+          />          
           <PrivateRoute
             exact
             path="/affiliate/become"

@@ -73,6 +73,10 @@ const AffiliateArea: React.FC = () => {
     history.push("/affiliate/advertising");
   };
 
+  const goToExperience = () => {
+    history.push("/affiliate/experience");
+  };  
+
   const establishment = user?.establishments?.[0] || null;
   const displayName = establishment?.name;
   const profilePhoto = user?.avatar_url;
@@ -166,11 +170,17 @@ const AffiliateArea: React.FC = () => {
               </Option>
               <Divider />
 
+              <Option onClick={goToExperience}>
+                <OptionIcon src={editIcon} alt="Gerenciar experiências" />
+                  Gerenciar experiências
+              </Option>
+              <Divider />               
+
               <Option onClick={goToAdvertising}>
                 <OptionIcon src={publicidadeIcon} alt="Ícone Publicidade" />
                 Loja do Afiliado
               </Option>
-              <Divider />
+              <Divider />             
 
               {establishment?.social_links?.site && (
                 <Option>
