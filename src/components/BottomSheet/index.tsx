@@ -1,5 +1,5 @@
 import { createGesture } from "@ionic/react";
-import { ReactNode, useEffect, useRef } from "react";
+import { ReactNode, useEffect, useRef, useState  } from "react";
 import { useAuthContext } from "../../contexts/AuthContext";
 import {
   AvatarContainer,
@@ -33,6 +33,7 @@ export const BottomSheet: React.FC<Props> = ({
   const drawerRef = useRef<HTMLDivElement>(null);
   const { user } = useAuthContext();
   const {  selectedMedal, setSelectedMedalState } = useGamificationContext();
+  const [isOpen, setIsOpen] = useState(false);
   const history = useHistory();
   const OPEN_Y = -window.innerHeight * 0.8;
   const CLOSED_Y = -80;
@@ -43,6 +44,7 @@ export const BottomSheet: React.FC<Props> = ({
 
     c.style.transform = `translateY(${CLOSED_Y}px)`;
     c.dataset.open = "false";
+    setIsOpen(false);
 
     let target: "open" | "close" | null = null;
 
@@ -71,9 +73,11 @@ export const BottomSheet: React.FC<Props> = ({
         if (target === "open") {
           c.style.transform = `translateY(${OPEN_Y}px)`;
           c.dataset.open = "true";
+          setIsOpen(true);
         } else if (target === "close") {
           c.style.transform = `translateY(${CLOSED_Y}px)`;
           c.dataset.open = "false";
+          setIsOpen(false);
         } else {
           // fallback se não passou do threshold
           c.style.transform =
@@ -99,6 +103,8 @@ export const BottomSheet: React.FC<Props> = ({
 
     c.style.transform = `translateY(${CLOSED_Y}px)`;
     c.dataset.open = "false";
+    setIsOpen(false);
+    
     
     onClose();
   };
@@ -112,6 +118,7 @@ export const BottomSheet: React.FC<Props> = ({
     c.style.transition = "200ms ease-out";
     c.style.transform = `translateY(${OPEN_Y}px)`;
     c.dataset.open = "true";
+    setIsOpen(true);
   };
   
 
@@ -163,14 +170,14 @@ export const BottomSheet: React.FC<Props> = ({
           <span>Experiências</span>
           <img src={MedalDefault} alt="Medalha" style={{ width: '18px', height: 'auto', fill: '#8e9455', stroke: '#8e9455', position: 'absolute', bottom: '20px', left: '35px' }} />
         </MainPageMedalButton>
-      </MainPageMedalButtonsContainer>
-      {displayAvatar && (
+      </MainPageMedalButtonsContainer>      
+      {displayAvatar && isOpen && (
         <>
-        <AvatarContainer className="avatar-container">
-          <AvatarProgressBorder $progress={40} className="avatar-progress-border">
-            <img src={user?.avatar_url || "/assets/default-photo.png"} alt="" />
+         <AvatarContainer className="avatar-container">          
+          <AvatarProgressBorder $progress={0} className="avatar-progress-border">
+            <img src={user?.avatar_url || "/assets/default-photo.png"} alt="" />            
           </AvatarProgressBorder>
-        </AvatarContainer>
+        </AvatarContainer> 
         </>
       )}
       <div className="swipe-helper" />

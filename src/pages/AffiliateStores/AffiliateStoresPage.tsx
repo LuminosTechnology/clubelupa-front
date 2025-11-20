@@ -25,6 +25,7 @@ import AppHeader from "../../components/SimpleHeader";
 import { useDebounce } from "../../hooks/useDebounce";
 import { Establishment } from "../../types/api/api";
 import { CategoryFilter } from "./components/filters";
+import { color } from "framer-motion";
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -132,7 +133,7 @@ const AffiliateStoresPage: React.FC = () => {
         style={{ "--background": "#ffffff" }}
         fullscreen
       >
-        <IonLoading isOpen={loading} message="Carregando afiliados…" />
+        <IonLoading isOpen={loading} message="Carregando afiliados…" style={{ "color": "#9fa369" }} />
         <IonToast
           isOpen={!!error}
           message={error}
