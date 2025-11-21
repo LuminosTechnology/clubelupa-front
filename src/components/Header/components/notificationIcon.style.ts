@@ -23,6 +23,7 @@ export const NotificationIcon = styled.div<NotificationIconProps>`
 
   }}
 
+
   position: absolute;
   z-index: 9;
   
@@ -31,7 +32,7 @@ export const NotificationIcon = styled.div<NotificationIconProps>`
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background-color: red;
+  background-color: var(--ion-color-tertiary);
   color: white;
   padding: 2px;
   

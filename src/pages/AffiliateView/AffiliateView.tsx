@@ -391,7 +391,7 @@ const AffiliateView: React.FC = () => {
             <IonSpinner color={"primary"} />
           </SpinnerContainer>
         ) : (
-          <ScrollArea>
+          <ScrollArea style={{"--margin-top":"0","--padding-top":"0"} as any}>
             <BackButtonWrapper color={color} onClick={() => history.goBack()}>
               <BackButton src={backButtonVerde} alt="Voltar" />
             </BackButtonWrapper>

@@ -25,8 +25,8 @@ export const PhotoHeader = styled.div<{ image: string }>`
 
 export const BackButtonWrapper = styled.button<{ color: string }>`
   position: fixed;
-  top: 45px;
-  left: 45px;
+  margin-top: 2rem;
+  left: 5%;
   z-index: 10;
   width: 46px;
   height: 46px;

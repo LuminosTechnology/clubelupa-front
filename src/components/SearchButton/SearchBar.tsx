@@ -17,7 +17,6 @@ interface SearchBarProps {
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
-  
   onChange,
   placeholder = "O que você procura hoje?",
   iconSrc,
