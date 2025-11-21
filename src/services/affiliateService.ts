@@ -7,6 +7,42 @@ import {
   AdvertisementData,
   BecomeAnAffiliateRequest,
 } from "../types/api/affiliate";
+import { ExperienceRedemption } from '../types/api/affiliateExperience';
+
+
+
+/**
+ * Retorna a lista de vouchers de experiência que foram resgatados pelos sócios,
+ * mas ainda não foram utilizados no estabelecimento.
+ * API: GET /api/v1/establishment/experiences/to-use-redemptions
+ */
+export const getToUseRedemptions = async (): Promise<PaginatedResponse<ExperienceRedemption[]>> => {
+  const { data } = await api.get('/establishment/experiences/to-use-redemptions');
+  return data;
+};
+
+/**
+ * Retorna a lista de vouchers de experiência que já foram utilizados no estabelecimento.
+ * API: GET /api/v1/establishment/experiences/redemptions
+ */
+export const getRedeemed = async (): Promise<PaginatedResponse<ExperienceRedemption[]>> => {
+  const { data } = await api.get('/establishment/experiences/redemptions');
+  return data;
+};
+
+/**
+ * Marca um voucher como utilizado, a partir do código localizador fornecido pelo sócio.
+ * API: PATCH /api/v1/establishment/experience-redemptions/by-code/{redemption_code}/mark-used
+ * @param redemptionCode O código do voucher a ser validado.
+ */
+export const markRedemptionAsUsed = async (redemptionCode: string): Promise<ExperienceRedemption> => {
+  const { data } = await api.patch(
+    `/establishment/experience-redemptions/by-code/${redemptionCode}/mark-used`
+  );
+  return data; // A API retorna o objeto atualizado
+};
+
+
 
 /** Retorna o primeiro afiliado associado ao token ou null. */
 export const getMyFirstAffiliate = async (): Promise<AffiliateData | null> => {

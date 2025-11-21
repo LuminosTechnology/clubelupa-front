@@ -195,7 +195,7 @@ const LupoCoins: React.FC = () => {
                     <VouncherTitle>{item.title}</VouncherTitle>
                     <VouncherCategory>{item.category?.name}</VouncherCategory>
                     <VouncherQuantity>
-                      {item.cost_in_coins}&nbsp;LupaCoins
+                      {item.cost_in_coins}&nbsp;Moedas Lupa
                     </VouncherQuantity>
                     <ViewMore
                       onClick={() => {

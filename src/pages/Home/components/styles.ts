@@ -12,8 +12,9 @@ export const AchievementsTitle = styled.h1`
 margin: 0;
 `;
 
-export const SelectedMedalImage = styled.img`
+export const SelectedMedalImage = styled.img<{ $containsMedal: boolean }>`
   width: 60%;
+  
 `;
 export const AchievementsParagraph = styled.p`
 margin: 0;

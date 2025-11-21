@@ -9,6 +9,7 @@ export interface RegisterUserRequest {
   password_confirmation: string;
   auto_premium_code?: string;
   avatar?: File;
+  referral_code: string;
 }
 
 export interface UpdateUserRequest extends Partial<RegisterUserRequest> {

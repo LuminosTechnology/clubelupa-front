@@ -11,6 +11,7 @@ import AffiliatePendingApprovalRegisterSuccess from "./pages/AffiliateRegister/A
 import AffiliateRegister from "./pages/AffiliateRegister/AffiliateRegister";
 import AffiliateStores from "./pages/AffiliateStores/AffiliateStoresPage";
 import AffiliateView from "./pages/AffiliateView/AffiliateView";
+import { AffiliateExperiencePage } from "./pages/AffiliateExperience/AffiliateExperience";
 import Experience from "./pages/Experience/Experience";
 import ForgotPassword from "./pages/ForgotPassword";
 import ChangePassword from "./pages/ForgotPassword/ChangePassword";
@@ -65,6 +66,8 @@ import { GlobalPopupModal } from "./components/GlobalPopupModal/GlobalPopupModal
 import { RewardRouterListener } from './components/RewardRouterListener/RewardRouterListener'; 
 import { PopupRouterListener } from './components/PopupRouterListener/PopupRouterListener';
 
+import DeeplinkHandler from "./components/DeeplinkHandler/DeeplinkHandler";
+
 declare global {
   interface Window {
     Purchases?: PurchasesPlugin;
@@ -114,6 +117,8 @@ const App: React.FC = () => {
         <GlobalRewardModal />
         <GlobalPopupModal />
         <IonReactRouter key={isAuthenticated ? "auth" : "no-auth"}>
+
+          <DeeplinkHandler />
 
           <RewardRouterListener />
           <PopupRouterListener />
@@ -173,6 +178,11 @@ const App: React.FC = () => {
             path="/affiliate/advertising"
             component={AffiliateAdsPage}
           />
+          <PrivateRoute
+            exact
+            path="/affiliate/experience"
+            component={AffiliateExperiencePage}
+          />          
           <PrivateRoute
             exact
             path="/affiliate/become"

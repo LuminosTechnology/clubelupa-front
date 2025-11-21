@@ -1,80 +1,147 @@
-import React, { useEffect, useState } from "react";
-import { IonPage, IonContent } from "@ionic/react";
-import { useLocation } from "react-router-dom";
+// src/pages/Experience/Experience.tsx
+
+import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { IonPage, IonContent, IonSegment, IonSegmentButton, IonLabel, IonSpinner, IonList } from "@ionic/react";
 
 import AppHeader from "../../components/SimpleHeader";
 import SearchBar from '../../components/SearchButton/SearchBar';
 
 import {
-  ScrollArea,
   Container,
   ListWrapper,
   StoreCard,
   StoreInfo,
   StoreLine,
+  TabsContainer,
+  RedemptionCodeWrapper,
+  UsedDate,
+  NoResultsMessage
 } from "./Experience.style";
 
 import searchIcon from "../../assets/lupa-search.svg";
-import { ExperienceService } from "../../services/experiencesService";
-import { ExperienceHistory } from "../../types/api/experiences";
 
-export interface Store {
-  id: number;
-  name: string;
-  category: string;
-  img: string;
-}
-
+// Importando o novo serviço e o tipo correto
+import { ExperienceService } from "../../services/experience-partner-service";
+import { ExperienceRedemption } from "../../types/api/affiliateExperience";
 
 const Experience: React.FC = () => {
   const [query, setQuery] = useState("");
-  const [experiences, setExperiences] = useState<ExperienceHistory[]>([]);
-  const location = useLocation();
- 
-  const fetchExperiences = async () => {
-    const response = await ExperienceService.getExperiencesByUser();
-    setExperiences(response);
+  const [activeTab, setActiveTab] = useState<'toUse' | 'used'>('toUse');
+
+  const [toUseList, setToUseList] = useState<ExperienceRedemption[]>([]);
+  const [usedList, setUsedList] = useState<ExperienceRedemption[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      if (activeTab === 'toUse') {
+        const response = await ExperienceService.getUserToUseRedemptions();
+        setToUseList(response.data);
+      } else {
+        const response = await ExperienceService.getUserRedeemed();
+        setUsedList(response.data);
+      }
+    } catch (error) {
+      console.error("Falha ao buscar experiências:", error);
+      // Aqui você pode adicionar um toast de erro se desejar
+    } finally {
+      setLoading(false);
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const filterExperiences = (list: ExperienceRedemption[]) => {
+      if (!query) return list;
+      const queryLower = query.toLowerCase();
+      return list.filter(exp =>
+          (exp.experience_name || '').toLowerCase().includes(queryLower) ||
+          (exp.establishment_name || '').toLowerCase().includes(queryLower)
+      );
   };
+  
+  // Usando useMemo para evitar re-filtragens desnecessárias
+  const filteredToUseList = useMemo(() => filterExperiences(toUseList), [toUseList, query]);
+  const filteredUsedList = useMemo(() => filterExperiences(usedList), [usedList, query]);
 
-  useEffect(() => {
-    fetchExperiences();
-  }, []);
+  const renderList = (list: ExperienceRedemption[], isUsedTab: boolean) => {
+    if (loading) {
+      return <IonSpinner name="crescent" style={{ display: 'block', margin: 'auto', marginTop: '50px' }}/>;
+    }
 
-  useEffect(() => {
-    fetchExperiences();
-  }, [location.pathname]);
+    if (list.length === 0) {
+        return (
+            <NoResultsMessage>
+                {query 
+                    ? "Nenhum resultado encontrado para sua busca."
+                    : (isUsedTab ? 'Você ainda não resgatou nenhuma experiência.' : 'Você não possui experiências para resgatar.')}
+            </NoResultsMessage>
+        );
+    }
+
+    return (
+      <IonList style={{ background: 'transparent' }}>
+        {list.map(exp => (
+          <StoreCard key={exp.id}>
+            <StoreInfo>
+              <StoreLine>{exp.experience_name}</StoreLine>
+              <StoreLine>{exp.establishment_name}</StoreLine>
+              <StoreLine>{exp.cost_in_coins} Moedas</StoreLine>
+            </StoreInfo>
+            {isUsedTab ? (
+              <UsedDate>
+                Utilizado em: {exp.used_at?.short_with_time}
+              </UsedDate>
+            ) : (
+              <RedemptionCodeWrapper>
+                <p>Apresente este código no estabelecimento:</p>
+                <span>{exp.redemption_code}</span>
+              </RedemptionCodeWrapper>
+            )}
+          </StoreCard>
+        ))}
+      </IonList>
+    );
+  };
 
   return (
     <IonPage>
       <AppHeader
-        title="Histórico de Exp."
+        title="Minhas Experiências"
         backgroundColor="#E0A075"
         textColor="#FFFFFF"
       />
 
       <IonContent fullscreen style={{ "--background": "#FFFFFF" } as React.CSSProperties}>
-        <ScrollArea>
           <Container>
             <SearchBar
               value={query}
               onChange={setQuery}
-              placeholder="O que você procura hoje?"
+              placeholder="Buscar por experiência ou local"
               iconSrc={searchIcon}
             />
 
+            <TabsContainer>
+                <IonSegment value={activeTab} onIonChange={e => setActiveTab(e.detail.value as any)}>
+                    <IonSegmentButton value="toUse">
+                        <IonLabel>A Resgatar</IonLabel>
+                    </IonSegmentButton>
+                    <IonSegmentButton value="used">
+                        <IonLabel>Resgatados</IonLabel>
+                    </IonSegmentButton>
+                </IonSegment>
+            </TabsContainer>
+
             <ListWrapper>
-              {experiences.map(exp => (
-                <StoreCard key={exp.id}>
-                  <StoreInfo>
-                    <StoreLine>{exp.experience_name}</StoreLine>
-                    <StoreLine>{exp.establishment_name}</StoreLine>
-                    <StoreLine>{exp.cost_in_coins} Moedas</StoreLine>
-                  </StoreInfo>
-                </StoreCard>
-              ))}
+              {activeTab === 'toUse' 
+                ? renderList(filteredToUseList, false) 
+                : renderList(filteredUsedList, true)
+              }
             </ListWrapper>
           </Container>
-        </ScrollArea>
       </IonContent>
     </IonPage>
   );

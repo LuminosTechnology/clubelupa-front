@@ -5,8 +5,9 @@ import {
   IonIcon,
   useIonViewDidEnter,
   useIonViewWillEnter,
+  IonActionSheet
 } from "@ionic/react";
-import { close } from "ionicons/icons";
+import { close, qrCode, documentText, locate } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ButtonsContainer,
@@ -20,7 +21,20 @@ import {
   RestaurantInfo,
   ScanButton,
   ViewMoreButton,
+  InvoiceArea,
+  InvoiceShowAreaButton,
+  SendNotaFiscalButton,
+  RecenterButton
 } from "./map.style";
+
+import { uploadInvoice } from '../../services/invoice-upload-service';
+
+import { 
+  Divider, 
+  AlternativeButton, 
+  AlternativeLabel, 
+  AlternativeSection, 
+} from '../../pages/AffiliateView/AffiliateView.style';
 
 import { CapacitorBarcodeScanner } from "@capacitor/barcode-scanner";
 import { Capacitor } from "@capacitor/core";
@@ -73,6 +87,18 @@ const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
   const [checkinError, setCheckinError] = useState<string | undefined>();
   const [showCheckinError, setShowCheckinError] = useState(false);
 
+  const [showPhotoOptions, setShowPhotoOptions] = useState(false);
+  const [receiptPhotoFile, setReceiptPhotoFile] = useState<File | undefined>(undefined);
+  const [receiptPhotoUrl, setReceiptPhotoUrl] = useState<string | undefined>(undefined);
+  const receiptPhotoFileRef = useRef<HTMLInputElement>(null);
+
+  const [isUploadingInvoice, setIsUploadingInvoice] = useState(false);
+  const [showInvoiceSuccess, setShowInvoiceSuccess] = useState(false);
+  const [showInvoiceError, setShowInvoiceError] = useState(false);
+  const [invoiceMessage, setInvoiceMessage] = useState<string | undefined>(undefined);  
+
+  const [showInvoiceArea, setShowInvoiceArea] = useState(false);
+
   const DEFAULT_LOCATION = { lat: -25.427806, lng: -49.265102 };
 
   const apiKey = () => {
@@ -113,6 +139,8 @@ const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
 
   /* ─── Inicialização do Mapa (nova lógica) ───────────────────────────── */
   useEffect(() => {
+
+  
     const initMap = async () => {
       if (gMap) return;
       if (!mapRef.current || !mapReady) return;
@@ -147,13 +175,21 @@ const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
         },
       });
 
-      await newMap.disableClustering();
+      //await newMap.disableClustering();
       await newMap.enableCurrentLocation(true);
 
       setGMap(newMap);
     };
 
     initMap();
+
+    return () => {
+      if (gMap) {
+        gMap.destroy();
+        setGMap(null);
+      }
+    };
+
   }, [mapReady]);
 
   useIonViewWillEnter(() => {
@@ -323,6 +359,7 @@ const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
       console.error("Erro ao fazer check-in:", e);
     }
   };
+  
 
   const getDistanceAndCheckin = (est: Establishment) => {
     if (!userLoc || !est.addresses.length || !data?.max_checkin_distance_meters)
@@ -339,6 +376,95 @@ const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
 
     return { distance, canCheckin };
   };
+
+  const handleReceiptPhotoChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setReceiptPhotoFile(file);
+    setReceiptPhotoUrl(URL.createObjectURL(file));
+  };
+
+  const clearReceiptPhoto = () => {
+    setReceiptPhotoFile(undefined);
+    setReceiptPhotoUrl(undefined);
+    if (receiptPhotoFileRef.current) {
+      receiptPhotoFileRef.current.value = '';
+    }
+  };
+
+const handleRecenterMap = async () => {
+    if (gMap && userLoc) {
+      await gMap.setCamera({
+        coordinate: userLoc,
+        zoom: 11, // Um zoom mais próximo é melhor para recentralizar
+        animate: true,
+      });
+    }
+  };
+
+  const handleInvoiceUpload = async () => {
+    if (!receiptPhotoFile || !selected?.id) return;
+
+    setIsUploadingInvoice(true);
+    try {
+      const response = await uploadInvoice({
+        establishment_id: Number(selected.id),
+        invoice_file: receiptPhotoFile,
+      });
+      
+      setInvoiceMessage(response.message);
+      setShowInvoiceSuccess(true);
+      
+      clearReceiptPhoto();
+    } catch (error: any) {
+      console.error("Erro ao enviar nota fiscal:", error);
+      
+      if (error.response?.data?.message) {
+        setInvoiceMessage(error.response.data.message);
+      } else {
+        setInvoiceMessage("Erro ao enviar nota fiscal. Tente novamente.");
+      }
+      setShowInvoiceError(true);
+    } finally {
+      setIsUploadingInvoice(false);
+      setShowInvoiceArea(false);
+    }
+  };
+
+  const handleReceiptPhotoClick = () => {
+    setShowPhotoOptions(true);
+  };  
+
+  const handleCameraOption = async () => {
+    setShowPhotoOptions(false);
+    setIsLoadingScan(true);
+    try {
+      const result = await CapacitorBarcodeScanner.scanBarcode({ hint: 0 });
+      if (result.ScanResult) {
+        setReceiptPhotoUrl(result.ScanResult);
+        setScanMessage("Foto capturada com sucesso!");
+        setShowScanSuccess(true);
+      }
+    } catch (error: any) {
+      setScanMessage("Erro ao capturar foto");
+      setShowScanError(true);
+      console.error("Erro ao capturar foto:", error);
+    } finally {
+      setIsLoadingScan(false);
+      setShowInvoiceArea(false);
+    }
+  };
+
+  const handleGalleryOption = () => {
+    setShowPhotoOptions(false);
+    receiptPhotoFileRef.current?.click();
+  };  
+
+    const handleShowInvoice = () => {
+    setShowInvoiceArea(true);
+  };  
+
+  const color = '#E6C178';
 
   /* ─── UI ─────────────────────────────────────────────────────────────── */
   return (
@@ -370,6 +496,27 @@ const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
         message={checkinError}
         buttons={["OK"]}
       />
+      <IonAlert
+        isOpen={showInvoiceSuccess}
+        header="Nota fiscal enviada"
+        message={invoiceMessage}
+        buttons={["OK"]}
+        onDidDismiss={() => {
+          setShowInvoiceSuccess(false);
+        }}
+      />
+      <IonAlert
+        isOpen={showInvoiceError}
+        header="Erro ao enviar nota fiscal"
+        message={invoiceMessage}
+        buttons={["OK"]}
+        onDidDismiss={() => {
+          setShowInvoiceError(false);
+          clearReceiptPhoto();
+        }}
+      />
+  
+  
       <capacitor-google-map
         ref={mapRef}
         id="map"
@@ -381,10 +528,38 @@ const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
         }}
       ></capacitor-google-map>
 
+      <RecenterButton onClick={handleRecenterMap}>
+        <IonIcon icon={locate} />
+      </RecenterButton>
+
+      <IonActionSheet
+        isOpen={showPhotoOptions}
+        header="Escolha uma opção"
+        buttons={[
+          {
+            text: "Tirar foto",
+            icon: "camera",
+            handler: handleCameraOption,
+          },
+          {
+            text: "Escolher da galeria",
+            icon: "images",
+            handler: handleGalleryOption,
+          },
+          {
+            text: "Cancelar",
+            icon: "close",
+            role: "cancel",
+          },
+        ]}
+        onDidDismiss={() => setShowPhotoOptions(false)}
+      />    
+
       <RestaurantCard className={!!selected ? "show" : ""}>
         <CloseButton
           onClick={() => {
             setSelected(undefined);
+            setShowInvoiceArea(false);
           }}
         >
           <IonIcon icon={close} />
@@ -449,10 +624,93 @@ const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
                   <p>Muito longe do local para fazer check-in.</p>
                 )
               ) : null}
-              {selected?.can_has_purchase && (
-                <ScanButton onClick={() => handleScan(selected.id)}>
-                  ESCANEAR NOTA
-                </ScanButton>
+
+
+              <Divider />
+              <AlternativeLabel>
+                Escanear com Qr Code ou Envio de Nota
+              </AlternativeLabel>
+              <ScanButton onClick={ handleShowInvoice }>
+                ESCANEAR NOTA
+              </ScanButton>       
+
+              {selected?.can_has_purchase && showInvoiceArea && (                  
+
+                  <InvoiceArea style={{ width: '100%' }}>
+                      <br/>
+                 
+                    <>                      
+                      <AlternativeSection style={{ flexDirection: 'row', textWrap: 'nowrap', width: '100%'  }}>
+                        <ViewMoreButton 
+                          onClick={() => handleScan(selected.id)} 
+                          style={{ 
+                            width: '50%', 
+                            display: 'flex', 
+                            flexDirection:'row', 
+                            alignItems: 'center', 
+                            justifyContent: 'center',
+                            gap: '0 4px'
+                          }}>
+                            <IonIcon icon={qrCode} slot="start" />
+                            QR CODE
+                        </ViewMoreButton>                           
+                        {/* <AlternativeLabel> OU </AlternativeLabel> */}
+                        <ViewMoreButton 
+                          onClick={handleReceiptPhotoClick} 
+                          style={{ 
+                            width: '50%', 
+                            display: 'flex', 
+                            flexDirection:'row', 
+                            alignItems: 'center', 
+                            justifyContent: 'center' ,
+                            gap: '0 4px'
+                          }}>
+                          {/* <IonIcon icon={documentText} slot="start" /> */}
+                          Enviar recibo
+                        </ViewMoreButton>
+                        
+                        <input
+                          type="file"
+                          ref={receiptPhotoFileRef}
+                          style={{ display: "none" }}
+                          onChange={handleReceiptPhotoChange}
+                          accept="image/*"
+                        />
+                      </AlternativeSection>
+                    </>
+                    <br />
+                    {receiptPhotoUrl && (
+                      <div style={{ marginTop: "12px", textAlign: "center" }}>
+                        <img
+                          src={receiptPhotoUrl}
+                          alt="Foto do recibo"
+                          style={{
+                            maxWidth: "200px",
+                            maxHeight: "200px",
+                            borderRadius: "8px",
+                            border: `2px solid ${color}`,
+                          }}
+                        />
+                        <p style={{ margin: "8px 0 0", fontSize: "12px", color: "#666" }}>
+                          Foto selecionada com sucesso!
+                        </p>
+                        <SendNotaFiscalButton 
+                          bg={color} 
+                          onClick={handleInvoiceUpload}
+                          disabled={isUploadingInvoice}
+                          style={{ 
+                            marginTop: "12px",
+                            opacity: isUploadingInvoice ? 0.6 : 1,
+                            cursor: isUploadingInvoice ? "not-allowed" : "pointer"
+                          }}
+                        >
+                          {isUploadingInvoice ? "Enviando..." : "Enviar Nota Fiscal"}
+                        </SendNotaFiscalButton>
+                      </div>
+                    )}
+                    <br />            
+
+                  </InvoiceArea>             
               )}
             </ButtonsContainer>
           </RestaurantDetails>

@@ -105,6 +105,7 @@ export const AvatarProgressBorder = styled.div<{ $progress: number }>`
   border-radius: 100%;
   aspect-ratio: 1;
   width: 110px;
+  position: relative;
 
   padding: 5px;
   background: ${({ $progress }) =>

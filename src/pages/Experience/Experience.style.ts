@@ -1,63 +1,84 @@
-// src/pages/AffiliateStores/Experience.style.ts
-import styled from "styled-components";
+// src/pages/Experience/Experience.style.ts
+
+import styled from 'styled-components';
+import { IonCard } from '@ionic/react';
 
 export const ScrollArea = styled.div`
-  position: absolute;
-  top: 56px;       /* ajuste se seu AppHeader tiver altura diferente */
-  bottom: 0;
-  left: 0;
-  margin-top: 80px;
-  right: 0;
+  height: 100%;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
 `;
 
 export const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-  padding: 32px 20px 40px 0;
-  background: #ffffff;
+  padding: 16px;
+  background-color: #ffffff;
+`;
+
+export const TabsContainer = styled.div`
+  margin-bottom: 20px;
 `;
 
 export const ListWrapper = styled.div`
+  margin-top: 20px;
+`;
+
+export const StoreCard = styled(IonCard)`
+  --background: #f9f9f9;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 28px;
-`;
-
-export const StoreCard = styled.div`
-  display: flex;
-  width: 100%;
-`;
-
-export const StoreImage = styled.img`
-  width: 110px;
-  height: 110px;
-  object-fit: cover;
 `;
 
 export const StoreInfo = styled.div`
-  flex: 1;
-  padding: 12px 16px;
-  border-top-right-radius: 16px;
-  border-bottom-right-radius: 16px;
-  background: #F2F2F1;
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  gap: 8px; /* Espaçamento entre as linhas */
 `;
 
 export const StoreLine = styled.span`
-  color: #666666;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 1em;
+  color: #666;
+
+  &:first-child {
+    font-weight: bold;
+    font-size: 1.15em;
+    color: #333;
+  }
 `;
 
-export const StoreLineLink = styled.a`
-  color: #666666;
-  font-size: 13px;
-  font-weight: 600;
-  text-decoration: underline;
-  text-decoration-color: rgba(0, 0, 0, 0.3);
+export const RedemptionCodeWrapper = styled.div`
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #e0a075;
+  color: #ffffff;
+  border-radius: 8px;
+  text-align: center;
+
+  span {
+    font-weight: bold;
+    font-size: 1.3em;
+    letter-spacing: 2px;
+  }
+
+  p {
+      margin: 4px 0 0;
+      font-size: 0.8em;
+  }
+`;
+
+export const UsedDate = styled.div`
+    margin-top: 12px;
+    font-size: 0.9em;
+    color: #888;
+    text-align: right;
+    width: 100%;
+`;
+
+export const NoResultsMessage = styled.div`
+  text-align: center;
+  margin-top: 40px;
+  font-size: 1.1em;
+  color: #888;
 `;

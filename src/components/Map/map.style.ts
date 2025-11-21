@@ -16,6 +16,57 @@ export const MapLoader = styled.div`
   justify-content: center;
 `;
 
+export const InvoiceShowAreaButton = styled.button`
+`;
+
+// map.style.ts
+
+// ... (outros imports e estilos)
+
+export const RecenterButton = styled.div`
+  position: absolute;
+  bottom: 14%;
+  right: 4%;
+  z-index: 5;
+  background: white;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 28px;
+    color: #3880ff; /* Cor padrão do Ionic */
+  }
+`;
+
+export const SendNotaFiscalButton = styled.button<{ bg: string }>`
+  display: block;
+  width: 217px;
+  margin: 0 auto;
+  padding: 14px 0;
+  background: ${({ bg }) => bg};
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
+`;
+
+export const InvoiceArea = styled.div`
+`;
+
 /* --------- popup / card ---------- */
 export const RestaurantCard = styled.div`
   position: absolute;
@@ -36,6 +87,7 @@ export const RestaurantCard = styled.div`
   &.show {
     opacity: 1;
     transform: translate(-50%, -50%);
+    z-index: 990;
   }
 `;
 

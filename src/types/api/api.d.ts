@@ -36,6 +36,8 @@ export interface User {
     status: "active" | string;
     user_id: number;
   }[];
+
+  referral_code: string;
 }
 
 export type FlashMessage = {
