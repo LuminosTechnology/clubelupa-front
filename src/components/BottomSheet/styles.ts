@@ -57,6 +57,18 @@ export const CustomCard = styled.div`
     border-radius: 30px 30px 0 0;
   }
 
+  &[data-open='false'] .avatar-progress-border {
+    width: 110px !important;
+    height: 110px !important;
+    img {
+      border-radius: 50%;
+      cover: cover;
+      height: 90%;
+      width: 90%;
+      object-fit: cover;
+    }
+  }
+
   &[data-open='true'] .closed {
     display: none;
   }
@@ -73,11 +85,12 @@ export const CustomCard = styled.div`
   }
 
   &[data-open='true'] .avatar-progress-border {
-    width: 90px !important;
+    width: 100px !important;
+    height: 100px !important;
   }
 
   &[data-open='false'] .main-page-medal-buttons-container {
-  display: none;
+    display: none;
   }
 
   &[data-open='true'] .swipe-indicator-container {
@@ -104,7 +117,8 @@ export const AvatarContainer = styled.div`
 export const AvatarProgressBorder = styled.div<{ $progress: number }>`
   border-radius: 100%;
   aspect-ratio: 1;
-  width: 110px;
+  width: 110px !important;
+  height: 110px !important;
   position: relative;
 
   padding: 5px;
@@ -117,10 +131,11 @@ export const AvatarProgressBorder = styled.div<{ $progress: number }>`
   overflow: hidden;
 
   img {
-    object-fit: cover;
-    width: 100%;
-    height: 100%;
     border-radius: 50%;
+    cover: cover;
+    height: 95%;
+    width: 95%;
+    object-fit: cover;
   }
 `;
 
