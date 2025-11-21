@@ -3,15 +3,18 @@ import { IonContent, IonModal } from "@ionic/react";
 import styled from "styled-components";
 
 export const Container = styled.div`
-  position: relative;
   display: flex;
   flex-direction: column;
+  background-color: transparent;
+  padding-top: 0 !important;
+  margin-top: 6rem;
+  --ion-safe-area-top: 0px; 
+  --ion-safe-area-bottom: 0px;
 `;
 
 export const ListWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 28px;
   padding-bottom: 28px;
 `;
 

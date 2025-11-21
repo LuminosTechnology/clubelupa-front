@@ -7,6 +7,8 @@ import {
   RightSpacer,  
 } from "./header.style";
 
+import useDeviceDetection from "../../hooks/useDeviceDetection";
+
 import { MenuIconWrapper } from "../Header/components/notificationIcon.style";
 
 import { NotificationBadge } from "../Header/components/notificationIcon";
@@ -41,6 +43,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   const history = useHistory();
   const location = useLocation();
   const { isMainMenuNavigation, mainMenuRoutes, setIsMainMenuNavigation } = useNavigationContext();
+  const { isIOSLike } = useDeviceDetection();
 
   // Resetar o estado de navegação do menu principal quando não estivermos em uma rota do menu principal
   useEffect(() => {
@@ -65,7 +68,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 
   return (
     <>
-      <HeaderContainer $bgColor={backgroundColor}>
+      <HeaderContainer $bgColor={backgroundColor} $isIOSLike={isIOSLike}>
         {/* botão voltar */}
         <BackButton src={arrowLeft} alt="Voltar" onClick={handleBack} />
 

@@ -113,7 +113,7 @@ const AffiliateStoresPage: React.FC = () => {
   };
 
   return (
-    <IonPage style={{ "--background": "#ffffff" }}>
+    <IonPage style={{ "--background": "#ffffff", "--margin-top": "0" , "--padding-top": "0" }}>
       <CategoryFilter
         isOpen={isFilterOpen}
         onClose={handleCloseModal}
@@ -130,7 +130,7 @@ const AffiliateStoresPage: React.FC = () => {
       />
       <IonContent
         ref={containerRef}
-        style={{ "--background": "#ffffff" }}
+        style={{ "--background": "#ffffff","--margin-top": "0" , "--padding-top": "0" }}
         fullscreen
       >
         <IonLoading isOpen={loading} message="Carregando afiliados…" style={{ "color": "#9fa369" }} />
@@ -142,7 +142,6 @@ const AffiliateStoresPage: React.FC = () => {
           onDidDismiss={() => setError(undefined)}
         />
         <Container>
-
           <SearchBar
             value={query}
             onChange={setQuery}

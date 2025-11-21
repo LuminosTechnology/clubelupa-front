@@ -1,15 +1,13 @@
 import styled from "styled-components";
 
-export const SearchBarWrapper = styled.div`
+export const SearchBarWrapper = styled.div<{ $isIOSLike?: boolean }>`
   border-radius: 100px;
   background: #f0f0ef;
   border: 1px solid #868950;
   display: flex;
+  margin: 0 1rem 1.5rem 1rem;
   align-items: center;
-  gap: 12px;
-  padding: 0.5rem 1rem;
-  margin: 2rem 1.25rem;
-  margin-right: 2rem;
+  padding: 0.5rem 0.8rem;
 `;
 
 export const SearchIcon = styled.img`
