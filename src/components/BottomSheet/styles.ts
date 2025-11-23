@@ -63,8 +63,8 @@ export const CustomCard = styled.div`
     img {
       border-radius: 50%;
       cover: cover;
-      height: 90%;
-      width: 90%;
+      height: 98%;
+      width: 98%;
       object-fit: cover;
     }
   }
