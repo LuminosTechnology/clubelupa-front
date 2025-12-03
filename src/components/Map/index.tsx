@@ -248,9 +248,11 @@ const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
     
           const offsetLat = baseLat + radius * Math.cos(i * angleStep);
           const offsetLng = baseLng + radius * Math.sin(i * angleStep);
-    
-          const iconUrl =
-            e.categories.find((c) => c.parent_id === null)?.icon_url ||
+  
+          const iconUrl = e.has_highlight
+            ? e.categories.find((c) => c.parent_id === null)?.icon_highlight_url ||
+            "assets/affiliate_pin.png"
+            : e.categories.find((c) => c.parent_id === null)?.icon_url ||
             "assets/affiliate_pin.png";
     
           const markerId = await gMap.addMarker({
