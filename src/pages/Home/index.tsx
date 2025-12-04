@@ -7,7 +7,7 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import Header from "../../components/Header";
-import Map from "../../components/Map";
+import AffiliatesMap from "../../components/Map";
 import { useAuthContext } from "../../contexts/AuthContext";
 import { useSubscriptionAlert } from "../../hooks/useSubscriptionAlert";
 import { HomeBottomSheet } from "./components/home-bottom-sheet";
@@ -106,7 +106,7 @@ const Home: React.FC = () => {
         />
         <IonContent scrollY={false}>
           <Header onSearchChange={setSearchValue} />
-          <Map
+          <AffiliatesMap
             searchValue={searchValue}
             mapReady={mapReady}
             onViewMore={(affiliate) => {
