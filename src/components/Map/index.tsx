@@ -249,16 +249,26 @@ const Map: React.FC<MapProps> = ({ searchValue, mapReady }) => {
           const offsetLat = baseLat + radius * Math.cos(i * angleStep);
           const offsetLng = baseLng + radius * Math.sin(i * angleStep);
   
+
+            if(e.name == "Quintal do Lupa"){
+              const t = 0;
+              
+            }
+
           const iconUrl = e.has_highlight
             ? e.categories.find((c) => c.parent_id === null)?.icon_highlight_url ||
             "assets/affiliate_pin.png"
             : e.categories.find((c) => c.parent_id === null)?.icon_url ||
             "assets/affiliate_pin.png";
     
+
+
+            let iconSize = e.has_highlight ? 100 : 50;
+
           const markerId = await gMap.addMarker({
             coordinate: { lat: offsetLat, lng: offsetLng },
             iconUrl,
-            iconSize: { width: 50, height: 50 },
+            iconSize: { width: iconSize, height: iconSize },
             iconAnchor: { x: 25, y: 50 },
           });
     
