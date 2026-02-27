@@ -112,6 +112,7 @@ const VerifyEmail: React.FC = () => {
           <Button variant="secondary" onClick={onSubmit} disabled={isDisabled}>
             ENVIAR
           </Button>
+          <Text>Não tem acesso ao código ? <a href="mailto:contato@clubelupa.com.br">Entre em contato com o Lupa.</a></Text>
         </ContentWrapper>
       </CustomContent>
     </IonPage>

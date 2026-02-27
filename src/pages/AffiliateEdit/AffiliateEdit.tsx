@@ -342,8 +342,6 @@ const AffiliateEdit: React.FC = () => {
 
     if (TypeValidations.stringIsNullOrEmpty(newData.name)) newErrors.name = "Nome do Local é obrigatório";
 
-    if (TypeValidations.arrayNumberIsNullOrEmpty(newData.attributes)) newErrors.attributes = "É obrigatório conter ao menos um atributo";
-
     if (TypeValidations.stringIsNullOrEmpty(newData.description)) newErrors.description = "Descrição é obrigatório";
 
     if (!newData.shop_photo && TypeValidations.stringIsNullOrEmpty(shopPhotoUrl))
